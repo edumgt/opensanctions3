@@ -22,8 +22,8 @@ echo "⏳ Waiting for database to become healthy..."
 sleep 10
 
 # 3️⃣ Zavod ETL 실행
-echo "⚙️  Running Zavod ETL..."
-docker compose run --rm zavod zavod run datasets/us/ofac/us_ofac_sdn.yml
+# echo "⚙️  Running Zavod ETL..."
+# docker compose run --rm zavod zavod run datasets/us/ofac/us_ofac_sdn.yml
 
 # 4️⃣ Zavod UI 구동
 echo "🌐 Starting Zavod UI..."
