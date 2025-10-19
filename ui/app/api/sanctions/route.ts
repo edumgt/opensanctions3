@@ -1,56 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
-// ✅ Docker 환경에서 Next.js 컨테이너가 DB 컨테이너에 접근할 때는 반드시 "db" 사용
 const pool = new Pool({
-  host: process.env.DB_HOST || "db",
+  host: process.env.DB_HOST || "localhost",
   port: 5432,
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "password",
   database: process.env.DB_NAME || "dev",
 });
 
-// ✅ Sanction 데이터 구조 인터페이스 정의 (ESLint no-explicit-any 해결)
+// ✅ 상세 필드 포함 인터페이스
 interface SanctionRecord {
+  entity_id: string;
   name: string;
+  birth_date?: string;
+  place_of_birth?: string;
+  nationality?: string;
   country?: string;
+  id_number?: string;
+  passport_number?: string;
   authority?: string;
-  start_date?: string;
   source_url?: string;
 }
 
-// ✅ GET /api/sanctions?q=samsung
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim().toLowerCase() || "";
 
-  // 검색어 없으면 빈 배열 반환
-  if (!q) return NextResponse.json<SanctionRecord[]>([]);
+  if (!q) return NextResponse.json([]);
 
   const client = await pool.connect();
   try {
-    // 1️⃣ sanctions_view 가 있으면 우선 사용
-    const query = `
-      SELECT name, country, authority, start_date, source_url
-      FROM sanctions_view
-      WHERE LOWER(name) LIKE $1
-         OR LOWER(authority) LIKE $1
-         OR LOWER(country) LIKE $1
+    const sql = `
+      SELECT
+        e.entity_id,
+        MAX(CASE WHEN s.prop = 'name' THEN s.value END) AS name,
+        MAX(CASE WHEN s.prop = 'birthDate' THEN s.original_value END) AS birth_date,
+        MAX(CASE WHEN s.prop = 'birthPlace' THEN s.value END) AS place_of_birth,
+        MAX(CASE WHEN s.prop = 'nationality' THEN s.value END) AS nationality,
+        MAX(CASE WHEN s.prop = 'country' THEN s.value END) AS country,
+        MAX(CASE WHEN s.prop = 'id' THEN s.value END) AS id_number,
+        MAX(CASE WHEN s.prop = 'passportNumber' THEN s.value END) AS passport_number,
+        MAX(CASE WHEN s.prop = 'authority' THEN s.value END) AS authority,
+        MAX(CASE WHEN s.prop = 'sourceUrl' THEN s.value END) AS source_url
+      FROM statement s
+      JOIN statement e ON e.entity_id = s.entity_id
+      WHERE LOWER(s.value) LIKE $1
+         OR LOWER(e.value) LIKE $1
+      GROUP BY e.entity_id
       ORDER BY name
       LIMIT 50;
     `;
-    const result = await client.query<SanctionRecord>(query, [`%${q}%`]);
 
-    
-
+    const result = await client.query(sql, [`%${q}%`]);
     return NextResponse.json(result.rows);
   } catch (err) {
-    if (err instanceof Error) {
-      console.error("❌ DB Query Error:", err.message);
-      return NextResponse.json({ error: err.message }, { status: 500 });
-    }
-    console.error("❌ Unknown DB Error:", err);
-    return NextResponse.json({ error: "Unknown database error" }, { status: 500 });
+    console.error("❌ Sanction query error:", err);
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
