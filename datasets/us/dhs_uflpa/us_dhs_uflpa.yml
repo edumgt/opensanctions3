@@ -1,0 +1,83 @@
+title: US UFLPA Entity List
+entry_point: crawler.py
+prefix: us-uflpa
+coverage:
+  frequency: daily
+  schedule: "0 */6 * * *"
+  start: 2023-10-11
+load_statements: true
+ci_test: false
+summary: >-
+  The US DHS publishes this list of entities wholly or in part using forced labour
+  in the People's Republic of China, especially from the Xinjiang Uyghur Autonomous
+  Region.
+description: |
+  > The Uyghur Forced Labor Prevention Act (Public Law No. 117-78), also known as 
+  > the UFLPA, directs the Forced Labor Enforcement Task Force to develop a strategy
+  > for supporting enforcement of the prohibition on the importation of goods into the
+  > United States manufactured wholly or in part with forced labor in the People's
+  > Republic of China, especially from the Xinjiang Uyghur Autonomous Region, or Xinjiang.
+  >
+  > The UFLPA was enacted on December 23, 2021, with a June 21, 2022 effective date
+  > for a rebuttable presumption that goods mined, produced, or manufactured wholly or
+  > in part in Xinjiang or by an entity on the UFLPA Entity List are prohibited from
+  > U.S. importation under 19 U.S.C. § 1307.
+
+  \- [DHS](https://www.dhs.gov/uflpa)
+url: https://www.dhs.gov/uflpa-entity-list
+publisher:
+  name: Department of Homeland Security
+  acronym: DHS
+  description: |
+    The Department of Homeland Security is the federal department responsible for public security,
+    including counter terrorism, border security, security of cyberspace and critical infrastructure,
+    and economic security.
+  country: us
+  url: https://www.dhs.gov/
+  official: true
+data:
+  url: "https://www.dhs.gov/uflpa-entity-list"
+  format: HTML
+dates:
+  formats: ["%B %d, %Y"]
+tags:
+  - list.sanction
+  - target.cn
+  - issuer.west
+
+assertions:
+  min:
+    schema_entities:
+      Company: 120
+      Organization: 5
+  max:
+    schema_entities:
+      Company: 280
+      Organization: 50
+
+lookups:
+  sanction.program:
+    options:
+      - match:
+          - "A list of facilities and entities, including the Xinjiang Production and Construction Corps, that source material from Xinjiang or from persons working with the government of Xinjiang or the Xinjiang Production and Construction Corps for purposes of the ‘‘poverty alleviation’’ program or the ‘‘pairing-assistance’’ program or any other government-labor scheme that uses forced labor - Section 2(d)(2)(B)(v)"
+          - "A list of entities working with the government of Xinjiang to recruit, transport, transfer, harbor or receive forced labor or Uyghurs, Kazakhs, Kyrgyz, or members of other persecuted groups out of Xinjiang - Section 2(d)(2)(B)(ii)"
+          - "A list of entities in Xinjiang that mine, produce, or manufacture wholly or in part any goods, wares, articles and merchandise with forced labor - Section 2(d)(2)(B)(i)"
+        value: US-UFLPA
+  names:
+    normalize: true
+    lowercase: true
+    options:
+      - match: Sichuan Yuan’an Pharmaceutical Co. Ltd. (also known as Sichuan Yuanan Pharmaceutical Co. Ltd.)
+        value: Sichuan Yuan’an Pharmaceutical Co., Ltd.
+        aliases:
+          - Sichuan Yuanan Pharmaceutical Co., Ltd.
+  type:
+    options:
+      - contains:
+          - Co.
+          - Group
+          - Corporation
+        entity_schema: Company
+        rel_schema: Ownership
+        subject: owner
+        object: asset

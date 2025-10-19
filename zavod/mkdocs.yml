@@ -1,0 +1,66 @@
+site_name: zavod
+repo_url: https://github.com/opensanctions/opensanctions
+
+theme:
+  name: material
+  logo: https://assets.opensanctions.org/images/ura/logo_white.png
+  favicon: https://assets.opensanctions.org/images/favicon-32x32.png
+  palette:
+    primary: custom
+    accent: custom
+  extra_css: [stylesheets/extra.css]
+
+extra:
+  social:
+    - icon: material/web
+      link: https://www.opensanctions.org/
+    - icon: material/mail
+      link: https://www.opensanctions.org/contact/
+    - icon: material/slack
+      link: https://www.opensanctions.org/slack/
+    - icon: material/github
+      link: https://github.com/opensanctions/opensanctions
+
+plugins:
+  - autorefs
+  # - social
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            show_object_full_path: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - tables
+
+nav:
+  - Overview: index.md
+  - install.md
+  - Tutorial: tutorial.md
+  - Command-line usage: usage.md
+  - metadata.md
+  - context.md
+  - helpers.md
+  - Best practices:
+      - best_practices/caching.md
+      - best_practices/patterns.md
+      - best_practices/datapatch_lookups.md
+      - best_practices/dates_meta.md
+      - best_practices/http_operations.md
+      - best_practices/priorities.md
+      - best_practices/merge_checklist.md
+      - best_practices/xpath_and_html.md
+  - PEPs: peps.md
+  - Enforcements: enforcements.md
+  - Data Reviews: data_reviews.md
+  - Wikidata: wikidata.md

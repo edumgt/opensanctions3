@@ -1,0 +1,205 @@
+title: UK FCDO Sanctions List
+entry_point: crawler.py
+prefix: gb-fcdo
+disabled: false
+coverage:
+  schedule: "0 */2 * * *"
+  frequency: daily
+  start: 2024-05-09
+load_statements: true
+summary: >-
+  UK sanctions collated by the Foreign, Commonwealth & Development Office
+description: |
+  As described by the [FCDO](https://www.gov.uk/government/publications/the-uk-sanctions-list):
+
+  > The UK government publishes the UK Sanctions List, which provides
+  > details of those designated under regulations made under the Sanctions
+  > Act. The list also details which sanctions measures apply to these
+  > persons or ships, and in the case of UK designations, provides a
+  > statement of reasons for the designation.
+url: https://www.gov.uk/government/publications/the-uk-sanctions-list
+publisher:
+  name: Foreign, Commonwealth & Development Office
+  acronym: FCDO
+  description: >
+    The FCDO pursue our national interests and those of British citizens. The FCDO safeguards the UK’s security,
+    defend our values, reduce poverty and tackle global challenges with our international partners.
+    FCDO is a ministerial department, supported by 12 agencies and public bodies.
+  url: https://www.gov.uk/government/organisations/foreign-commonwealth-development-office
+  country: gb
+  official: true
+data:
+  url: https://www.gov.uk/government/publications/the-uk-sanctions-list
+  format: HTML
+  lang: eng
+dates:
+  formats: ["%d/%m/%Y", "dd/mm/%Y", "dd/%m/%Y"]
+tags:
+  - list.sanction
+  - issuer.west
+  - sector.maritime
+
+assertions:
+  min:
+    schema_entities:
+      Person: 3060
+      Organization: 890
+      Vessel: 125
+  max:
+    schema_entities:
+      Person: 7200
+      Organization: 2090
+      Vessel: 800
+
+lookups:
+  sanction.program:
+    options:
+      - match:
+          - "The Afghanistan (Sanctions) (EU Exit) Regulations 2020"
+          - "Isil (Da'esh) and Al-Qaeda (United Nations Sanctions) (EU Exit) Regulations 2019"
+          - "The Republic of Belarus (Sanctions) (EU Exit) Regulations 2019"
+          - "The Bosnia and Herzegovina (Sanctions) (EU Exit) Regulations 2020"
+          - "The Central African Republic (Sanctions) (EU Exit) Regulations 2020"
+          - "The Chemical Weapons (Sanctions) (EU Exit) Regulations 2019"
+          - "The Counter-Terrorism (Sanctions) (EU Exit) Regulations 2019"
+          - "The Counter-Terrorism (International Sanctions) (EU Exit) Regulations 2019"
+          - "The Cyber (Sanctions) (EU Exit) Regulations 2020"
+          - "The Democratic People's Republic of Korea (Sanctions) (EU Exit) Regulations 2019"
+          - "The Global Anti-Corruption Sanctions Regulations 2021"
+          - "The Global Human Rights Sanctions Regulations 2020"
+          - "The Republic of Guinea-Bissau (Sanctions) (EU Exit) Regulations 2019"
+          - "The Guinea (Sanctions) (EU Exit) Regulations 2019"
+          - "The Haiti (Sanctions) Regulations 2022"
+          - "The Iran (Sanctions) (Nuclear) (EU Exit) Regulations 2019"
+          - "The Iran (Sanctions) Regulations 2023"
+          - "The Libya (Sanctions) (EU Exit) Regulations 2020"
+          - "The Mali (Sanctions) (EU Exit) Regulations 2020"
+          - "The Myanmar (Sanctions) Regulations 2021"
+          - "The Russia (Sanctions) (EU Exit) Regulations 2019"
+          - "The Syria (Sanctions) (EU Exit) Regulations 2019"
+          - "The Venezuela (Sanctions) (EU Exit) Regulations 2019"
+          - "The Yemen (Sanctions) (EU Exit) Regulations 2020"
+          - "The Zimbabwe (Sanctions) (EU Exit) Regulations 2019"
+          - "The Sudan (Sanctions) (EU Exit) Regulations 2020"
+          - "The South Sudan (Sanctions) (EU Exit) Regulations 2019"
+          - "The Somalia (Sanctions) (EU Exit) Regulations 2020"
+          - "The Nicaragua (Sanctions) (EU Exit) Regulations 2020"
+          - "The Iraq (Sanctions) (EU Exit) Regulations 2020"
+          - "The Democratic Republic of the Congo (Sanctions) (EU Exit) Regulations 2019"
+          - "The Global Irregular Migration and Trafficking in Persons Sanctions Regulations 2025"
+        value: GB-SAMLA
+  languages:
+    options:
+      - match: Arabic
+        value: ara
+      - match: Chinese
+        value: zho
+      - match: Russian
+        value: rus
+      - match: Belarusian
+        value: bel
+      - match: Bosnian
+        value: bos
+      - match: Korean
+        value: kor
+      - match: Romanian; Moldavian; Moldovan
+        value: ron
+      - match: Persian
+        value: fas
+      - match: Ukrainian
+        value: ukr
+      - match: Greek
+        value: ell
+      - match: Hebrew
+        value: heb
+      - match: Bulgarian
+        value: bul
+      - match: Serbian
+        value: srp
+      - match: Turkish
+        value: tur
+      - match: Burmese
+        value: mya
+      - match: Kazakh
+        value: kaz
+      - match: Georgian
+        value: kat
+      - match: Thai
+        value: tha
+      - match: Polish
+        value: pol
+      - match: Czech
+        value: ces
+      - match: Kirghiz; Kyrgyz
+        value: kir
+  name_type:
+    lowercase: true
+    normalize: true
+    options:
+      - match:
+          - "Primary name"
+          - "Primary name variation"
+        value: name
+      - match: "Alias"
+        value: alias
+  type.country:
+    normalize: true
+    options:
+      - match: Congo (Democratic Republic)
+        value: Democratic Republic of Congo
+        # according to 'marinetraffic.com' the vessel is registered in Guinea: https://www.marinetraffic.com/en/ais/details/ships/shipid:214941/mmsi:632001136/imo:9277735/vessel:LUNAR_TIDE
+        # what was meant by 'Tazmania' is yet to be figured out
+      - match: Tazmania
+        value: null
+  type.email:
+    options:
+      - match:
+          - "Email:"
+          - www.140zavod.by
+          - and
+          - request@mehr
+          - fci.ir
+          - info@etemad
+          - mobin.com
+          - www.surena
+          - gc.com
+          - Unknown
+          - www.mtsbank.ru
+          - indoc@SIBANTHRACITE
+          - GROUP.ru
+          - S@synesis.y
+          - elko.ru
+        value: null
+      - match: www.bloodandhonour.co.uk
+        prop: website
+      - match: "sales@ruspolymet.ru,"
+        value: "sales@ruspolymet.ru"
+      - match: "ruspolymet@ruspolymet.ru,"
+        value: ruspolymet@ruspolymet.ru
+      - match: "info@zrekond.ru,"
+        value: "info@zrekond.ru"
+      - match: "zgen@zrekond.ru,"
+        value: "zgen@zrekond.ru"
+      - match: "gen@zrekond.ru,"
+        value: "gen@zrekond.ru"
+      - match: "info@npo-poisk.ru,"
+        value: "info@npo-poisk.ru"
+      - match: ravabet.eogpc.ir
+        value: ravabet@eogpc.ir
+      - match: http://www.petropars.com/fa/petroparsgroup/pre-شرکت-پتروپارس-ریسورسز-انجینیرینگ-PRE
+        prop: website
+      - match: administrator@nitc.co.ir,
+        value: administrator@nitc.co.ir
+  type.date:
+    options:
+      - match: 00/00/1975
+        value: 1975
+      - match: 15/08/19yy
+        value: null # We don't have a way to represent day-month birthdays
+  type.string:
+    options:
+      - match: P.O. Box 1863 and 2501
+        prop: postOfficeBox
+        value:
+          - 1863
+          - 2501

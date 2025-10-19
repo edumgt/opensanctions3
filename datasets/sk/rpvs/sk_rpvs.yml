@@ -1,0 +1,131 @@
+name: sk_rpvs
+title: Slovakia Public Sector Partners Register (Register partnerov verejného sektora - RPVS)
+prefix: oo
+entry_point: crawler.py
+disabled: false
+coverage:
+  frequency: weekly
+  start: 2023-01-01
+deploy:
+  disk: 20Gi
+  memory: 2Gi
+  # premium: true
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - senzing.json
+resolve: false
+ci_test: false
+summary: >-
+  Data is collected by the Ministry of Justice of the Slovak Republic in the ‘Register
+  partnerov verejného sektora’ (RPVS), and covers entities benefiting from public
+  funding or conducting business with the state, so-called ‘Partners of Public
+  Sector’. The RPVS is an official register that lists individuals and organizations 
+  that receive money or other assets from the state, local governments, or other public 
+  sector bodies — above a certain legal threshold.
+
+  Participation in the RPVS is mandatory for those who meet the legal criteria, but 
+  voluntary for others who wish to disclose their ties to the public sector.
+publisher:
+  name: Ministerstvo spravodlivosti Slovenskej republiky
+  name_en: Ministry of Justice of the Slovak Republic
+  acronym: MSSR
+  url: https://www.justice.gov.sk
+  official: true
+  description: |
+    The Ministry of Justice of the Slovak Republic is the central authority of the Slovak 
+    State Administration for the Courts and Bailiffs.
+    [Source: Wikipedia](https://en.wikipedia.org/wiki/Ministry_of_Justice_(Slovakia))
+url: https://rpvs.gov.sk/rpvs
+data:
+  url: https://rpvs.gov.sk/opendatav2/PartneriVerejnehoSektora?$skip=0
+  format: JSON
+
+lookups:
+  columns:
+    options:
+      - match: Id
+        value: id
+      - match: Meno
+        value: name
+      - match: Priezvisko
+        value: surname
+      - match: DatumNarodenia
+        value: dob
+      - match: TitulPred  # (e.g. academic or professional titles like Mgr., Dr., Ing.)
+        value: title_prefix
+      - match: TitulZa
+        value: title_suffix  # (e.g. PhD., CSc., MBA)
+      - match: ObchodneMeno
+        value: trading_name
+      - match: Ico
+        value: registration_number
+      - match: FormaOsoby
+        value: entity_type
+      - match: PlatnostOd
+        value: valid_from
+      - match: PlatnostDo
+        value: valid_to
+      - match: Adresa
+        value: address
+      - match: Partner
+        value: partner
+      - match: PravnaForma
+        value: legal_form
+      - match: MenoUlice
+        value: street_name
+      - match: OrientacneCislo
+        value: house_number
+      - match: Mesto
+        value: city
+      - match: MestoKod
+        value: city_code
+      - match: Psc
+        value: postal_code
+      - match: JeVerejnyCinitel
+        value: is_public_official
+      - match: KonecniUzivateliaVyhod
+        value: beneficial_owners
+      - match: VerejniFunkcionari
+        value: public_officials
+      - match: StatistickyKod
+        value: economic_classification
+      - match: "@odata.context"
+        value: "@odata.context"
+      - match: SupisneCislo
+        value: reference_number
+      - match: Identifikator
+        value: identifier
+      - match: CisloVlozky
+        value: registry_entry_number
+      - match: Vymaz
+        value: deletion_date
+      - match: Pokuta
+        value: fine
+      - match: OverenieIdentifikacieKUV
+        value: kuv_verification
+      - match: KvalifikovanePodnety
+        value: qualified_reports
+  type.url:
+    options:
+      - regex: /entities/.*
+        value: null
+  type.string:
+    options:
+      - match: 841 04 Bratislava
+        prop: city
+      - match:
+          - 33 Tseuk Luk Street
+          - 9 Northshore Terrace
+        prop: street
+      - match:
+          - the Palm Jumeirah
+          - Hodkovičky, 147 00
+        prop: region
+      # null falsy firstName
+      - match: 10/46
+        prop: null
+  type.name:
+    options:
+      - match: 1115
+        value: null

@@ -1,0 +1,35 @@
+title: OpenSanctions Research Data
+prefix: osre
+disabled: false
+entry_point: crawler.py
+coverage:
+  frequency: daily
+  start: 2023-12-18
+exports:
+  - statistics.json
+load_statements: true
+summary: >
+  Additional findings regarding specific entities that have been gathered by
+  the OpenSanctions team, included as corrections/errata
+description: |
+  This dataset is used to implement corrections where they're needed on top of
+  the source data. It also includes ISINs for specific securities subject to sanctions.
+data:
+  url: https://docs.google.com/spreadsheets/d/e/2PACX-1vTtQD9wiHuyl23NmrIeAACET4OohOXhmuxQv817FHHas8uO4k8VBzex25nIOPqsG9300aXJIqCZzo--/pub?gid=1612308021&single=true&output=csv
+  format: csv
+publisher:
+  name: OpenSanctions
+  description: |
+    This data was curated by OpenSanctions and initially submitted by our users and customers.
+  url: https://www.opensanctions.org
+  official: false
+
+assertions:
+  min:
+    schema_entities:
+      Company: 20
+      Security: 10
+  max:
+    schema_entities:
+      Company: 70
+      Security: 50

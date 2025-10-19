@@ -1,0 +1,11 @@
+
+services:
+  app:
+    build: .
+    image: ghcr.io/opensanctions/opensanctions:latest
+    hostname: work
+    volumes:
+      - "./data:/opensanctions/data"
+      - "./opensanctions:/opensanctions/opensanctions"
+    tmpfs:
+      - "/tmp"

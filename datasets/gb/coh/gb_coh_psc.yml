@@ -1,0 +1,390 @@
+name: gb_coh_psc
+title: Companies House (UK) Persons with Significant Control
+prefix: gb-coh
+disabled: false
+entry_point: psc_parse.py
+coverage:
+  frequency: weekly
+  start: 2023-07-28
+deploy:
+  premium: true
+  cpu: "1000m"
+  cpu_limit: "2000m"
+  memory: 3000Mi
+  memory_limit: "4000Mi"
+  disk: 150Gi
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+  - senzing.json
+resolve: false
+ci_test: false
+summary: >-
+  The database of beneficial owners of companies incorporated in England, Wales,
+  Scotland and Northern Ireland.
+publisher:
+  name: UK Companies House
+  acronym: CoH
+  description: |
+    Companies House is the UK body responsible for managing the incorporation of
+    limited companies, and the maintenance of their records.
+  url: https://www.gov.uk/government/organisations/companies-house
+  country: gb
+  official: true
+data:
+  url: "http://download.companieshouse.gov.uk/en_pscdata.html"
+  format: JSON
+  lang: eng
+
+dates:
+  formats: ["%d/%m/%Y"]
+
+lookups:
+  type.country:
+    lowercase: true
+    options:
+      - match:
+          - Companies House
+          - England & Wales Companies Register
+          - Compaines House
+          - Company Director
+          - CHANNEL ISLANDS
+          - VIRGIN ISLANDS
+          - VIRGIN IS-US
+          - NETHERLANDS ANTILLES
+          - SOUTH-WEST AFRICA
+          - Stateless
+          - Not Specified/Other
+          - Other
+          - N/A
+          - None
+          - Non-Resident
+          - African
+          - Director
+          - British Overseas Territory
+          - Other Country
+        contains:
+          - Register Of Companies
+          - Not Specified
+          - Unknown
+        value: null
+        weight: 1000
+      - contains:
+          - "Germany"
+          - Bavaria
+        match:
+          - Baden-Wuerttenberg
+        value: de
+        weight: 111
+      - match:
+          - Hong Konger
+        value: hk
+      - match: Macanese
+        value: mo
+      - match:
+          - Congolese (Drc)
+          - Congolese (Congo)
+        value: cd
+      - match:
+          - Citizen Of Bosnia And Herzegovina
+        value: ba
+      - match: Vincentian
+        value: vc
+      - match: Citizen Of Seychelles
+        value: sc
+      - match: Citizen Of The Dominican Republic
+        value: do
+      - match: Citizen Of Antigua And Barbuda
+        value: ag
+      - match: Kittitian
+        value: kn
+      - match:
+          - ROI
+          - IRISH REP
+        value: ie
+      - match: GUERNSEY REGISTRY, GUERNSEY
+        value: gg
+      - match: FAROE IS
+        value: fo
+      - match: REPUBLIC OF NIGERIA
+        value: ng
+      - match: ST VINCENT
+        value: vc
+      - match: YEMEN ARAB REPUBLIC
+        value: ye
+      - match: Cymraes
+        value: gb-wls
+      - contains: Scotland
+        value: gb-sct
+        weight: 550
+      - match:
+          - Us Dual
+          - De, Usa
+          - Georgia, United States
+          - Georgia, USA
+          - Usa (Other)
+        contains:
+          - United States Of America
+          - Delaware
+          - California
+          - Pennsylvania
+          - American
+          - New York
+          - Missouri
+          - Tennessee
+          - Minnesota
+          - U.S.A.
+          - Washington
+          - Florida
+          - Texas
+          - Wyoming
+          - Ohio
+          - Nevada
+          - Oregon
+          - Illinois
+          - Arizona
+          - Colorado
+          - Michigan
+          # - Georgia
+          - North Carolina
+          - Virginia
+          - Massachusetts
+          - New Jersey
+          - Indiana
+          - Maryland
+          - Wisconsin
+          - Connecticut
+          - South Carolina
+          - Kentucky
+          - Louisiana
+          - Alabama
+          - Iowa
+          - Kansas
+          - Oklahoma
+          - Utah
+          - Arkansas
+          - Mississippi
+          - Nebraska
+          - New Mexico
+          - Idaho
+          - Maine
+          - West Virginia
+          - New Hampshire
+          - Hawaii
+          - Montana
+          - Rhode Island
+          - Vermont
+          - Alaska
+          - North Dakota
+          - South Dakota
+          # - Delaware
+        value: us
+        weight: 50
+      - contains:
+          - Ireland
+          - Irish
+        value: ie
+        weight: 20
+      - contains:
+          - France
+          - French
+        value: fr
+        weight: 90
+      - contains: Switzerland
+        value: ch
+        weight: 500
+      - contains:
+          - Canada
+          - British Columbia
+        value: ca
+        weight: 120
+      - contains: Luxmebourg
+        value: lu
+      - contains: Jersey
+        value: je
+        weight: 300
+      - contains: Vanuatu
+        value: vu
+        weight: 91
+      - contains: Bulgaria
+        value: bg
+        weight: 92
+      - contains: Thailand
+        value: th
+        weight: 93
+      - contains: Cyprus
+        value: cy
+        weight: 94
+      - contains: "Malta"
+        value: mt
+        weight: 95
+      - contains: "Gibraltar"
+        value: gi
+        weight: 96
+      - contains: Belize
+        value: bz
+        weight: 81
+      - contains: "Israel"
+        value: il
+        weight: 97
+      - contains: "Singapore"
+        value: sg
+        weight: 98
+      - contains: "Australia"
+        value: au
+        weight: 99
+      - contains: "Austria"
+        value: at
+        weight: 107
+      - contains: "New Zealand"
+        value: nz
+        weight: 103
+      - contains: "Spain"
+        value: es
+        weight: 104
+      - contains: "Italy"
+        value: it
+        weight: 105
+      - contains: "India"
+        value: in
+        weight: 10
+      - contains: Czech
+        value: cz
+        weight: 31
+      - contains: Guernsey
+        value: gg
+        weight: 299
+      - match:
+          - Registered In England And Wales
+          - At The Registrar Of Companies, England
+          - Engand
+          - Engalnd And Wales
+          - Uk (England And Wales)
+          - United Kingdom (England & Wales)
+          - England, Uk
+          - Englad
+          - Gb-Eng
+          - E&W
+        contains:
+          - United Kingdom
+          - United Kingdon
+          - Great Britian
+          - Great Britain
+          - England
+          - Wales
+          - Cornish
+          - Northern Ireland
+          - Yorkshire
+        value: gb
+        weight: 21
+      - contains:
+          - United Ararb Emirates
+          - United Arab Emirates
+          - U.A.E
+        value: ae
+        weight: 152
+      - contains:
+          - Liechtenstein
+        value: li
+      - contains:
+          - "Turkey"
+          - Turkish
+        value: tr
+        weight: 230
+      - contains:
+          - "Netherland"
+          - Amsterdam
+        value: nl
+        weight: 110
+      - contains:
+          - Bermuda
+          - Bermudi
+        value: bm
+      - contains:
+          - Russian Federation
+        value: ru
+        weight: 100
+      - contains:
+          - British
+          - Britian
+          - London
+          - Enlgand
+        match:
+          - Englan
+        value: gb
+        weight: -1
+  type.name:
+    options:
+      - match:
+          - 10060158
+          - 06417525
+          - 8397710
+          - 1692
+          - 08815086
+          - 07698418
+          - 00261074
+          - 02580612
+          - 11716280
+          - 00988096
+          - 03686347
+          - "58:12"
+          - 06326644
+          - 06382426
+          - "50:50"
+          - 00853659
+          - 02489142
+          - 3.13
+          - 14356840
+          - 10041069
+          - 12541559
+          - 08946236
+          - ". . ."
+          - 12
+          - 09690124
+          - 01272648
+          - 08784568
+          - 12253002
+          - 06949717
+          - 10189159
+          - 06345440
+          - 15217355
+          - 07239018
+          - 08394165
+          - 14047659
+          - 1
+          - "."
+          - 1975
+          - 26041444
+          - "0 0"
+          - 09252304
+          - 03739406
+          - 06869556
+          - 08732222
+          - 11870669
+          - 00033040
+          - 00501316
+          - ". ."
+          - 888
+          - 00524665
+          - 03405697
+          - 00035448
+          - 09111623
+          - 11142208
+          - 01363485
+          - 1170
+          - 11730937
+          - 02557955
+          - 07266923
+          - 0711
+          - 00508380
+          - 069
+          - 1964
+          - 10006052
+          - 11688656
+          - 040
+          - 1.1.2000
+          - 02960349
+          - 12272895
+          - 2022
+        value: null

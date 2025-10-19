@@ -1,0 +1,178 @@
+title: Ukraine SFMS Blacklist
+entry_point: crawler.py
+prefix: ua-sfms
+coverage:
+  frequency: daily
+  start: 2021-02-12
+load_statements: true
+summary: >
+  Ukraine's financial intelligence unit publishes this list of sanctioned
+  individuals.
+description: |
+  The Ukrainian sanctions list appaears to largely mirror the UN main list, but
+  does not retain a lot of the detail contained in the original list.
+
+  Title on their web site: "An up-to-date list of persons involved in terrorist
+  activities or subject to international sanctions" (Актуальний перелік осіб,
+  пов’язаних з провадженням терористичної діяльності або стосовно яких застосовано
+  міжнародні санкції)
+
+  A PDF version is [available here](https://fiu.gov.ua/assets/userfiles/Terror/BlackListFull.pdf).
+publisher:
+  name: State Finance Monitoring Service
+  acronym: SFMS
+  description: >
+    The State Finance Monitoring Service (SFMS, Державна служба фінансового моніторингу
+    України (Держфінмоніторинг) is a national center for receiving and
+    analyzing reports of suspicious transactions and other information related to money
+    laundering related to predicate offenses and terrorist financing, and to disseminate
+    the results of this analysis.
+  url: https://fiu.gov.ua/
+  country: ua
+  official: true
+url: https://fiu.gov.ua/en/pages/dijalnist/protidija-terorizmu/perelik-teroristiv
+data:
+  # url: https://fiu.gov.ua/assets/userfiles/Terror/zBlackListFull.xml
+  url: https://fiu.gov.ua/assets/userfiles/Terror/BlackListFull.xml
+  format: XML
+ci_test: false
+dates:
+  formats:
+    [
+      "%d %b %Y",
+      "%d %B %Y",
+      "%Y",
+      "%b %Y",
+      "%B %Y",
+      "%d %b. %Y",
+      "%d %b.%Y",
+      "%d.%m.%Y",
+      "%b. %Y",
+      "c. %Y",
+      "%B %d, %Y",
+      "%Y%m%d",
+    ]
+tags:
+  - list.sanction
+
+assertions:
+  min:
+    schema_entities:
+      Person: 580
+      LegalEntity: 160
+  max:
+    schema_entities:
+      Person: 1350
+      LegalEntity: 380
+
+lookups:
+  type.address:
+    lowercase: true
+    options:
+      - match:
+          - Philippines
+          - Qatar
+          - Somalia
+          - Turkey
+        value: null
+      - match: "Branch Office 6: Shop number 237, Shah Zada Market (also known as Sarai Shahzada), Puli Khishti area, Police District 1, Kabul, Afghanistan, Telephone: +93-202-103386, +93-202-101714, 0202-104748, Mobile: +93-797-059059, +93-702-222222, e-mail: helmand_exchange_msp@yahoo.com"
+        value: Shop number 237, Shah Zada Market (also known as Sarai Shahzada), Puli Khishti area, Police District 1, Kabul, Afghanistan
+  type.country:
+    lowercase: true
+    normalize: true
+    options:
+      - match:
+          - Kuwaiti citizenship withdrawn in 2002
+          - Stateless Palestinian
+        value: null
+      - contains: Syrian Arab Republic
+        value: Syria
+      - match: Jordanian of Palestinian origin
+        value: JO
+      - match:
+          - Somali Location
+          - Somalia Alt.
+        value: Somalia
+      - match: Sudanese by birth
+        value: Sudan
+      - match: United States. Also believed to hold Syrian nationality
+        values:
+          - US
+          - SY
+      - match: Possibly Ethiopian
+        value: Ethiopia
+      - match: former Soviet Union
+        value: SUHH
+      - match: United Kingdom of Great Britain and Northern Irela
+        value: GB
+      - match: Baghdad, Iraq
+        value: IQ
+      - match: Sanaa, Yemen
+        value: YE
+      - match: South Sudan number
+        value: SS
+      - match: Alexandria, Egypt
+        value: EG
+      - match: "682" # ISO 3166-1 numeric code for Saudi Arabia
+        value: SA
+      - match: "Unconfirmed (likely Iran)"
+        value: IR
+  type.date:
+    options:
+      - match: 11 November 1960, 11 November 1967, 11 November 1969, 1 January 1969
+        values:
+          - 1960-11-11
+          - 1967-11-11
+          - 1969-11-11
+          - 1969-01-01
+      - match: February 8,1965
+        value: "1965-02-08"
+      - match: 19 December 1980,
+        values:
+          - 1980-12-19
+      - match: 22 Sept. 1978
+        value: "1978-09-22"
+      - match: Approximatelty 1975
+        value: 1975
+      - match: 1979-1982
+        values:
+          - 1979
+          - 1982
+      - match: 1962-1963
+        values:
+          - 1962
+          - 1963
+      - match: 1954-1955
+        values:
+          - 1954
+          - 1955
+      - match: 1966-1967
+        values:
+          - 1966
+          - 1967
+      - match: 1956-1957
+        values:
+          - 1956
+          - 1957
+      - match: 1970-1973
+        values:
+          - 1970
+          - 1973
+      - match: 1960-1962
+        values:
+          - 1960
+          - 1962
+      - match: Aug. and Sep. 1977
+        values:
+          - 1977-08
+          - 1977-09
+      - match: 19810205, 19720101
+        values:
+          - 1981-02-05
+          - 1972-01-01
+      - match:
+          - Kandahar
+          - Logar
+          - (24/06/1402 (Hijri Calendar))
+          - (30-35 years old)
+        value: null

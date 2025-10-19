@@ -1,0 +1,39 @@
+title: Estonia Members of the Riigikogu
+entry_point: crawler.py
+prefix: ee-rii
+coverage:
+  frequency: daily
+  start: "2024-02-08"
+load_statements: true
+ci_test: false
+summary: >-
+  Members of the Riigikogu, Estonia's unicameral parliament
+description: |
+  This dataset comprises information about current members of the Riigikogu,
+  which is the unicameral parliament of Estonia. 
+
+  It is constituted with a total of 101 seats, each member is elected through
+  a national election for a four year term. In addition to approving legislation,
+  the Parliament appoints high officials, including the prime minister, and
+  elects the president.
+tags:
+  - list.pep
+publisher:
+  name: Riigikogu
+  description: Estonia Parliament
+  url: https://www.riigikogu.ee/en/
+  official: true
+  country: "ee"
+url: "https://www.riigikogu.ee/en/parliament-of-estonia/composition/members-riigikogu/"
+data:
+  url: https://www.riigikogu.ee/en/parliament-of-estonia/composition/members-riigikogu/
+  format: HTML
+
+assertions:
+  min:
+    schema_entities:
+      # This is important because we skip entities whose name can't be scraped from the page.
+      Person: 90
+  max:
+    schema_entities:
+      Person: 120

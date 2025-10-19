@@ -1,0 +1,119 @@
+title: Malaysia MOHA Sanctions List
+entry_point: crawler.py
+prefix: mymoha
+coverage:
+  frequency: weekly
+  start: "2023-07-11"
+load_statements: true
+ci_test: false
+summary: >
+  The Malaysian Home Affairs list designates those found to be involved in acts
+  of terrorism.
+description: |
+  > This list is made by the Minister of Home Affairs under the section 66B (1) of
+  > the Anti-Money Laundering, Anti-Terrorism Financing and Proceeds From Illegal
+  > Activities 2001 [Act 613]. Under section 66B (1) of the Act 613,
+  >
+  > Where the Minister of Home Affairs is satisfied on information given to him by
+  > a police officer that:
+  >
+  > (a) an entity has knowingly committed, attempted to commit, participated in
+  > committing or facilitated the commission of, a terrorist act; or
+  > (b) an entity is knowingly acting on behalf of, at the direction of, or in
+  > association with, an entity referred to in paragraph (a),
+  >
+  > the Minister of Home Affairs may, by order published in the Gazette, declare the
+  > entity to be a specified entity.
+publisher:
+  name: Ministry of Home Affairs (Kementerian Dalam Negeri)
+  acronym: MOHA
+  description: |
+    Sanctions in the ministry are managed by the division responsible for
+    Countering Financing of Terrorism.
+  url: https://www.moha.gov.my/utama/index.php/en
+  country: my
+  official: true
+url: https://www.moha.gov.my/utama/index.php/en/component/content/article/350-list-of-ministries-of-home-affairs
+data:
+  url: https://www.moha.gov.my/utama/index.php/en/component/content/article/350-list-of-ministries-of-home-affairs
+  format: PDF
+  lang: msa
+http:
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36" (zavod; opensanctions.org)
+dates:
+  formats: ["%d %B %Y", "%d %b %Y", "%d.%m.%Y"]
+  months:
+    May: Mei
+    February: Februari
+    August: Ogos
+    January: Januari
+tags:
+  - list.sanction
+
+assertions:
+  min:
+    schema_entities:
+      Person: 65
+      Organization: 20
+  max:
+    schema_entities:
+      Person: 200
+      Organization: 50
+
+lookups:
+  columns_person:
+    options:
+      - match: 1
+        value: no
+      - match: 2
+        value: reference_no
+      - match: 3
+        value: name
+      - match: 4
+        value: title
+      - match: 5
+        value: position
+      - match: 6
+        value: birth_date
+      - match: 7
+        value: birth_place
+      - match: 8
+        value: other_name
+      - match: 9
+        value: citizenship
+      - match: 10
+        value: passport_no
+      - match: 11
+        value: id_no
+      - match: 12
+        value: address
+      - match: 13
+        value: date_listed
+  columns_organization:
+    options:
+      - match: 1
+        value: no
+      - match: 2
+        value: reference_no
+      - match: 3
+        value: name
+      - match: 4
+        value: alias
+      - match: 5
+        value: other_name
+      - match: 6
+        value: address
+      - match: 7
+        value: date_listed
+  type.country:
+    options:
+      - match: Filipina (Pemastautin Tetap di Malaysia)
+        value: Philippines
+  type.date:
+    options:
+      - match: 20.2.1976 13.2.1975 15.2.1976 7.1.1977
+        values:
+          - 1976-02-20
+          - 1975-02-13
+          - 1976-02-15
+          - 1977-01-07

@@ -1,0 +1,52 @@
+name: iso9362_bic
+title: Business Identifier Code (BIC) Reference Data
+prefix: bic
+# disabled: true
+entry_point: crawler.py
+coverage:
+  frequency: "monthly"
+  start: 2024-04-04
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+ci_test: false
+load_statements: true
+summary: >-
+  Reference data for SWIFT BIC code, including bank names and addresses
+description: |
+  > BIC is the International Standard ISO 9362:2014. This standard specifies
+  > the elements and structure of a universal identifier code, the business
+  > identifier code (BIC), for financial and non-financial institutions, for
+  > which such an international identifier is required to facilitate 
+  > automated processing of information for financial services.
+
+  This dataset contains the reference data for the Business Identifier Code.
+  In essence, it's a list of every bank in the world (some BIC holders are not
+  banks, some banks don't have BICs).
+
+  Branch information has been excluded from this dataset.
+tags:
+  - sector.banking
+publisher:
+  name: Society for Worldwide Interbank Financial Telecommunication
+  acronym: SWIFT
+  description: |
+    SWIFT is a global member-owned cooperative that provides secure financial
+    messaging services. It is used by more than 11,000 financial institutions
+    and offers comprehensive reference data for the financial industry.
+  url: https://www.swift.com/
+  official: true
+url: https://www.iso9362.org/isobic/overview.html
+data:
+  url: https://www.iso9362.org/bicservice/public/v1/bicdata/_pdf
+  format: PDF
+  lang: eng
+http:
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36
+
+lookups:
+  type.country:
+    options:
+      - match: UT
+        value: null

@@ -1,0 +1,57 @@
+title: US DEA Fugitives
+entry_point: crawler.py
+prefix: us-dea-fugi
+coverage:
+  frequency: daily
+  start: 2024-03-27
+http:
+  retry_methods: [GET, POST]
+load_statements: true
+summary: >
+  Fugitives from the US's Drug Enforcement Administration
+description: |
+  The Drug Enforcement Administration's (DEA) consists of persons alleged to have
+  committed federal violations of laws and regulations related to controlled
+  substances.
+
+  This dataset includes basic demographic information, as well as a summary of
+  what they are accused of.
+publisher:
+  name: Drug Enforcement Administration
+  acronym: DEA
+  description: >
+    The DEA is a U.S. agency tasked with enforcing U.S. controlled substance laws and
+    regulations, and to enable the justice system to take action on those
+    contravening these laws and regulations.
+  url: https://www.dea.gov
+  official: true
+  country: "us"
+tags:
+  - list.wanted
+url: "https://www.dea.gov/fugitives/all"
+data:
+  url: https://www.dea.gov/fugitives/all
+  format: HTML
+ci_test: false
+
+assertions:
+  min:
+    schema_entities:
+      Person: 520
+  max:
+    schema_entities:
+      Person: 1200
+
+lookups:
+  type.name:
+    options:
+      - match:
+          - 42
+          - 27
+          - 888888
+          - "--"
+        value: null
+  type.gender:
+    options:
+      - match: Unknown
+        value: null

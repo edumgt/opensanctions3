@@ -1,0 +1,253 @@
+title: Israel Terrorists Organizations and Unauthorized Associations lists
+entry_point: crawler.py
+prefix: il-nbctf
+coverage:
+  schedule: "0 */6 * * *"
+  frequency: daily
+  start: 2021-10-22
+load_statements: true
+summary: >-
+  Terrorist organizations and individuals as designated by the Israeli government
+description: |
+  > According to the Defense Regulations (Emergency), 1945 and the Prohibition on
+  > Terrorist Financing Law 5765-2004 and Designations on Terrorist Organizations
+  > in accordance with the Prevention of Terrorism Ordinance No 33 5708-1948 and
+  > the Counter Terrorism Law, 2016
+
+  Broadly:
+
+  > The Counter-Terrorism Law, 5776-2016 (hereinafter: the Law) authorizes the
+  > Minister of Defense to designate a group of persons as a Terrorist Organization.
+  > Such a designation may be made following a reasoned request by a Security
+  > Agency (Israel Security Agency, Israel Defense Force, the Mossad, Israel
+  > Police) and the consent of the Attorney General of Israel.
+publisher:
+  name: "National Bureau for Counter Terror Financing"
+  acronym: NBCTF
+  description: |
+    The National Bureau for Counter Terror Financing (NBCTF), at the Ministry of Defense,
+    was established with the aim of unifying and concentrating national efforts to counter
+    financial infrastructure of terrorist organizations, perpetrators and parties involved
+    in Terror Financing.
+  country: il
+  url: https://nbctf.mod.gov.il/en/aboutus/Pages/mandate.aspx
+  official: true
+url: https://nbctf.mod.gov.il/en/Minister%20Sanctions/Designation/Pages/downloads.aspx
+data:
+  url: https://nbctf.mod.gov.il/he/Announcements/Documents/NBCTFIsrael%20-%20Terror%20Organization%20Designation%20List_XL.xlsx
+  format: XLSX
+dates:
+  formats:
+    ["%d/%m/%Y", "%d.%m.%Y", "%Y-%m-%d", "%d %m %Y", "%m %Y", "%d %b. %Y"]
+  months:
+    "03": מרס
+    "05": "May"
+tags:
+  - list.sanction
+
+assertions:
+  min:
+    schema_entities:
+      Person: 375
+      Organization: 345
+      LegalEntity: 30
+      Address: 20
+  max:
+    schema_entities:
+      Person: 885
+      Organization: 800
+      LegalEntity: 140
+      Address: 55
+
+lookups:
+  type.country:
+    lowercase: true
+    normalize: true
+    options:
+      - match:
+          - BENGHAZI
+          - DERNA
+          - בנגאזי
+          - דרנה
+        value: Libya
+      - match: פיליפים / סעודיה
+        values:
+          - Saudi Arabia
+          - Philippines
+      - match: ירדן, כווית
+        values:
+          - Jordan
+          - Kuweit
+      - match:
+          - Ramallah
+          - Khan Younis, Gaza
+          - אזרחות פלסטינית
+          - Gaza
+          - עזה
+        value: PS
+      - match: תוניס
+        value: Tunisia
+      - match: תורכיה ירדן ערב הסעודית
+        values:
+          - Turkey
+          - Jordan
+          - Saudi Arabia
+      - match:
+          - PAKISTAN AND AFGHNISTAN
+          - פקיסטן ואפגניסטן
+        values:
+          - AF
+          - PK
+      - match: עירק/סוריה
+        values:
+          - Iraq
+          - Syria
+      - match: אוזבקיסטן / אפגניסטן
+        values:
+          - Uzbekistan
+          - Afghanistan
+      - match: אלג'יר או רש"פ
+        values:
+          - Algeria
+          - PS
+      - match:
+          - "עיראק ולבנט - דרום מזרח אסיה"
+        values:
+          - Iraq
+      - match:
+          - "עיראק ולבנט - חוראסאן"
+          - IRAQ AND LEVANT-KHORASAN
+        values:
+          - Iraq
+      - match: Saada, Yemen
+        value: Yemen
+  type.date:
+    options:
+      - match:
+          - 24657
+        value: null
+      - match:
+          - לינק להכרזה
+          - בוטל ביום
+          - הכרזה בוטלה
+        value: null
+      - match: 1/1/67
+        value: "1967-01-01"
+      - match: הכרזה בוטלה ביום 29.8.21
+        value: null
+      - match: 16/6/67
+        value: "1967-06-16"
+      - match: 1964-1971
+        values:
+          - 1964
+          - 1971
+      - match: 1965-1969
+        values:
+          - 1965
+          - 1969
+  type.email:
+    options:
+      - match: admin@europalforum org.uk
+        value: admin@europalforum.org.uk
+      - contains: "101193998017268"
+        value: null
+  type.url:
+    options:
+      - match: "טוויטר: @PalesAbroadE"
+        value: https://twitter.com/PalesAbroadE
+      - contains: Samidoun.net
+        values:
+          - http://samidoun.net
+          - http://palestinevaincra.com
+      - match: "טוויטר: @EuroPalForum"
+        value: https://twitter.com/EuroPalForum
+      - match: "טוויטר: Addameer"
+        value: https://twitter.com/Addameer
+  key_operatives:
+    options:
+      - match: "•  Farid Ae Rahman Mohammed Abu Dayer\nID card: 926760927\nDate of birth: 25/01/1983\nTelephone no.: 0905076536228\n•  Mohamed Merouan Ae Raouf Khaledi\nID card: 801289307\nDate of birth: 18/02/1987\nTelephone no.: 0905315044351\n•  Ahmed Dahesh Mahmoud Abu Nada\nID card: 400032637\nDate of birth: 14/06/1994\nTelephone no.: 0905316527351"
+        operatives:
+          - schema: Person
+            name: Farid Ae Rahman Mohammed Abu Dayer
+            idNumber: 926760927
+            birthDate: 1983-01-25
+            phone: 0905076536228
+          - schema: Person
+            name: Mohamed Merouan Ae Raouf Khaledi
+            idNumber: 801289307
+            birthDate: 1987-02-18
+            phone: 0905315044351
+          - schema: Person
+            name: Ahmed Dahesh Mahmoud Abu Nada
+            idNumber: 400032637
+            birthDate: 1994-06-14
+            phone: 0905316527351
+      - match: "Abdul Satar Abdul Manan, Khairullah Barakzai Khudai Nazar"
+        operatives:
+          - name: Abdul Satar Abdul Manan
+          - name: Khairullah Barakzai Khudai Nazar
+      - match: "Hafiz Muhammad Saeed"
+        operatives:
+          - name: Hafiz Muhammad Saeed
+      - match: "Abu Talha"
+        operatives:
+          - name: Abu Talha
+      - match: "עטאף עליאן"
+        operatives:
+          - name: "עטאף עליאן"
+      - match: "בנימין כהנא, דוד אקסלרוד ויקותיאל בן יעקב"
+        operatives:
+          - name: בנימין כהנא
+          - name: דוד אקסלרוד
+          - name: יקותיאל בן יעקב
+      - match: "ברוך מרזל, נועם פדרמן, טירן פולק"
+        operatives:
+          - name: ברוך מרזל
+          - name: נועם פדרמן
+          - name: טירן פולק
+      - match: "פתחי שקאקי - עבד אלעזיז עודה - אסעד תמימי - ג'בר עמאר - אחמד מהנא - מניר שפיק - מעין טאהר"
+        operatives:
+          - name: פתחי שקאקי
+          - name: עבד אלעזיז עודה
+          - name: אסעד תמימי
+          - name: ג'בר עמאר
+          - name: אחמד מהנא
+          - name: מניר שפיק
+          - name: מעין טאהר
+      - match: "ראאד צלאח מחאג'נה - כמאל חסין חטיב - עבד אלרחים תופיק ח'ליל - יוסף עורסאן עואודה - פאדל מחמד וישאחי - חכמת פהים נעאמנה - סלימאן אחמד אגבריה - אוסאמה חסין אלעוקבי - יוסף שאהר אבו ג'אמע ונוספים ולרבות מועצת השורא (מג'לס שורא) וההנהלה הביצועית (אלאדארה אלתנפיד'יה)"
+        operatives:
+          - name: ראאד צלאח מחאג'נה
+          - name: כמאל חסין חטיב
+          - name: עבד אלרחים תופיק ח'ליל
+          - name: יוסף עורסאן עואודה
+          - name: פאדל מחמד וישאחי
+          - name: חכמת פהים נעאמנה
+          - name: סלימאן אחמד אגבריה
+          - name: אוסאמה חסין אלעוקבי
+          - name: יוסף שאהר אבו ג'אמע
+          - name: מועצת השורא (מג'לס שורא)
+          - name: ההנהלה הביצועית (אלאדארה אלתנפיד'יה)
+      - match: 'אמין ע''אזי אבו ראשד "אבו אברהים", שמקום מושבו בבלגיה; מחמד יוסף אל–חג''אזי "אבו אחמד", שמקום מושבו בבלגיה; מחמד מחמוד אחמד עווד/חנון "אבו מצעב", שמקום מושבו באיטליה ; מאזן עוני עיסא כחיל "אבו אסאמה", שמקום מושבו בצרפת; מאג''ד חליל מוסא זיר "אבו עבדאללה" שמקום מושבו בבריטניה; עאדל עבדאללה חסן דרמאן "אבו אלברא", שמקום מושבו באוסטריה;  ראמי צאלח אסמעיל עבדה "אבו צאלח", שמקום מושבו בבריטניה ;זאהר חאלד חסן ביראווי "אבו חאלד", שמקום מושבו בבריטניה; עראפת מאדי מחמוד שכרי "אבו בראא", שמקום מושבו בבריטניה; מחמד כאט''ם רשיד מערוף צואלחה "אבו עבאדה", שמקום מושבו בבריטניה; עצאם יוסף צלאח מצטפא "אבו יוסף", שמקום מושבו בבריטניה;'
+        operatives:
+          - name: אמין ע'אזי אבו ראשד "אבו אברהים"
+            country: Belgium
+          - name: מחמד יוסף אל–חג'אזי "אבו אחמד"
+            country: Belgium
+          - name: מחמד מחמוד אחמד עווד/חנון "אבו מצעב"
+            country: Italy
+          - name: מאזן עוני עיסא כחיל "אבו אסאמה"
+            country: France
+          - name: מאג'ד חליל מוסא זיר "אבו עבדאללה"
+            country: UK
+          - name: עאדל עבדאללה חסן דרמאן "אבו אלברא"
+            country: Austria
+          - name: ראמי צאלח אסמעיל עבדה "אבו צאלח"
+            country: UK
+          - name: זאהר חאלד חסן ביראווי "אבו חאלד"
+            country: UK
+          - name: עראפת מאדי מחמוד שכרי "אבו בראא"
+            country: UK
+          - name: מחמד כאט'ם רשיד מערוף צואלחה "אבו עבאדה"
+            country: UK
+          - name: עצאם יוסף צלאח מצטפא "אבו יוסף"
+            country: UK

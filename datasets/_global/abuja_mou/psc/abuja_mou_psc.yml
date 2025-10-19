@@ -1,0 +1,58 @@
+title: Abuja MoU Port State Control Inspections
+entry_point: crawler.py
+prefix: abuja-mou-psc
+coverage:
+  frequency: weekly
+  start: "2025-07-14"
+# We only enrich from this dataset, we load the statements only from the enricher.
+load_statements: false
+# Long-running and needs the cache, so not workable in CI
+ci_test: false
+summary: >
+  Vessels inspected by member authorities under the Abuja MoU.
+description: |
+  This dataset contains ships inspected by port state control while visiting ports under the jurisdiction
+  of Abuja MoU member authorities. Each record includes, but is not limited to, the ship's
+  identity, flag, and associated company.
+
+  **Note:** We only include the latest 3 years of data from the source.
+publisher:
+  name: Abuja Memorandum of Understanding
+  acronym: Abuja MoU
+  description: |
+    > The Memorandum of Understanding on Port State Control for West and Central African
+    > Region (Abuja MoU) is one of the 9 Regional MoUs and 1 National MoU established pursuant
+    > to IMO Resolution A.682(17) of 1991. Operating under a Cooperative Agreement with IMO,
+    > Abuja MoU was established as an inter-governmental organization comprising the Maritime
+    > Administrations of twenty-two Countries abutting the Atlantic Coast of Africa.
+  url: https://abujamou.org/en/
+  official: true
+  country: "zz"
+tags:
+  - sector.maritime
+url: https://abujamou.org/en/inspection-database/
+data:
+  url: https://abuja.marinet.ru/public.php
+  format: HTML
+  lang: eng
+http:
+  total_retries: 5
+  backoff_factor: 2
+  retry_methods: [POST, GET]
+
+dates:
+  formats: ["%d.%m.%Y"]
+
+assertions:
+  min:
+    schema_entities:
+      Organization: 40
+      Vessel: 1000
+
+lookups:
+  type.identifier:
+    options:
+      - match: 636019170
+        prop: mmsi
+      - match: 91764126
+        value: 9176412

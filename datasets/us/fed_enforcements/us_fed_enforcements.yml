@@ -1,0 +1,93 @@
+title: US Federal Reserve Enforcement Actions
+entry_point: crawler.py
+prefix: us-fed
+coverage:
+  frequency: daily
+  start: 2024-04-10
+deploy:
+  memory: "4500Mi"
+  memory_limit: "5500Mi"
+load_statements: true
+ci_test: false # GPT key not available in CI
+summary: >
+  Enforcement actions against entities and individuals for violations of laws, rules, or regulations
+description: |
+  This dataset comprises information about individuals and entities that have
+  have violated laws, rules, or regulations, unsafe or unsound practices,
+  breaches of fiduciary duty, and violations of final orders.
+
+  From their website:
+
+  > Generally, the Federal Reserve takes formal enforcement actions against the
+  > above entities and individuals for violations of laws, rules, or regulations,
+  > unsafe or unsound practices, breaches of fiduciary duty, and violations of
+  > final orders. Formal enforcement actions include cease and desist orders,
+  > written agreements, prompt corrective action directives, removal and prohibition
+  > orders, and orders assessing civil money penalties.
+tags:
+  - sector.banking
+  - list.enforcement
+publisher:
+  name: Federal Reserve Board
+  acronym: FRB
+  url: https://www.federalreserve.gov/aboutthefed.htm
+  description: >
+    The Federal Reserve works to promote the effective operation of the U.S.
+    economy and, more generally, the public interest.
+  official: true
+  country: "us"
+url: "https://www.federalreserve.gov/supervisionreg/enforcement-actions-about.htm"
+data:
+  url: https://www.federalreserve.gov/supervisionreg/files/enforcementactions.csv
+  format: CSV
+  lang: eng
+
+assertions:
+  min:
+    schema_entities:
+      Company: 1400
+      Person: 990
+  max:
+    schema_entities:
+      Company: 3300
+      Person: 2330
+
+dates:
+  formats: ["%B %d, %Y"]
+
+lookups:
+  individual_name:
+    options:
+      - match: "Carl V. Thomas, Eva June Thomas, Stephen P. Thomas, Mary Beth Thomas, Marguerite Thomas, Charles Tomlinson, Herbert Phillips, Lloyd Phillips, R.L. Phillips, Stanley Phillips, Rhonda Phillips, Scott Ward, Angela Ward, Forrest Buckley, James C. Crowe, Johnny V. Jones, Harper Guinn and Jeff Guinn"
+        values:
+          - Carl V. Thomas
+          - Eva June Thomas
+          - Stephen P. Thomas
+          - Mary Beth Thomas
+          - Marguerite Thomas
+          - Charles Tomlinson
+          - Herbert Phillips
+          - Lloyd Phillips
+          - R.L. Phillips
+          - Stanley Phillips
+          - Rhonda Phillips
+          - Scott Ward
+          - Angela Ward
+          - Forrest Buckley
+          - James C. Crowe
+          - Johnny V. Jones
+          - Harper Guinn
+          - Jeff Guinn
+      - match: "Department of Private Affairs of Sheikh Zayed bin Sultan Al-Nahyan"
+        values:
+          - Sheikh Zayed bin Sultan Al-Nahyan
+      - match: "Members of the Board of Directors of the Abu Dhabi Investment Authority"
+        # cf. https://www.adia.ae/en/pr/2022/pdf/adia-2022_board-of-directors.pdf
+        values:
+          - H.H. Sheikh Tahnoun bin Zayed Al Nahyan
+          - H.H. Sheikh Khaled bin Mohamed bin Zayed Al Nahyan
+          - H.H. Sheikh Mansour bin Zayed Al Nahyan
+          - H.H. Sheikh Hamed bin Zayed Al Nahyan
+          - H.E. Khalil Mohammed Sharif Foulathi
+          - H.E. Jassem Mohamed Bu Ataba Al Zaabi
+          - H.E. Hamad Mohammed Al Hurr Al Suwaidi

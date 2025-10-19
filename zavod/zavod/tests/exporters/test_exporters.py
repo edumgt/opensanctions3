@@ -1,0 +1,310 @@
+from csv import DictReader
+from followthemoney.cli.util import path_entities
+from followthemoney import EntityProxy, ValueEntity, Statement
+from followthemoney.statement import CSV, read_path_statements
+from json import load, loads
+from nomenklatura import Resolver
+from nomenklatura.judgement import Judgement
+from datetime import datetime
+
+from zavod import settings
+from zavod.entity import Entity
+from zavod.integration.dedupe import get_dataset_linker
+from zavod.store import get_store
+from zavod.exporters import export_dataset
+from zavod.archive import clear_data_path, DATASETS
+from zavod.exporters.ftm import FtMExporter
+from zavod.exporters.names import NamesExporter
+from zavod.exporters.simplecsv import SimpleCSVExporter
+from zavod.exporters.statements import StatementsCSVExporter
+from zavod.meta import Dataset, load_dataset_from_path
+from zavod.crawl import crawl_dataset
+from zavod.tests.conftest import DATASET_2_YML, COLLECTION_YML
+from zavod.tests.exporters.util import harnessed_export
+
+
+TIME_SECONDS_FMT = "%Y-%m-%dT%H:%M:%S"
+
+default_exports = {
+    "entities.ftm.json",
+    "names.txt",
+    "senzing.json",
+    "source.csv",
+    "targets.nested.json",
+    "targets.simple.csv",
+}
+
+
+def export(dataset: Dataset) -> None:
+    linker = get_dataset_linker(dataset)
+    store = get_store(dataset, linker)
+    store.sync(clear=True)
+    view = store.view(dataset)
+    export_dataset(dataset, view)
+
+
+def test_export(testdataset1: Dataset):
+    dataset_path = settings.DATA_PATH / DATASETS / testdataset1.name
+    clear_data_path(testdataset1.name)
+
+    crawl_dataset(testdataset1)
+    export(testdataset1)
+
+    # it parses and finds expected number of entities
+    assert (
+        len(list(path_entities(dataset_path / "entities.ftm.json", EntityProxy))) == 12
+    )
+
+    with open(dataset_path / "index.json") as index_file:
+        index = load(index_file)
+        assert index["name"] == testdataset1.name
+        assert index["entity_count"] == 12
+        assert index["target_count"] == 6
+        resources = {r["name"] for r in index["resources"]}
+        for r in default_exports:
+            assert r in resources
+
+    with open(dataset_path / "names.txt") as names_file:
+        names = names_file.readlines()
+        # it contains a couple of expected names
+        assert "Jakob Maria Mierscheid\n" in names
+        assert "Johnny Doe\n" in names
+
+    with open(dataset_path / "resources.json") as resources_file:
+        resources = {r["name"] for r in load(resources_file)["resources"]}
+        for r in default_exports:
+            assert r in resources
+
+    with open(dataset_path / "senzing.json") as senzing_file:
+        entities = [loads(line) for line in senzing_file.readlines()]
+        assert len(entities) == 8
+        for ent in entities:
+            assert ent["RECORD_TYPE"] in {"PERSON", "ORGANIZATION"}
+
+    with open(dataset_path / "statistics.json") as statistics_file:
+        statistics = load(statistics_file)
+        assert statistics["entity_count"] == 12
+        assert statistics["target_count"] == 6
+
+    with open(dataset_path / "targets.nested.json") as targets_nested_file:
+        targets = [loads(r) for r in targets_nested_file.readlines()]
+        assert len(targets) == 6
+        for target in targets:
+            assert target["schema"] in {"Person", "Organization", "Company"}
+
+    with open(dataset_path / "targets.simple.csv") as targets_simple_file:
+        targets = list(DictReader(targets_simple_file))
+        assert len(targets) == 6
+        assert "Oswell E. Spencer" in {t["name"] for t in targets}
+
+
+def test_minimal_export_config(testdataset2: Dataset):
+    """Test export when dataset.exporters is empty list"""
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset2.name
+    clear_data_path(testdataset2.name)
+
+    crawl_dataset(testdataset2)
+    export(testdataset2)
+
+    with open(dataset_path / "index.json") as index_file:
+        index = load(index_file)
+        resources = {r["name"] for r in index["resources"]}
+        for r in default_exports:
+            assert r not in resources
+
+    with open(dataset_path / "resources.json") as resources_file:
+        resources = {r["name"] for r in load(resources_file)["resources"]}
+        for r in default_exports:
+            assert r not in resources
+
+    # make sure the stats are still written:
+    with open(dataset_path / "statistics.json") as statistics_file:
+        statistics = load(statistics_file)
+        assert statistics["entity_count"] == 18
+
+
+def test_custom_export_config(testdataset2_export: Dataset):
+    """Test export when dataset.exporters has custom exports listed"""
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset2_export.name
+    clear_data_path(testdataset2_export.name)
+
+    crawl_dataset(testdataset2_export)
+    export(testdataset2_export)
+
+    with open(dataset_path / "index.json") as index_file:
+        index = load(index_file)
+        resources = {r["name"] for r in index["resources"]}
+        for r in {"names.txt", "securities.csv"}:
+            assert r in resources
+        for r in default_exports - {"names.txt", "securities.csv"}:
+            assert r not in resources
+
+    with open(dataset_path / "resources.json") as resources_file:
+        resources = {r["name"] for r in load(resources_file)["resources"]}
+        for r in {"names.txt", "securities.csv"}:
+            assert r in resources
+        for r in default_exports - {"names.txt", "securities.csv"}:
+            assert r not in resources
+
+
+def test_ftm(testdataset1: Dataset):
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset1.name
+    clear_data_path(testdataset1.name)
+
+    crawl_dataset(testdataset1)
+    harnessed_export(FtMExporter, testdataset1)
+
+    entities = list(path_entities(dataset_path / "entities.ftm.json", ValueEntity))
+    for entity in entities:
+        # Fail if incorrect format
+        assert entity.first_seen is not None
+        datetime.strptime(entity.first_seen, TIME_SECONDS_FMT)
+        assert entity.last_seen is not None
+        datetime.strptime(entity.last_seen, TIME_SECONDS_FMT)
+        assert entity.last_change is not None
+        datetime.strptime(entity.last_change, TIME_SECONDS_FMT)
+        assert entity.datasets == {"testdataset1"}
+
+    john = [e for e in entities if e.id == "osv-john-doe"][0]
+    assert john.get("name") == ["John Doe"]
+
+    fam = [
+        e for e in entities if e.id == "osv-eb0a27f226377001807c04a1ca7de8502cf4d0cb"
+    ][0]
+    assert fam.schema.name == "Family"
+
+
+def test_ftm_referents(testdataset1: Dataset, resolver: Resolver[Entity]):
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset1.name
+    clear_data_path(testdataset1.name)
+
+    identifier = resolver.decide(
+        "osv-john-doe", "osv-johnny-does", Judgement.POSITIVE, user="test"
+    )
+    testdataset1.resolve = True
+    crawl_dataset(testdataset1)
+    harnessed_export(FtMExporter, testdataset1, linker=resolver)
+
+    entities = list(path_entities(dataset_path / "entities.ftm.json", EntityProxy))
+    assert len(entities) == 11
+
+    john = [e for e in entities if e.id == identifier][0]
+    john_dict = john.to_dict()
+    assert len(john_dict["referents"]) == 2
+    assert "osv-johnny-does" in john_dict["referents"]
+    assert "osv-john-doe" in john_dict["referents"]
+    assert str(identifier) not in john_dict["referents"]
+    assert len(john_dict["datasets"]) == 1
+    assert "testdataset1" in john_dict["datasets"]
+
+    # Dedupe against an entity from another dataset.
+    # The entity ID is included as referent but is not included in the export.
+
+    dataset2 = load_dataset_from_path(DATASET_2_YML)
+    assert dataset2 is not None
+    collection = load_dataset_from_path(COLLECTION_YML)
+    assert collection is not None
+    collection_path = settings.DATA_PATH / "datasets" / collection.name
+    crawl_dataset(dataset2)
+    other_dataset_id = "td2-freddie-bloggs"
+    harnessed_export(FtMExporter, collection, linker=resolver)
+    entities = list(path_entities(collection_path / "entities.ftm.json", EntityProxy))
+    assert len(entities) == 29
+
+    resolver.decide("osv-john-doe", other_dataset_id, Judgement.POSITIVE, user="test")
+    clear_data_path(collection.name)
+    harnessed_export(FtMExporter, collection, linker=resolver)
+    entities = list(path_entities(collection_path / "entities.ftm.json", EntityProxy))
+    assert len(entities) == 28  # After deduplication there's one less entity
+    assert [] == [e for e in entities if e.id == other_dataset_id]
+
+    john = [e for e in entities if e.id == identifier][0]
+    john_dict = john.to_dict()
+    assert "osv-johnny-does" in john_dict["referents"]
+    assert "osv-john-doe" in john_dict["referents"]
+    assert other_dataset_id in john_dict["referents"]
+    assert len(john_dict["datasets"]) == 2
+    assert collection.name not in john_dict["datasets"]
+
+
+def test_names(testdataset1: Dataset):
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset1.name
+    clear_data_path(testdataset1.name)
+
+    crawl_dataset(testdataset1)
+    harnessed_export(NamesExporter, testdataset1)
+
+    with open(dataset_path / "names.txt") as names_file:
+        names = names_file.readlines()
+
+    # it contains a couple of expected names
+    assert "Jakob Maria Mierscheid\n" in names
+    assert "Johnny Doe\n" in names
+    assert "Jane Doe\n" in names  # Family member
+    assert len(names) == 14
+
+
+def test_targets_simple(testdataset1: Dataset):
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset1.name
+    clear_data_path(testdataset1.name)
+
+    crawl_dataset(testdataset1)
+    harnessed_export(SimpleCSVExporter, testdataset1)
+
+    with open(dataset_path / "targets.simple.csv") as csv_file:
+        reader = DictReader(csv_file)
+        rows = list(reader)
+
+    john = [r for r in rows if r["id"] == "osv-john-doe"][0]
+    # Some people probably assume column order even though they ideally shouldn't
+    assert list(john.keys()) == [
+        "id",
+        "schema",
+        "name",
+        "aliases",
+        "birth_date",
+        "countries",
+        "addresses",
+        "identifiers",
+        "sanctions",
+        "phones",
+        "emails",
+        "program_ids",
+        "dataset",
+        "first_seen",
+        "last_seen",
+        "last_change",
+    ]
+    assert john == {
+        "id": "osv-john-doe",
+        "schema": "Person",
+        "name": "John Doe",
+        "aliases": "",
+        "birth_date": "1975",
+        "countries": "us",
+        "addresses": "",
+        "identifiers": "",
+        "sanctions": "",
+        "phones": "",
+        "emails": "",
+        "program_ids": "ZZ-TEST1;ZZ-TEST2",
+        "dataset": "OpenSanctions Validation Dataset",  # Dataset title
+        "first_seen": settings.RUN_TIME_ISO,  # Seconds string format
+        "last_seen": settings.RUN_TIME_ISO,
+        "last_change": settings.RUN_TIME_ISO,
+    }
+    # Assert the dates above are in the expected format
+    datetime.strptime(settings.RUN_TIME_ISO, TIME_SECONDS_FMT)
+
+
+def test_statements(testdataset1: Dataset):
+    dataset_path = settings.DATA_PATH / "datasets" / testdataset1.name
+    clear_data_path(testdataset1.name)
+
+    crawl_dataset(testdataset1)
+    harnessed_export(StatementsCSVExporter, testdataset1)
+
+    path = dataset_path / "statements.csv"
+    statements = list(read_path_statements(path, CSV))
+    entities = [s.canonical_id for s in statements if s.prop == Statement.BASE]
+    assert len(entities) == 12

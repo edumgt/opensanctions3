@@ -1,0 +1,139 @@
+title: Every Politician
+entry_point: crawler.py
+prefix: evpo
+disabled: false
+coverage:
+  frequency: never
+  start: "2015-12-05"
+  end: "2019-05-21"
+deploy:
+  memory: "2000Mi"
+  schedule: "@monthly"
+load_statements: true
+summary: >
+  All members of national legislatures in the world, collected from hundreds of
+  government web sites and consolidated via Wikidata.
+description: |
+  The EveryPolitician project ran until 2019 and created a mechanism for consolidating
+  data about members of parliament for 233 different countries and territories. As part
+  of the project, EveryPolitician operated a large fleet of crawlers which read the web
+  sites of parliaments around the world.
+
+  The project was [shut down in June 2019](https://www.mysociety.org/2019/06/26/placing-everypolitician-on-hold/)
+  ceasing updates to this dataset.
+
+  OpenSanctions continues to include members from this dataset which meet our standard
+  criteria of PEP classification: national legislature members are included for 20 years
+  after they held a position if an end date is known, otherwise for 40 years after they
+  entered the position. They are excluded 5 years after their death, or 120 years
+  after their birth.
+
+  Other sources will eventually replace this dataset completely as we continually
+  improve PEP coverage through more current sources.
+publisher:
+  name: UK Citizens Online Democracy
+  acronym: MySociety
+  description: |
+    MySociety is a non-profit group developing online technologies that empower citizens
+    to participate in politics and civic life.
+  url: https://www.mysociety.org/
+  official: false
+tags:
+  - list.pep
+url: http://everypolitician.org
+data:
+  url: https://data.opensanctions.org/contrib/everypolitician/countries.json
+  format: JSON
+ci_test: false
+
+lookups:
+  org_id:
+    # normalize: true
+    lowercase: true
+    # required: true
+    options:
+      - match:
+          - "party/unknown"
+          - "independent"
+          - "independant"
+          - "_IND"
+          - "ind"
+          - "independent_candidate"
+          - "indép."
+          - "independiente"
+          - "independent_members"
+          - "independent_mps"
+          - "none"
+          - "n/a"
+          - "na"
+          - "non_inscrit"
+          - "non-inscrit"
+          - "non-inscrits_divers_droite"
+          - "non-inscrits_divers_gauche"
+          - "non_specificato"
+          - "non-partisan"
+          - "no_agrupado"
+          - "Aucun_bloc"
+          - "partilös"
+          - "out_of_faction"
+          - "s.partido"
+          - "unknown"
+          - "initial-presiding-officer"
+          - "speaker"
+          - "speaker_of_the_house"
+          - "deputy-speaker"
+          - "pres"
+          - "president_of_the_senate"
+          - "autre"
+          - "*"
+          - "-"
+        value: null
+  position_label:
+    normalize: true
+    options:
+      - match: Member of the Congress
+        value: Member of Congress
+      - match: Member of the Parliament
+        value: Member of Parliament
+      - match: Member of the Dail Eireann
+        value: Member of Dáil Éireann
+  type.url:
+    options:
+      - contains:
+          - het-politiek-college
+          - Olimpia Teligioridou (facebook)
+          - koutsoukosgiannis.gr
+          - gunhild.wallin
+        value: null
+  type.email:
+    options:
+      - match:
+          - ministersecrcasapng.gov.pg
+          - "-"
+          - "j"
+          - No tiene
+          - com
+          - janak.ram@sansad
+        value: null
+      - match: giovani.bushishi@parliament@gov.rw
+        value: giovani.bushishi@parliament.gov.rw
+      - match: knaru@morobe.gov.pg or knarumpg@gmail.com
+        values:
+          - knaru@morobe.gov.pg
+          - knarumpg@gmail.com
+      - match: la.khan7860@yahoo
+        value: la.khan7860@yahoo.com
+      - match: Victoria.Oliver@deputies.gov.ggvictoria1.oliver@icloud.com
+        values:
+          - Victoria.Oliver@deputies.gov.gg
+          - victoria1.oliver@icloud.com
+      - match: marycamachotorres@gmail.commarycamachotorres@gmail.com
+        value: marycamachotorres@gmail.com
+      - match: barnabeloundou@assnatcm
+        value: barnabeloundou@assnat.cm
+      - match: aliyoum@assnatcm
+        value: aliyoum@assnat.cm
+      - match: Email:Councillor.Ellick@helanta.co.sh
+        value: Councillor.Ellick@helanta.co.sh
+      - match: (i)joice.george@sansad.nic.in
+        value: joice.george@sansad.nic.in

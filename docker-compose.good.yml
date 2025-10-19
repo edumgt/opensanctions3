@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: opensanctions-db
+    environment:
+      POSTGRES_DB: dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data   # ✅ 로컬에 DB 저장
+
+  zavod:
+    image: ghcr.io/opensanctions/opensanctions:latest
+    container_name: opensanctions-etl
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env              # ✅ .env 파일을 자동 로드
+    environment:
+      ZAVOD_DATABASE_URI: postgresql://postgres:password@db:5432/dev
+    command: >
+      bash -c "
+        echo '🚀 Running Zavod pipeline...' &&
+        zavod crawl datasets/ae/local_terrorists/ae_local_terrorists.yml &&
+        zavod export datasets/ae/local_terrorists/ae_local_terrorists.yml &&
+        zavod load-db datasets/ae/local_terrorists/ae_local_terrorists.yml &&
+        echo '✅ Done. Data written to Postgres.'
+      "
+    volumes:
+      - ./datasets:/opensanctions/datasets
+      - ./data:/opensanctions/data
+      - ./zavod:/opensanctions/zavod
+
+  web:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: zavod-ui
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      ZAVOD_DATABASE_URI: postgresql://postgres:password@db:5432/dev
+      ZAVOD_ALLOW_UNAUTHENTICATED: "true"
+      LANG: en_US.UTF-8
+      TZ: UTC
+    working_dir: /app
+    command: npm run start

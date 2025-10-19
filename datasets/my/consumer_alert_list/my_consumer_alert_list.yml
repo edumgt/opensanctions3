@@ -1,0 +1,60 @@
+title: Malaysia Financial Consumer Alert List
+entry_point: crawler.py
+prefix: my-ale
+coverage:
+  frequency: daily
+  start: 2024-04-23
+load_statements: true
+summary: >
+  Entities who have been wrongly represented as being licensed by the Central Bank of Malaysia.
+description: |
+  From the Bank Negara Malaysia website:
+
+  > The Financial Consumer Alert List (FCA List) is a guide to enhance the
+  > awareness on entities or schemes which may have been wrongly perceived
+  > or represented as being licensed or regulated by Bank Negara Malaysia (BNM).  
+  >
+  > The FCA List is updated based on information received by BNM from members of
+  > the public, after conducting necessary assessments on the reported entities
+  > and schemes. Consumers may refer to the FCA List as one of several ways to
+  > check if an entity or a scheme has been identified as one that has not been
+  > authorised by BNM to offer financial products or services that are regulated
+  > by BNM.
+  >
+  > The absence or subsequent removal of an entity or a scheme from the FCA List
+  > however should not be construed as confirmation that such entity or scheme is
+  > or has been licensed or regulated by BNM. As with any financial investment,
+  > consumers are advised to exercise due care when investing in any entity or
+  > financial scheme.
+publisher:
+  name: Bank Negara Malaysia
+  acronym: BNM
+  description: Central Bank of Malaysia
+  url: https://www.bnm.gov.my
+  official: true
+  country: "my"
+url: "https://www.bnm.gov.my/financial-consumer-alert-list"
+data:
+  url: https://www.bnm.gov.my/financial-consumer-alert-list
+  format: HTML
+  lang: eng
+ci_test: false
+
+dates:
+  formats: ["%Y/%m/00%d"]
+lookups:
+  type.name:
+    lowercase: true
+    normalize: true
+    options:
+      - match: "OctaFX Collecting agents of OctaFX as per following: i. Gavann Entertainment Sdn. Bhd. (1486933P) ii. Pro Niaga Consultation (SA0385991W) iii. Dass City Holdings Sdn. Bhd. (1486888W) iv. Mus Tech Trading Sdn. Bhd. (1472611D) v. Al Mierul International Sdn. Bhd. (1487076A) vi. Wan Energy Solution (M) Sdn. Bhd. (1486752D) vii. Taqara Solutions Sdn. Bhd. (1486752D)"
+        values:
+          - OctaFX
+
+assertions:
+  min:
+    schema_entities:
+      LegalEntity: 490
+  max:
+    schema_entities:
+      LegalEntity: 600

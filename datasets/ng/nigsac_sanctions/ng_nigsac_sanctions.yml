@@ -1,0 +1,97 @@
+title: Nigeria Sanctions List
+entry_point: crawler.py
+prefix: nigsac
+coverage:
+  frequency: daily
+  start: 2023-07-14
+load_statements: true
+summary: >
+  Nigeria enforces the UN Security Council list but also has an independent
+  list of designations.
+description: |
+  > On 12th May, 2022, President Muhammadu Buhari passed the Terrorism (Prevention
+  > and Prohibition) Act, 2022 (TPPA) into law and on the same day, the Attorney-General
+  > of the Federation issued a Regulation for the Implementation of Targeted
+  > Financial Sanctions Related to Terrorism, Terrorism Financing and Other Related
+  > Matters, 2022. The law gave Nigeria a legal framework for the implementation of
+  > United Nations Security Council Resolutions (UNSCRs) related to counter-financing
+  > of terrorism and counter-proliferation financing as well as in line with the
+  > Financial Action Task Force (FATF) Recommendations. The TPPA incorporated the
+  > Nigeria Sanctions Committee (NSC) which was earlier established by the Terrorism
+  > Prevention (Freezing of International Terrorist Funds and Other Related Measures)
+  > Regulations, 2013 (TPR). The TPPA also expanded the functions of the NSC by
+  > identifying it as the body responsible for the implementation of UNSCRs related
+  > to proliferation financing.
+
+  For specific regulatory requirements, [see here](https://apps.nfiu.gov.ng/nigsac/NiraReports).
+publisher:
+  name: Nigeria Sanctions Committe
+  acronym: NigSac
+  description: |
+    The Nigeria Sanctions Committee (“NSC”) is Chaired by the Honourable Attorney-General
+    of the Federation and Minister of Justice and is empowered to make all necessary,
+    regulations, guidelines, procedures and rules for the implementation of the UNSCRs
+    in Nigeria. The scope of these rules and guideline apply to all individuals and entities
+    in Nigeria.
+
+    The NSC by virtue of Section 10 of the TPPA 2022 is empowered to enforce the
+    implementation of all the UNSCRs contained in Schedule 1 of the Terrorism (Prevention
+    and Prohibition) Act 2022.
+  url: https://nigsac.gov.ng/AboutUs
+  country: ng
+  official: true
+tags:
+  - list.sanction
+url: https://nigsac.gov.ng/IndSancList
+data:
+  url: https://nigsac.gov.ng/IndSancList
+  format: HTML
+dates:
+  formats: ["%m/%d/%Y %H:%M:%S %p"]
+
+assertions:
+  min:
+    schema_entities:
+      Person: 21
+      LegalEntity: 9
+    country_entities:
+      ng: 12
+  max:
+    schema_entities:
+      Person: 50
+      LegalEntity: 20
+lookups:
+  entities_as_individuals:
+    options:
+      - match: YAN BINDIGA GROUP NLBDG
+        props:
+          entity-name: Yan Bindiga Group
+          country: Nigeria
+      - match: YAN TAÁDDA GROUP
+        props:
+          entity-name: Yan Taadda Group
+          country: Nigeria
+      - match: INDIGENOUS PEOPLE OF BIAFRA (IPOB)
+        props:
+          entity-name: Indigenous People of Biafra
+          aliases: IPOB
+          country: Nigeria
+      - match: ISLAMIC STATE OF WEST AFRICA PROVINCE (ISWAP)
+        props:
+          entity-name: THE ISAMALIC STATE OF WEST AFRICA PROVINCE
+          aliases: ISWAP
+          country: Nigeria
+      - match: ANSARUL MUSLIMINA FI BILADIS SUDAN (ANSARU)
+        props:
+          entity-name: Ansarul Muslimina Fi Biladis Sudan
+          aliases: ANSARU
+          country: Nigeria
+      - match: JAMA'ATU AHLIS SUNNA LIDDA'AWATI WAL-JIHAD
+        props:
+          entity-name: Boko Haram
+          aliases: JAMA'ATU AHLIS SUNNA LIDDA'AWATI WAL-JIHAD
+          country: Nigeria
+  type.date:
+    options:
+      - match: 0001-01-01T12:00:00
+        format: null

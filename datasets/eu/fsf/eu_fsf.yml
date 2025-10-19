@@ -1,0 +1,356 @@
+title: "EU Financial Sanctions Files (FSF)"
+entry_point: crawler.py
+prefix: eu-fsf
+coverage:
+  schedule: "0 */2 * * *"
+  frequency: daily
+  start: 2021-01-24
+deploy:
+  memory: "1000Mi"
+  memory_limit: "1500Mi"
+load_statements: true
+summary: >
+  As part of the Common Foreign Security Policy the European Union publishes
+  a sanctions list that is implemented by all member states.
+description: |
+  The combined sanctions list for the European Union, which is also the sanctions list
+  used by most of the member states in place of publishing their own. Some countries, like
+  France, do publish additional sanctions data with additional legal implications.
+
+  Description from the web site:
+
+  > The correct application of financial sanctions is crucial in order to meet the
+  > objectives of the Common Foreign and Security Policy and especially to help prevent
+  > the financing of terrorism. The application of financial sanctions constitutes an
+  > obligation for both the public and private sector. In this regard, the EU assigns
+  > particular responsibility to credit and financial institutions, since they are
+  > involved in the bulk of financial transfers and transactions affected by the relevant
+  > Regulations.
+  >
+  > In order to facilitate the application of financial sanctions, the European
+  > Banking Federation, the European Savings Banks Group, the European Association of
+  > Co-operative Banks and the European Association of Public Banks ("the EU Credit Sector
+  > Federations") and the Commission recognised the need for an EU consolidated list
+  > of persons, groups and entities subject to CFSP related financial sanctions. It was
+  > therefore agreed that the Credit Sector Federations would set up a database
+  > containing the consolidated list for the Commission, which would host and maintain
+  > the database and keep it up-to-date. This database was developed first and foremost
+  > to assist the members of the EU Credit Sector Federations in their compliance with
+  > financial sanctions.
+  >
+  > **Disclaimer:** While every effort is made to ensure that the database and the
+  > consolidated list correctly reproduce all relevant data of the officially adopted
+  > texts published in the Official Journal of the European Union, neither the Commission
+  > nor the EU credit sector federations accepts any liability for possible omissions
+  > of relevant data or mistakes, and for any use made of the database or of the
+  > consolidated list. Only the information published in the Official Journal of the EU
+  > is deemed authentic.
+
+  The data is published in a password-protected area but the generated download links
+  can be used to programmatically update the material.
+
+  This dataset covers, amongst others, the following EU policy mechanisms:
+
+  - Council Regulation (EC) No 2580/2001 imposing sanctions based on Council Common Position 2001/931/CFSP
+  - Council regulation (EU) 2016/1686 imposing sanctions based on Council Decision (CFSP) 2016/1693
+tags:
+  - list.sanction
+  - juris.eu
+  - issuer.west
+  - sector.maritime
+publisher:
+  name: Directorate‑General for Financial Stability, Financial Services and Capital Markets Union
+  acronym: DG FISMA
+  description: |
+    The Directorate‑General for Financial Stability, Financial Services and Capital Markets
+    Union is the Commission department responsible for EU policy on financial services.
+  country: eu
+  url: https://commission.europa.eu/about-european-commission/departments-and-executive-agencies/financial-stability-financial-services-and-capital-markets-union_en
+  official: true
+url: https://www.eeas.europa.eu/eeas/european-union-sanctions_en#10710
+data:
+  url: https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw
+  format: XML
+
+assertions:
+  min:
+    schema_entities:
+      Person: 3400
+      Address: 1250
+      Organization: 970
+      Vessel: 1
+  max:
+    schema_entities:
+      Person: 8000
+      Address: 2900
+      Organization: 2300
+      Vessel: 50
+
+lookups:
+  sanction.program:
+    # in accordance with https://sanctionsmap.eu/#/main?search=%7B%22value%22:%22%22,%22searchType%22:%7B%7D%7D
+    options:
+      # Afghanistan
+      - match: AFG
+        value: EU-AFG
+      # Belarus
+      - match: BLR # implementing Article 8a of Regulation (EC) No 765/2006 concerning restrictive measures in view of the situation in Belarus
+        value: EU-BLR
+      # Bosnia & Herzegovina
+      - match:
+        value: EU-BOSNIA
+      # Burundi
+      - match: BDI # implementing Regulation (EU) 2015/1755 concerning restrictive measures in view of the situation in Burundi
+        value: EU-BDI
+      # Central African Republic
+      - match: CAF # implementing Article 17(3) of Regulation (EU) No 224/2014 concerning restrictive measures in view of the situation in the Central African Republic
+        value: EU-CAF
+      # Chemical weapons
+      - match: CHEM # implementing Regulation (EU) 2018/1542 concerning restrictive measures against the proliferation and use of chemical weapons
+        value: EU-CHEM
+      # Cyber-attacks
+      - match: CYB
+        value: EU-CYB
+      # Democratic People's Republic of Korea (DPRK – North Korea)
+      - match: PRK
+        value: EU-PRK
+      # Democratic Republic of the Congo
+      - match: COD # implementing Article 9(5) of Regulation (EC) No 1183/2005 imposing certain specific restrictive measures directed against persons acting in violation of the arms embargo with regard to the Democratic Republic of the Congo
+        value: EU-COD
+      # Guatemala
+      - match: GTM # implementing Regulation (EU) 2024/287 concerning restrictive measures in view of the situation in Guatemala
+        value: EU-GTM
+      # Guinea
+      - match: GIN # implementing Regulation (EU) No 1284/2009 imposing certain specific restrictive measures in respect of the Republic of Guinea
+        value: EU-GIN
+      # Guinea-Bissau
+      - match: GNB # mplementing Article 11(1) of Regulation (EU) No 377/2012 concerning restrictive measures directed against certain persons, entities and bodies threatening the peace, security or stability of the Republic of Guinea-Bissau
+        value: EU-GNB
+      # Haiti
+      - match: HTI # implementing Regulation (EU) 2022/2309 concerning restrictive measures in view of the situation in Haiti
+        value: EU-HTI
+      # Human rights
+      - match: HR
+        value: EU-HR
+      # Iran
+      - match:
+          IRN # implementing Regulation (EU) No 267/2012 concerning restrictive measures against Iran
+          # implementing Regulation (EU) 2023/1529 concerning restrictive measures in view of Iran’s military support to Russia’s war of aggression against Ukraine and to armed groups and entities in the Middle East and the Red Sea region
+        value: EU-IRN
+      # Iraq
+      - match: IRQ
+        value: EU-IRQ
+      # Lebanon
+      - match:
+        value: EU-LEBANON
+      # Libya
+      - match: LBY # implementing Article 21(5) of Regulation (EU) 2016/44 concerning restrictive measures in view of the situation in Libya
+        value: EU-LBY
+      # Mali
+      - match: MLI # implementing Article 12(2) of Regulation (EU) 2017/1770 concerning restrictive measures in view of the situation in Mali
+        value: EU-MLI
+      # Moldova
+      - match: MDA # implementing Regulation (EU) 2023/888 concerning restrictive measures in view of actions destabilising the Republic of Moldova
+        value: EU-MDA
+      # Myanmar (Burma)
+      - match: MMR # implementing Regulation (EU) No 401/2013 concerning restrictive measures in respect of Myanmar/Burma
+        value: EU-MMR
+      # Nicaragua
+      - match: NIC # implementing Regulation (EU) 2019/1716 concerning restrictive measures in view of the situation in Nicaragua
+        value: EU-NIC
+      # Niger
+      - match:
+        value: EU-NIGER
+      # Russia
+      - match: RUS # implementing Regulation (EU) 2024/1485 concerning restrictive measures in view of the situation in Russia
+        value: EU-RUS
+      - match: RUSDA
+        value: EU-RUSDA
+      # Somalia
+      - match: SOM
+        value: EU-SOM
+      # South Sudan
+      - match: SSD #  Article 20(3) of Regulation (EU) 2015/735 concerning restrictive measures in respect of the situation in South Sudan
+        value: EU-SSD
+      # Sudan
+      - match: SDN # implementing Article 15(3) of Regulation (EU) No 747/2014 concerning restrictive measures in view of the situation in Sudan
+        value: EU-SDN
+      - match: SDNZ # implementing Regulation (EU) 2023/2147 concerning restrictive measures in view of activities undermining the stability and political transition of Sudan
+        value: EU-SDNZ
+      # Syria
+      - match: SYR # Council Regulation concerning restrictive measures in view of the situation in Syria and repealing Regulation (EU) No 442/2011
+        value: EU-SYR
+      # Terrorism
+      - match: TERR
+        value: EU-TERR # implementing Article 2(3) of Regulation (EC) No 2580/2001 on specific restrictive measures directed against certain persons and entities with a view to combating terrorism
+      - match:
+          - TAQA
+          - EUAQ
+        value: EU-TAQA-EUAQ # Council Regulation (EC) No 881/2002 imposing certain specific restrictive measures directed against certain persons and entities associated with the Al Qaida network
+      - match: HAM
+        value: EU-HAM # COUNCIL REGULATION (EU) 2024/386 of 19 January 2024 establishing restrictive measures against those who support, facilitate or enable violent actions by Hamas and the Palestinian Islamic Jihad
+      # Tunisia
+      - match: TUN # implementing Regulation (EU) No 101/2011 concerning restrictive measures directed against certain persons, entities and bodies in view of the situation in Tunisia
+        value: EU-TUN
+      # Türkiye
+      - match: TUR # implementing Regulation (EU) 2019/1890 concerning restrictive measures in view of Turkey’s unauthorised drilling activities in the Eastern Mediterranean
+        value: EU-TUR
+      # Ukraine
+      - match: UKR
+        value: EU-UKR
+      # United States
+      - match:
+        value: EU-US-LEG
+      # Venezuela
+      - match: VEN # implementing Regulation (EU) 2017/2063 concerning restrictive measures in view of the situation in Venezuela
+        value: EU-VEN
+      # According to DG FISMA, this is an initial value used until an EU act is adopted corrsponding to the UN program
+      - match: UNLI
+        value: EU-UNLI
+      # Yemen
+      - match: YEM
+        value: EU-YEM
+      # Zimbabwe
+      - match: ZWE
+        value: EU-ZWE
+
+  subject_type:
+    options:
+      - match: person
+        value: Person
+      - match: enterprise
+        value: Organization
+  schema_override:
+    options:
+      - match:
+          - eu-fsf-eu-9442-82 # Unica
+          - eu-fsf-eu-9443-81 # New Konk
+        value: Vessel
+      - match:
+          - eu-fsf-eu-12692-74
+        value: Organization
+  contact_info:
+    options:
+      - match: PHONE
+        prop: phone
+      - match: FAX
+        prop: phone
+      - match: EMAIL
+        prop: email
+      - match: WEB
+        prop: website
+      - match: EMAILjur@skb-turbina.comPHONE+7 (351) 7751037WEBhttps://www.skb-turbina.com/
+        prop: null
+  identification_type:
+    options:
+      - match:
+          - id
+          - other
+          - tradelic
+          - ssn
+          - birthcert
+          - nationcert
+          - travelcardid
+          - electionid
+          - residentperm
+          - drivinglicence
+          - NRN
+          # United Nations Social Security Number
+          - unssn
+        schema: Identification
+      - match: passport
+        schema: Passport
+      - match: swiftbic
+        prop: swiftBic
+      - match: imo
+        prop: imoNumber
+      - match: regnumber
+        prop: registrationNumber
+      - match:
+          - fiscalcode
+          - taxid
+        prop: taxNumber
+      - match: euvat
+        prop: vatCode
+  type.name:
+    options:
+      - match: "-"
+        value: null
+  type.address:
+    lowercase: true
+    options:
+      - match: Moscow
+        value: Moscow
+      - match: "-"
+        value: null
+  type.email:
+    options:
+      - match:
+          - pac@silibank. com and kndic@co.chesin.com
+          - pac@silibank.com and kndic@co.chesin.com
+        values:
+          - pac@silibank.com
+          - kndic@co.chesin.com
+      - match: sjc117@ hotmail.com
+        value: sjc117@hotmail.com
+      - match: ryonha@ silibank.com
+        value: ryonha@silibank.com
+      - match: helmand_exchange_msp@ yahoo.com
+        value: helmand_exchange_msp@yahoo.com
+      - match: info@hamshointl.com and hamshogroup@yahoo.com
+        values:
+          - info@hamshointl.com
+          - hamshogroup@yahoo.com
+      - match: spccom2@scs‐net.org or spccom1@scsnet.org
+        values:
+          - spccom2@scs‐net.org
+          - spccom1@scsnet.org
+      - match: info@metallic-sy.com / shaamco@mail.sy
+        values:
+          - info@metallic-sy.com
+          - shaamco@mail.sy
+      - match: and millim@ silibank.com
+        value: millim@silibank.com
+      - match: sophia@guang xing.com
+        value: sophia@guangxing.com
+      - contains: hotelminsk@udp.gov.by
+        values:
+          - hotelminsk@udp.gov.by
+          - marketing@hotelminsk.by
+      - contains: v.myshevskaya@rostvert.ru
+        values:
+          - v.myshevskaya@rostvert.ru
+          - g.bunyaeva@rostvert.ru
+      - match: "kbisl 11olqa@m ail.ru"
+        value: "kbisl11olqa@mail.ru"
+      - match:
+          - "cannon49(a)mail"
+          - "ru"
+          - "all offices worldwide"
+        value: null
+      - match: "alarm@pzsignal. ru"
+        value: alarm@pzsignal.ru
+      - match: "info@chersones os-sev.ru"
+        value: "info@chersonesos-sev.ru"
+      - match: "https://moscow.rtrs.ru/"
+        prop: website
+      - match: mbbmos@mbbru.com  Mellimos@BMIRU.com  Mellimos@Rex400.ru
+        values:
+          - mbbmos@mbbru.com
+          - Mellimos@BMIRU.com
+          - Mellimos@Rex400.ru
+  type.gender:
+    lowercase: true
+    normalize: true
+    options:
+      - match: M
+        value: male
+      - match: F
+        value: female
+  type.string:
+    lowercase: true
+    options:
+      - match: PO Box 1406 - 60455
+        value: 60455
+      - match: "-"
+        value: null

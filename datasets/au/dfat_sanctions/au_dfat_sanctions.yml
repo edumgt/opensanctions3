@@ -1,0 +1,320 @@
+title: "Australian Sanctions Consolidated List"
+entry_point: crawler.py
+prefix: au-dfat
+coverage:
+  frequency: daily
+  schedule: "0 */2 * * *"
+  start: 2018-04-11
+load_statements: true
+summary: >-
+  The Consolidated List is a list of all persons and entities who are subject to
+  targeted financial sanctions under Australian sanctions law
+description: |
+  The Consolidated List is a list of all persons and entities who are subject to
+  targeted financial sanctions under Australian sanctions law. Those listed may be
+  Australian citizens, foreign nationals, or residents in Australia or overseas.
+
+  Australia implements two types of sanctions:
+
+  * United Nations Security Council (UNSC) sanctions, which Australia must impose as
+    a member of the UN.
+  * Australian autonomous sanctions, which are imposed as a matter of Australian
+    foreign policy.
+
+  ASO maintains the list and updates it regularly.
+url: https://www.dfat.gov.au/international-relations/security/sanctions/Pages/sanctions
+tags:
+  - list.sanction
+  - issuer.west
+publisher:
+  name: "Department of Foreign Affairs and Trade"
+  acronym: DFAT
+  description: |
+    The Australian Sanctions Office (ASO) is the Australian Government’s sanctions
+    regulator. It sits within DFAT’s Legal Division in the International Security,
+    Humanitarian and Consular Group.
+  country: au
+  url: http://dfat.gov.au/
+  official: true
+data:
+  url: "https://www.dfat.gov.au/sites/default/files/regulation8_consolidated.xlsx"
+  # url: "https://data.opensanctions.org/datasets/20231015/au_dfat_sanctions/source.xlsx"
+  format: XLSX
+
+assertions:
+  min:
+    schema_entities:
+      Person: 2000
+      LegalEntity: 700
+  max:
+    schema_entities:
+      Person: 4000
+      LegalEntity: 1500
+
+dates:
+  formats:
+    - "%Y-%m-%d"
+    - "%d/%m/%Y"
+    - "%d/%m /%Y"
+    - "%d %b. %Y"
+    - "%d %b.%Y"
+    - "%d %b %Y"
+    - "%d %B %Y"
+    - "%b. %Y"
+    - "%d %B. %Y"
+    - "%Y"
+    - "%m/%Y"
+    - "%B %Y"
+    - "%d-%b-%Y"
+    - "%b %Y"
+    - "%d. %b %Y"
+    - "c. %Y"
+    - "%B, %Y"
+lookups:
+  sanction.program:
+    options:
+      - match: "Autonomous (DPRK)"
+        value: AU-DPRK
+      - match: "Autonomous (FFRY)"
+        value: AU-YUGO
+      - match: "Autonomous (Iran)"
+        value: AU-IRAN
+      - match: "Autonomous (Libya)"
+        value: AU-LIBYA
+      - match: "Autonomous (Myanmar)"
+        value: AU-MYANMAR
+      - match: "Autonomous (Russia)"
+        value: AU-RUSSIA
+      - match: "Autonomous (Thematic – Corruption)"
+        value: AU-CRP
+      - match: "Autonomous (Thematic - Human Rights)"
+        value: AU-HUMAN
+      - match: "Autonomous (Thematic - Cyber)"
+        value: AU-CYB
+      - match: "Autonomous (Ukraine)"
+        value: AU-UKRAINE
+      - match: "Autonomous (Syria)"
+        value: AU-SYRIA
+      - match: "Autonomous (Zimbabwe)"
+        value: AU-ZIM
+      - match: "1267/1989/2253 (ISIL (Da'esh) and Al-Qaida)"
+        value: UN-SCISIL
+      - match: "1373 (2001)"
+        value: AU-UNSC1373
+      - match: "1518 (Iraq)"
+        value: UN-SC1518
+      - match: "1533 (Democratic Republic of the Congo)"
+        value: UN-SC1533
+      - match: "1591 (Sudan)"
+        value: UN-SC1591
+      - match: "1718 (DPRK)"
+        value: UN-SC1718
+      - match:
+          - "1970 (Libya) 1973 (Libya)"
+          - "1970 (Libya)"
+          - "1973 (Libya)"
+        value: UN-SC1970
+      - match: "1988 (Taliban)"
+        value: UN-SC1988
+      - match: "2206 (South Sudan)"
+        value: UN-SC2206
+      - match: "2140 (Yemen)"
+        value: UN-SC2140
+      - match: "2713 (Al-Shabaab)"
+        value: UN-SC2713
+      - match: "2127 (Central African Republic)"
+        value: UN-SC2127
+      - match:
+          - "2093 (2013)"
+          - "751 (Somalia and Eritrea)"
+        value: null
+  type:
+    normalize: true
+    lowercase: true
+    options:
+      - match:
+          - Individual
+          - Person
+          - Aka
+        value: Person
+      - match:
+          - Entity
+        value: LegalEntity
+      - match: "3590"
+        value: Person
+      - match:
+          - "275" # empty type cell
+          - "288"  # empty type cell
+          - "3198" # one of the rows inexplicably has type "Individual"
+        value: LegalEntity
+
+
+  name_type:
+    normalize: true
+    lowercase: true
+    options:
+      - match:
+          - aka
+          - a
+          - Original Script
+        value: alias
+      - match:
+          - Formerly known as
+          - Previously listed as
+        value: previousName
+      - match:
+          - Primary name
+          - Primay Name
+          - Primary
+          - null
+        value: name
+
+  type.address:
+    lowercase: true
+    options:
+      - match:
+          - "Address:"
+          - Lebanon
+          - Peru
+          - Philippines
+          - Qatar
+          - Russia
+          - Somalia
+          - Turkey
+          - n/a
+          - na
+        value: null
+      - match: "Branch Office 6: Shop number 237, Shah Zada Market (also known as Sarai Shahzada), Puli Khishti area, Police District 1, Kabul, Afghanistan, Telephone: +93-202-103386, +93-202-101714, 0202-104748, Mobile: +93-797-059059, +93-702-222222, e-mail: helmand_exchange_msp@yahoo.com"
+        value: Shop number 237, Shah Zada Market (also known as Sarai Shahzada), Puli Khishti area, Police District 1, Kabul, Afghanistan
+
+  type.country:
+    lowercase: true
+    normalize: true
+    options:
+      - contains: Syrian Arab Republic
+        value: Syria
+      - match: Malian / Mauritanian
+        values:
+          - Mauritania
+          - Mali
+      - match: Türkiyish
+        value: Turkey
+      - match:
+          - Turkish/Jordanian
+        values:
+          - Turkey
+          - Jordan
+      - match: Indonesian (as at Dec. 2003)
+        value: Indonesia
+      - match: Ukranian
+        value: UA
+      - match: Belarussian
+        value: BY
+      - match: Tobago
+        value: Trinidad
+      - match: Herzegovina
+        value: Bosnia
+      - match: "France (alt. citizen: Syri"
+        value: France
+      - contains: Fiji (Prakash’s Australian
+        value: Fiji
+      - contains:
+          - as a result of being in the service of declared terrorist organisation
+          - with effect from
+        match: Kuwaiti citizenship withdrawn in 2002
+        value: null
+      - match: Saudi Arabian (this aka only
+        value: Saudi Arabia
+      - match: Possibly Ethiopian
+        value: Ethiopia
+      - match: alt Citizenship Yemeni)
+        value: YE
+      - match: USSR (until 1991)
+        value: SUHH
+  type.date:
+    options:
+      - match:
+          - na
+          - Aug.
+          - "false passport)"
+        value: null
+      - match: 07/04/62
+        value: "1962-04-07"
+      - match: 05.09.1990
+        value: "1990-09-05"
+      - match: March 16, 1972
+        value: "1972-03-16"
+      - match: 01/10/1983,15/10/1983, 01/01/1980
+        values:
+          - 1983-10-01
+          - 1983-10-15
+          - 1980-01-01
+      - match: 09/11/ 1954
+        value: "1954-11-09"
+      - match: 3 March 1979 (from false passport)
+        value: "1979-03-03"
+      - match: 5/06/1953   15/06/1953
+        values:
+          - 1953-06-05
+          - 1953-06-15
+      - match: 11/10/1953  10/11/1953
+        values:
+          - 1953-10-11
+          - 1953-11-10
+      - match: April 1, 1978
+        value: "1987-04-01"
+      - match:
+          - 5 Feb. 1970 (this aka only, alt born 5 Feb. 1969
+          - 5 Feb. 1970 (this aka only, born 5 Feb. 1969
+        values:
+          - 1969-02-05
+          - 1970-02-05
+      - match: 10/061962
+        values:
+          - 1962-06-10
+      - match: 29-Aprl-1967
+        value: "1967-04-29"
+      - match: 23-Apr-68
+        value: "1968-04-23"
+      - match: 1970-1973
+        values:
+          - 1970
+          - 1971
+          - 1972
+          - 1973
+      - match: 1979-1982
+        values:
+          - 1979
+          - 1980
+          - 1981
+          - 1982
+      - match: 1954-1955
+        values:
+          - 1954
+          - 1955
+      - match: 1966-1967
+        values:
+          - 1966
+          - 1967
+      - match: 1962-1963
+        values:
+          - 1962
+          - 1963
+      - match: 1940-1941
+        values:
+          - 1940
+          - 1941
+      - match: 1956-1957
+        values:
+          - 1956
+          - 1957
+      - match: 1945-1950
+        values:
+          - 1945
+          - 1946
+          - 1947
+          - 1948
+          - 1949
+          - 1950
+      - match: "3 March 1979 (from"
+        value: "1979-03-03"

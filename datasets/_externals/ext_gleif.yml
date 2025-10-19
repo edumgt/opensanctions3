@@ -1,0 +1,110 @@
+type: external
+title: Legal Entity Identifier (LEI) Reference Data
+entry_point: zavod.runner.local_enricher:enrich
+full_dataset: gleif
+disabled: false
+hidden: false
+coverage:
+  schedule: "1 10 * * *"
+  frequency: weekly
+  start: 2022-05-30
+exports:
+  - statistics.json
+  - entities.delta.json
+deploy:
+  cpu: "2000m"
+  memory: "9000Mi"
+  disk: "30Gi"
+load_statements: true
+ci_test: false
+summary: >-
+  A concatenated data file of all entities which have been issued Legal
+  Entity Identifier (LEI) codes
+description: |
+  Legal Entity Identifiers (LEIs) are global company identification numbers. They
+  are meant to be used in international transactions in the future, backed by an
+  ISO-developed standard.
+
+  The GLEIF group assembles a database of all entities which have been issued an
+  LEI and is published as open data on the web.
+
+  ### Using the full data
+
+  In order to match GLEIF data with OpenSanctions, we've converted the full GLEIF
+  database to the FollowTheMoney data format used by our system. You can download
+  the [raw data and use it in full](https://github.com/opensanctions/gleif)
+  (updated daily).
+url: https://www.gleif.org/en/lei-data/gleif-concatenated-file
+publisher:
+  name: Global Legal Entity Identifier Foundation
+  acronym: GLEIF
+  description: |
+    Established by the Financial Stability Board in June 2014, the Global Legal Entity
+    Identifier Foundation (GLEIF) is tasked to support the implementation and use
+    of the Legal Entity Identifier (LEI). The foundation is backed and overseen by
+    the Regulatory Oversight Committee, representing public authorities from around
+    the globe that have come together to jointly drive forward transparency within
+    the global financial markets. GLEIF is a supra-national not-for-profit
+    organization headquartered in Basel, Switzerland.
+  url: https://www.gleif.org/en/about/this-is-gleif
+
+inputs:
+  - ann_graph_topics
+  - debarment
+  - eu_esma_sanctions
+  - eu_esma_saris
+  - ext_cy_companies
+  - ext_cz_business_register
+  - ext_ee_ariregister
+  - ext_gb_coh_psc
+  - ext_gleif
+  - ext_icij_offshoreleaks
+  - ext_lv_business_register
+  - ext_md_companies
+  - ext_ru_egrul
+  - ext_ua_edr
+  - ext_us_irs_ffi
+  - iso9362_bic
+  - opencorporates
+  - permid
+  - regulatory
+  - ru_cbr_banks
+  - sanctions
+  - enforcement
+  - special_interest
+
+config:
+  dataset: gleif
+  index_options:
+    max_candidates: 25
+    match_batch: 300
+  memory: 4000
+  strip_namespace: true
+  fuzzy: false
+  threshold: 0.5
+  algorithm: regression-v1
+  topics:
+    - role.pep
+    - role.rca
+    - sanction
+    - sanction.linked
+    - debarment
+    - asset.frozen
+    - poi
+    - gov.soe
+  schemata:
+    - Company
+    - Organization
+    # - LegalEntity
+
+assertions:
+  min:
+    schema_entities:
+      Security: 184000
+      Organization: 1000
+      Company: 1250
+  max:
+    schema_entities:
+      Security: 433000
+      Organization: 3000
+      Company: 4000

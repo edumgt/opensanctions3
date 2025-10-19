@@ -1,0 +1,111 @@
+type: external
+title: ICIJ Offshore Leaks Database
+entry_point: zavod.runner.local_enricher:enrich
+full_dataset: icij_offshoreleaks
+disabled: false
+hidden: false
+exports:
+  - statistics.json
+  - entities.delta.json
+deploy:
+  cpu: "1000m"
+  memory: "9000Mi"
+  disk: "100Gi"
+load_statements: true
+ci_test: false
+coverage:
+  start: 2022-05-23
+  end: 2023-07-26
+  schedule: "1 12 * * *"
+summary: >-
+  Combined data from the Panama Papers, Paradise Papers, Pandora Papers
+  and other cross-border investigations conducted by ICIJ and its partners
+description: |
+  > The International Consortium of Investigative Journalists obtained the data through five massive leaks:
+  >
+  > * Pandora Papers (2021): Data added in December 2021 comes from two offshore service providers’ documents that were part of the Pandora Papers dataset: Alemán, Cordero, Galindo & Lee (Alcogal) and Fidelity Corporate Services. Data from Alpha Consulting was added in April 2022. Data from Asiaciti Trust Asia Limited, CILTrust International, Commence Overseas Limited, IlShin, Overseas Management Company Inc, SFM Corporate Services and Trident Trust Company Limited was added in May 2022.
+  > * Paradise Papers (2017 & 2018): the Paradise Papers data in the Offshore Leaks database comes from the offshore law firm Appleby and a trove of data from seven corporate registries. Data from Appleby was added in November 2017, and the corporate registries data was added in December 2017 (Aruba, Bahamas, Barbados and Nevis) and February 2018 (Cook Islands, Malta and Samoa).
+  > * Bahamas Leaks (2016): In September 2016, ICIJ added data from the Bahamas Leaks investigation, which was based on a trove of data from the Bahamas corporate registry.
+  > * Panama Papers (2016): The Panama Papers data, added to the Offshore Leaks Database in May 2016, comes from Panama law firm Mossack Fonseca, whose inner workings were exposed as part of a collaborative investigation with German newspaper Süddeutsche Zeitung and more than 100 media partners.
+  > * Offshore Leaks (2013): This was the first information added to this database when it was published in June 2013, produced in conjunction with Costa Rican newspaper La Nación. This data covers a portion of offshore entities that were incorporated through Portcullis Trustnet (now Portcullis) and Commonwealth Trust Limited, two offshore service providers investigated as part of ICIJ’s 2013 Offshore Leaks exposé.
+
+  See also: [Offshore Leaks Database FAQ](https://offshoreleaks.icij.org/pages/faq).
+
+  ### Using the full data
+
+  In order to match OffshoreLeaks data with OpenSanctions, we've converted the full
+  database to the FollowTheMoney data format used by our system. You can download
+  the [raw data and use it in full](https://github.com/opensanctions/icij-offshoreleaks)
+  and audit the mechanism by which we have aligned the data.
+url: https://offshoreleaks.icij.org/
+publisher:
+  name: International Consortium of Investigative Journalists
+  acronym: ICIJ
+  description: |
+    ICIJ is a global network of reporters and media organizations that cooperate on
+    large-scale cross-border investigations. Its core team is a group of editors,
+    fact-checkers and data journalists who maintain the OffshoreLeaks database.
+  url: https://www.icij.org/about/
+  official: false
+
+inputs:
+  - ann_graph_topics
+  - debarment
+  - special_interest
+  - ext_cy_companies
+  - ext_cz_business_register
+  - ext_ee_ariregister
+  - ext_gb_coh_psc
+  - ext_ge_company_registry
+  - ext_gleif
+  - ext_icij_offshoreleaks
+  - ext_lv_business_register
+  - ext_md_companies
+  - ext_ru_egrul
+  - ext_ua_edr
+  - opencorporates
+  - enforcement
+  - ru_cbr_banks
+  - sanctions
+
+config:
+  dataset: icij_offshoreleaks
+  index_options:
+    match_batch: 300
+  strip_namespace: true
+  threshold: 0.7
+  memory: 4000
+  algorithm: regression-v1
+  topics:
+    - role.pep
+    - role.rca
+    - sanction
+    - sanction.linked
+    - debarment
+    - asset.frozen
+    - poi
+    - gov.soe
+  schemata:
+    - Company
+    - Organization
+    - LegalEntity
+    - Person
+
+assertions:
+  min:
+    schema_entities:
+      Company: 4200
+      LegalEntity: 2500
+  max:
+    schema_entities:
+      Company: 9900
+      LegalEntity: 5800
+
+lookups:
+  type.address:
+    options:
+      - match: "Portcullis TrustNet Chambers P.O. Box 3444 Road Town, Tortola BRITISH VIRGIN ISLANDS, 52/F., Cheung Kong Center 2 Queen's Road Central Hong Kong, Deutsche Bank AG, Hong Kong Floor 52, Cheung Kong Center 2 Queen's Road Central, Hong Kong Attn.: Ms. Annie Ng"
+        values:
+          - Portcullis TrustNet Chambers P.O. Box 3444 Road Town, Tortola BRITISH VIRGIN ISLANDS
+          - 52/F., Cheung Kong Center 2 Queen's Road Central Hong Kong
+          - "Attn.: Ms. Annie Ng, Deutsche Bank AG, Hong Kong Floor 52, Cheung Kong Center 2 Queen's Road Central, Hong Kong"

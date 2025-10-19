@@ -1,0 +1,489 @@
+title: PEPs from Chile Interest and Asset Declarations
+entry_point: crawler.py
+prefix: cl-info-probidad
+coverage:
+  frequency: daily
+  start: 2024-01-11
+load_statements: true
+summary: >
+  Data on Politically Exposed Persons from asset and interest declarations of Chilean public officials
+description: |
+  The Chilean Law of Probity in Public Function and Prevention of Conflicts of
+  Interest (Law N° 20.880) mandates the disclosure of interests and assets by
+  public officials and civil servants.
+
+  The law applies to a broad range of public officials,
+  including the President,
+  ministers,
+  undersecretaries,
+  regional governors,
+  legislative and judicial authorities,
+  military and police officers,
+  and leaders of political parties.
+
+  The list of individuals required to comply are similar to those considered PEPs.
+  However, the list included in Law N° 20.880 is more extensive.
+  This dataset does not publish information about the civil servants not considered PEPs.
+
+  The declarations are published by a joint initiative between the Consejo para la Transparencia (CPLT) and
+  the Contraloría General de la República (CGR).
+tags:
+  - list.pep
+publisher:
+  name: Consejo para la Transparencia
+  acronym: CPLT
+  description: |
+    The Council for Transparency (CPLT) is an autonomous public organization established by the
+    Law on the Transparency of Public Functions and Access to Information on Public Administration
+    in charge of guaranteeing citizens' right of access to public information,
+    with powers to enforce the law and impose penalties.
+  url: https://www.consejotransparencia.cl/
+  official: true
+  country: "cl"
+url: https://www.infoprobidad.cl/DatosAbiertos/Catalogos
+data:
+  url: https://www.infoprobidad.cl/Home/Listado
+  format: JSON
+ci_test: false
+
+dates:
+  formats: ["%Y/%m/%d"]
+
+assertions:
+  min:
+    schema_entities:
+      Person: 5800
+      Position: 600
+  max:
+    schema_entities:
+      Person: 14000
+      Position: 2000
+
+lookups:
+  type.string:
+    options:
+      - match: "."
+        value: null
+  positions:
+    options:
+      - is_pep: true
+        weight: 100
+        regex:
+          - "ALCALD.*"
+          - "CONCEJAL.*"
+          - "GOBERNADOR.*"
+          - "SENADOR.*"
+          - "MINISTR.*"
+          - "EMBAJADOR.*"
+          - "TESORER.*"
+          - "SEREMI.*"
+          - "PRIMER.* SECRETARI.*"
+          - "SEGUND.* SECRETARI.*"
+          - "TERCER.* SECRETARI.*"
+          - ".*ENCARGAD.* DE COMPRAS.*"
+          - "VICEPRESIDENT.* EJECUTIV.*"
+      - is_pep: true
+        match:
+          - "ALACALDE"  # typo of ALCALDE I think
+          - "CONSEJERO O CÓNSUL GENERAL SEGUNDA CLASE, TERCERA CATEGORÍA EXTERIOR"
+          - "CONSEJERO CONSEJO DE MONUMENTOS NACIONALES"
+          - "EX ALCALDE 2021-2024"
+          - "JUEZ"
+          - "PRESIDENTE COMPIN"
+          - "VICEPRESIDENTE"
+          - "VICEPRESIDENTE EJECUTIVO"
+          - "ALMIRANTE"
+
+      - is_pep: false
+        contains:
+          - CANDIDAT
+          - ESPECIALIST
+          - DIBUJANTE
+      - is_pep: false
+        weight: 200
+        regex:
+          - "ADMINISTRATIV.*"
+          - "ADMINISTRADOR.*"
+          - "INGENIER.*"
+          - "ASISTENT.*"
+          - "ANALIST.*"
+          - "TECNICO.*"
+      - is_pep: false
+        match:
+          - BODEGUERO
+          - CONSEJERO TECNICO
+          - CONSEJERO TRIBUTARIO
+          - DEFENSOR(A) NACIONAL
+          - ENCARGADO DE BODEGA
+          - ENCARGADO DE MANTENIMIENTO
+          - ENCARGADO DE SALA
+          - MERCADO_PÚBLICO
+          - NOTARIO Y CONSERVADOR
+          - OFICIAL DE SALA
+          - PROFESIONAL AREA INFRAESTRUCTURA
+          - SOPORTE TECNICO
+          - SUBADMINISTRADOR ZONAL
+          - SUBJEFE DEPTO. DE RECURSOS HUMANOS
+          - CAPITAN DE NAVIO
+          - PROFESIONALES UNIVERSITARIOS
+          - TECNOLOGO MEDICO
+
+      - is_pep: null # haven't looked closely yet
+        regex:
+          - ".*\\bJEFE\\b"
+          - ".*\\bDIRECTORA?\\b"
+      - is_pep: null
+        match:
+          - "ABOGADA"
+          - "ABOGADO ASISTENTE DE FISCAL"
+          - "ABOGADO CONSEJERO"
+          - "ABOGADO INTEGRANTE"
+          - "ABOGADO SECRETARIO DE COMISIONES"
+          - "ABOGADO"
+          - "ABOGADO(A)"
+          - "ABOGADO/A PANEL TÉCNICO CONCESIONES "
+          - "ABOGADO/A PANEL TÉCNICO DE CONCESIONES "
+          - "ACADEMICO"
+          - "ACADÉMICO/A"
+          - "ACALDE SUPLENTE "
+          - "AGENTE DESARROLLO LOCAL"
+          - "AGREGADO ASIMILADO A CUARTA CATEGORIA EXTERIOR"
+          - "AGREGADO COMERCIAL DEPARTAMENTO ECONOMICO MADRID"
+          - "AGREGADO LABORAL"
+          - "APOYO ADMINISTRACION MUNICIPAL"
+          - "APOYO ADMINISTRATIVO"
+          - "ARCHIVERO JUDICIAL"
+          - "ARQUITECTO DE SOLUCIONES TECNOLOGICAS"
+          - "ARQUITECTO"
+          - "ASESOR A HONORARIOS SUMA ALZADA"
+          - "ASESOR ALCALDÍA"
+          - "ASESOR DEPARTAMENTO CADENAS GLOBALES DE VALOR"
+          - "ASESOR GABINETE DIRECCION GENERAL"
+          - "ASESOR GABINETE DIRECCIÓN NACIONAL"
+          - "ASESOR"
+          - "ASESOR(A) ESTRATÉGICO(A)"
+          - "ASESOR/A GABINETE SUBSECRETARIO/A "
+          - "ASESOR/A"
+          - "AUXILIAR"
+          - "BIOQUIMICO"
+          - "C1"
+          - "CATEGORÍA A NIVEL 4"
+          - "CHOFER"
+          - "CIRUJANO DENTISTA"
+          - "COMISIONADO Y PRESIDENTE DEL CONSEJO DE LA COMISION PARA EL MERCADO FINANCIERO"
+          - "COMISIONADO"
+          - "CONDUCTOR"
+          - "CONSEJERA O CÓNSUL GENERAL SEGUNDA CLASE, TERCERA CATEGORÍA EXTERIOR"
+          - "CONSEJERO CONSEJO RESOLUTIVO DE ASIGNACIONES PARLAMENTARIAS"
+          - "CONSEJERO REGIONAL"
+          - "CONSEJERO"
+          - "CONSEJERO(A)"
+          - "CONSEJERO/A CONSEJO DE CONCESIONES "
+          - "CONSEJERO/A"
+          - "CONSEJEROS"
+          - "CONSERVADOR Y ARCHIVERO"
+          - "CONSERVADOR"
+          - "CONTRALOR GENERAL DE LA REPUBLICA"
+          - "CONTRALOR REGIONAL"
+          - "CONTRALOR"
+          - "CONTRATA GRADO 12 ASISTENTE SOCIAL"
+          - "COORDINADOR COMITÉ DE AUDITORÍA PARLAMENTARIA"
+          - "COORDINADOR DE CONTRATOS Y SERVICIOS DE MANTENIMIENTO"
+          - "COORDINADOR DE SEGURIDAD"
+          - "COORDINADOR DEPTO. RELACIONES PÚBLICAS"
+          - "COORDINADOR NACIONAL DE RECLUTAMIENTO Y SELECCION"
+          - "COORDINADOR NIVEL CENTRAL"
+          - "COORDINADOR TERRITORIAL"
+          - "COORDINADOR"
+          - "COORDINADOR/A REGIONAL"
+          - "COORDINADORA OFICINA SENDA-PREVIENE"
+          - "DECANO"
+          - "DEFENSOR NACIONAL"
+          - "DEFENSOR REGIONAL"
+          - "DELEGADO DELEGACIÓN GUANAQUEROS"
+          - "DELEGADO PRESIDENCIAL PROVINCIAL"
+          - "DELEGADO PRESIDENCIAL REGIONAL"
+          - "DELEGADO PRESIDENCIAL"
+          - "DIPUTADO/DA"
+          - "DIRECTIVO"
+          - "DIRECTIVOS"
+          - "DOCENTE AULA"
+          - "DOCENTE DIRECTIVO"
+          - "DOCENTE"
+          - "EDUCADOR (A) DIFERENCIAL"
+          - "EDUCADORA DE PARVULO"
+          - "ENCARGADA DE ADQUISICIONES"
+          - "ENCARGADA DE BODEGA  MUNICPAL"
+          - "ENCARGADA DE INVENTARIO"
+          - "ENCARGADA UNIDAD DE ADQUISICIONES"
+          - "ENCARGADO DE ADQUISICIONES"
+          - "ENCARGADO DE INFRAESTRUCTURA"
+          - "ENCARGADO DE PLANIFICACION"
+          - "ENCARGADO DE UNIDAD"
+          - "ENCARGADO DEPARTAMENTO DE EJECUCION"
+          - "ENCARGADO INFRAESTRUCTURA ESCUELAS"
+          - "ENCARGADO OFICINA DESARROLLO ECONOMICO LOCAL"
+          - "ENCARGADO VIVIENDA"
+          - "ENCARGADO ZONAL"
+          - "ENCARGADO"
+          - "ENFERMERA (O)"
+          - "ENFERMERA"
+          - "ENFERMERO"
+          - "EX ALCALDE"
+          - "EX ALCALDESA"
+          - "EX CONCEJAL"
+          - "EX-CONCEJAL"
+          - "EXPERTO"
+          - "FISCAL "
+          - "FISCAL ADJUNTO"
+          - "FISCAL JUDICIAL"
+          - "FISCAL NACIONAL ECONÓMICO"
+          - "FISCAL NACIONAL"
+          - "FISCAL REGIONAL"
+          - "FISCALIZADOR"
+          - "FISCALIZADOR/A"
+          - "FISCALIZADORES"
+          - "FONOAUDIOLOGO"
+          - "FUNCIÓN FISCALIZACIÓN O APOYO A FISCALIZACIÓN "
+          - "GENERAL DE EJERCITO"
+          - "GERENTE GENERAL INTERINO"
+          - "GERENTE GENERAL"
+          - "GERENTE"
+          - "HONORARIO POR PROGRAMA"
+          - "HONORARIO"
+          - "HONORARIOS - AGENTE PÚBLICO"
+          - "HONORARIOS"
+          - "INGENIERO CIVIL"
+          - "INSPECTOR (A) FISCAL DE OBRAS"
+          - "INSPECTOR DE DOM"
+          - "INSPECTOR DE OBRA"
+          - "INSPECTOR DE OBRAS MUNICIPALES"
+          - "INSPECTOR ESTABLECIMIENTO EDUCACIONAL"
+          - "INSPECTOR FISCAL"
+          - "INSPECTOR GENERAL"
+          - "INSPECTOR MUNI. CASINO JUEGOS"
+          - "INSPECTOR MUNICIPAL"
+          - "INSPECTOR TÉCNICO DE OBRAS"
+          - "INSPECTOR TECNICO"
+          - "INSPECTOR"
+          - "INSPECTOR/A TECNICO DE OBRAS"
+          - "INTEGRANTE DE LA COMISIÓN EXPERTA"
+          - "INTEGRANTE DEL COMITÉ TÉCNICO DE ADMISIBILIDAD"
+          - "INTEGRANTE PANEL TÉCNICO CONCESIONES"
+          - "INTEGRANTE SUPLENTE DE PANEL DE EXPERTOS LEY N° 20.378"
+          - "INTEGRANTE TITULAR DE PANEL DE EXPERTOS LEY N° 20.378"
+          - "INTENDENTE"
+          - "JEFA DE CONTABILIDAD"
+          - "JEFA DE GABINETE DEL MINISTRO DE RELACIONES EXTERIORES"
+          - "JEFATURA DE DEPARTAMENTO"
+          - "JEFATURA DE PROYECTOS"
+          - "JEFATURA DE UNIDAD"
+          - "JEFATURA DIVISIÓN DE ADMINISTRACIÓN Y SECRETARÍA GENERAL"
+          - "JEFATURA SEGUNDO NIVEL JERÁRQUICO"
+          - "JEFATURA"
+          - "JUEZ  DE POLICIA  LOCAL"
+          - "JUEZ (A) POLICÍA LOCAL"
+          - "JUEZ DE POLICIA LOCAL SUBROGANTE"
+          - "JUEZ DE POLICIA LOCAL"
+          - "JUEZ DE POLICÍA LOCAL"
+          - "JUEZ POLICIA LOCAL"
+          - "JUEZ POLICÍA LOCAL"
+          - "JUEZ(A) SUPLENTE"
+          - "JUEZ(A) TITULAR"
+          - "JUEZA DEL TRIBUNAL JUZGADO DE POLICIA LOCAL"
+          - "JUZGADO DE POLICIA LOCAL"
+          - "KINESIOLOGO"
+          - "MATRON/MATRONA"
+          - "MATRONA DIRECCIÓN DE SALUD MUNICIPAL"
+          - "MATRONA"
+          - "MEDICINA FAMILIAR "
+          - "MEDICO 22/22 HORAS"
+          - "MEDICO 22/28 HORAS"
+          - "MEDICO APS"
+          - "MEDICO CIRUJANO"
+          - "MEDICO DE 28 HORAS"
+          - "MEDICO EDF ART 8"
+          - "MEDICO"
+          - "MEDICOS"
+          - "MIEMBRO DEL CONSEJO CONSTITUCIONAL"
+          - "MIEMBRO ÓRGANO EJECUTIVO"
+          - "NINGUNO" # None
+          - "NOTARIO CONSERVADOR ARCHIVERO"
+          - "NOTARIO Y ARCHIVERO"
+          - "NOTARIO"
+          - "NUTRICIONISTA DESAM"
+          - "ODONTÓLOGO DIRECCIÓN DE SALUD MUNICIPAL"
+          - "OFICIAL 1º"
+          - "OFICIAL 2°"
+          - "OFICIAL 3°"
+          - "OFICIAL 4°"
+          - "OFICIAL ADMINISTRATIVO"
+          - "OFICIAL BODEGUERO"
+          - "OTRO"
+          - "OTROS PORFESIONALES"
+          - "OTROS PROFESIONALES"
+          - "OTROS"
+          - "PANELISTA"
+          - "PERIODISTA COMUNICACIONES"
+          - "PERIODISTA"
+          - "PRESIDENTE DEL CONSEJO"
+          - "PRESIDENTE DEL TRIBUNAL CALIFICADOR DE ELECCIONES"
+          - "PRESIDENTE DIRECTORIO"
+          - "PRESIDENTE SUPLENTE"
+          - "PRESIDENTE TITULAR"
+          - "PRESIDENTE"
+          - "PRESTACION DE SERVICIOS HONORARIOS EN LABORES Y/O PROCESOS ESPECIFICOS DE NIVEL PROFESIONAL"
+          - "PRESTADOR DE SERVICIOS A HONORARIOS"
+          - "PRIMER INTEGRANTE SUPLENTE"
+          - "PRIMER INTEGRANTE TITULAR"
+          - "PRIMER MIEMBRO SUPLENTE"
+          - "PRIMER MIEMBRO TITULAR"
+          - "PRIMER SECRETARIO"
+          - "PROFESIONAL COMITÉ DE AUDITORÍA PARLAMENTARIA"
+          - "PROFESIONAL DAF"
+          - "PROFESIONAL DE LA SALUD"
+          - "PROFESIONAL DEPARTAMENTO DE ALIMENTACIÓN ESCOLAR"
+          - "PROFESIONAL DIDECO, ENCARGADA OMIL Y SAP"
+          - "PROFESIONAL DOCENTE"
+          - "PROFESIONAL ENCARGADO DE FINANZAS"
+          - "PROFESIONAL EXPERTO ADUANERO"
+          - "PROFESIONAL EXPERTO"
+          - "PROFESIONAL GENERICO"
+          - "PROFESIONAL GRADO 7"
+          - "PROFESIONAL GRADO 9"
+          - "PROFESIONAL INSPECTOR TÉCNICO DE OBRAS"
+          - "PROFESIONAL PDTI"
+          - "PROFESIONAL UNIVERSITARIO"
+          - "PROFESIONAL"
+          - "PROFESOR "
+          - "PROFESOR ASOCIADO"
+          - "PROFESOR EDUCACIÓN BÁSICA "
+          - "PROFESOR ENCARGADO"
+          - "PROSECRETARIO"
+          - "PSICOLOGA"
+          - "PSICOLOGO"
+          - "QUIMICO FARMACEUTICO"
+          - "RECEPTOR JUDICIAL"
+          - "RECTOR "
+          - "RELACIONES PUBLICA "
+          - "RELATOR"
+          - "RELATOR(A) ABOGADO(A)"
+          - "RESOLUTOR"
+          - "REVISOR"
+          - "SARGENTO PRIMERO"
+          - "SARGENTO SEGUNDO"
+          - "SECR. ABOGADO DEL FISCAL JUDICIAL"
+          - "SECR. ABOGADO DEL PRESIDENTE"
+          - "SECRETARIA ABOGADA SUBRROGANTE"
+          - "SECRETARIA ABOGADA"
+          - "SECRETARIA EJECUTIVA"
+          - "SECRETARIA MUNICIPAL"
+          - "SECRETARIA REGIONAL MINISTERIAL DE GOBIERNO"
+          - "SECRETARIA RELATORA"
+          - "SECRETARIA"
+          - "SECRETARIA(O)"
+          - "SECRETARIO ABOGADO DEL TRIBUNAL DE CONTRATACIÓN PÚBLICA"
+          - "SECRETARIO ABOGADO"
+          - "SECRETARIO RELATOR"
+          - "SECRETARIO EJECUTIVO"
+          - "SECRETARIO GENERAL DE POLÍTICA EXTERIOR"
+          - "SECRETARIO GENERAL"
+          - "SECRETARIO MUNICIPAL"
+          - "SECRETARIO REGIONAL MINISTERIAL "
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES DE MAGALLANES Y ANTARTICA CHILENA"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE ANTOFAGASTA"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE ARICA Y PARINACOTA"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE ATACAMA"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGIÓN DE AYSÉN"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE COQUIMBO"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE LA ARAUCANÍA"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGIÓN DE LOS LAGOS"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGIÓN DE LOS RÍOS"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE MAGALLANES Y ANTARTICA CHILENA"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGIÓN DE TARAPACÁ"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGION DE VALPARAÍSO"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGIÓN DEL BIO BIO"
+          - "SECRETARIO REGIONAL MINISTERIAL DE DEPORTES REGIÓN DEL LIBERTADOR BERNARDO O´HIGGINS"
+          - "SECRETARIO REGIONAL MINISTERIAL DE ÑUBLE"
+          - "SECRETARIO REGIONAL MINISTERIAL DE SALUD"
+          - "SECRETARIO REGIONAL MINISTERIAL DEL DEPORTE REGION DEL MAULE"
+          - "SECRETARIO"
+          - "SECRETARIO(A) REGIONAL MINISTERIAL DE OBRAS PÚBLICAS REGIÓN DE ÑUBLE"
+          - "SECRETARIO(A) REGIONAL MINISTERIAL"
+          - "SECRETARIO/A REGIONAL MINISTERIAL DE AGRICULTURA"
+          - "SECRETARIO/A REGIONAL MINISTERIAL DE COQUIMBO "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE ANTOFAGASTA "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE ARICA Y PARINACOTA "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE ATACAMA "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE AYSÉN "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE LA ARAUCANÍA "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE LOS LAGOS "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE LOS RÍOS "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE MAGALLANES "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE TARAPACA "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DE VALPARAÍSO "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DEL BIO BIO "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DEL LIBERTADOR BERNARDO O'HIGGINS "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN DEL MAULE "
+          - "SECRETARIO/A REGIONAL MINISTERIAL REGIÓN METROPOLITANA "
+          - "SEGUNDO INTEGRANTE SUPLENTE"
+          - "SEGUNDO INTEGRANTE TITULAR"
+          - "SEGUNDO MIEMBRO SUPLENTE"
+          - "SEGUNDO MIEMBRO TITULAR"
+          - "SIN CARGO"
+          - "SUBCONTRALOR GENERAL"
+          - "SUBDIRECTOR ADMINISTRATIVO SERVICIO"
+          - "SUBDIRECTOR DE ARQUITECTURA"
+          - "SUBDIRECTOR GESTION DEL CUIDADO"
+          - "SUBDIRECTOR NACIONAL"
+          - "SUBDIRECTOR"
+          - "SUBDIRECTOR/A NACIONAL"
+          - "SUBGERENTE"
+          - "SUBJEFE DE DIVISION"
+          - "SUBSECRETARIA DE ECONOMÍA Y EMPRESAS DE MENOR TAMAÑO"
+          - "SUBSECRETARIA DE SALUD PÚBLICA"
+          - "SUBSECRETARIA RE RELACIONES ECONÓMICAS INTERNACIONALES"
+          - "SUBSECRETARIA"
+          - "SUBSECRETARIA(O) DE EVALUACIÓN SOCIAL"
+          - "SUBSECRETARIA/O"
+          - "SUBSECRETARIO DE RELACIONES EXTERIORES"
+          - "SUBSECRETARIO"
+          - "SUBSECRETARIO(A)"
+          - "SUBSECRETARIO/A "
+          - "SUBSECRETARIO/A DE AGRICULTURA"
+          - "SUBSECRETARIO/A DE TURISMO"
+          - "SUPERINTENDENTE"
+          - "SUPERVISOR DE PROGRAMAS, DIRECCIÓN REGIONAL"
+          - "SUPLENTE DE MINISTRO"
+          - "TEC. EN ENFERMERIA"
+          - "TÉCNICO"
+          - "TENIENTE CORONEL"
+          - "TERCER NIVEL JERARQUICO"
+          - ABOGADO ASESOR
+          - ACTIVO FIJO
+          - ANALISTA DE COMUNICACIONES
+          - ANALISTA DE CONTRATOS
+          - ASISTENTE DE CONTRATOS
+          - AUDITOR INFORMATICO
+          - AUDITOR INTERNO
+          - AUDITOR INTERNO
+          - AUDITOR INTERNO
+          - AUDITOR INTERNO DE AUDITORIA CONTINUA Y FORENSE
+          - AUDITOR INTERNO INFRAESTRUCTURA
+          - COORDINADOR ADMINISTRACIONES ZONALES
+          - COORDINADOR AREA AVANCE FISICO
+          - COORDINADOR DE DISEÑO
+          - COORDINADOR DE ESPECIALIDADES
+          - COORDINADOR DE TRIBUNAL
+          - ENCARGADO INFORMATICO
+          - INGENIERO DE GESTION DE OPERACIONES DE PLATAFORMAS
+          - INGENIERO DE PLATAFORMA
+          - INGENIERO EN GESTION DE PROCESOS INFORMATICOS
+          - MAYOR
+          - PROFESIONAL DE ANALISIS DE CONTRATOS
+          - PROFESIONAL SUBDEPARTAMENTO DE COMUNICACIONES
+          - PROFESSIONAL COMPLIANCE
+          - SUBJEFE DEPTO. DE FINANZAS Y PRESUPUESTO
+          - SUBJEFE DEPTO. INFORMATICA Y COMPUTACION
+          - SUBSECRETARIA DE RELACIONES EXTERIORES
+          - SUPERINTEDENTA (S)

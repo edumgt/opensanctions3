@@ -1,0 +1,59 @@
+title: US Iowa Medicaid Terminated Provider List
+entry_point: crawler.py
+prefix: us-media
+coverage:
+  start: "2024-09-06"
+  schedule: "10 4 1,15 * *"
+load_statements: true
+summary: >
+  This dataset contains a list of providers who have been terminated for cause from Iowa's Medicaid program.
+description: |
+  Section 1128 and Section 1902(a)(39) of the Social Security Act requires states to provide notice when the
+  enrollment of a Medicaid enrolled provider has been terminated “for cause”. Services rendered or ordered by
+  sanctioned providers are not eligible for Medicaid reimbursement. In addition, services provided by entities
+  owned or managed by sanctioned providers are not eligible for Medicaid reimbursement.
+tags:
+  - sector.medical
+  - sector.usmed.debarment
+publisher:
+  name: Iowa Health & Human Services
+  description:
+    Iowa Health & Human Services oversees Medicaid, public health, and welfare programs
+    in the state of Iowa.
+  acronym: HHS
+  url: https://hhs.iowa.gov
+  official: true
+  country: "us"
+url: "https://hhs.iowa.gov/programs/welcome-iowa-medicaid/provider-services/excluded-individuals-and-entities"
+data:
+  url: https://hhs.iowa.gov/programs/welcome-iowa-medicaid/provider-services/excluded-individuals-and-entities
+  format: HTML
+  lang: eng
+
+dates:
+  formats: ["%m/%d/%Y"]
+assertions:
+  min:
+    schema_entities:
+      Organization: 150
+      Person: 600
+  max:
+    schema_entities:
+      Organization: 400
+      Person: 1000
+
+lookups:
+  type.identifier:
+    options:
+      - regex: X00\d{6,9}
+        prop: registrationNumber
+      - match: "40980"
+        prop: registrationNumber
+      - match: N/A
+        value: null
+  type.date:
+    options:
+      - match: 104/2024
+        value: 2024-10-04
+      - match: 10/252024
+        value: 2024-10-25

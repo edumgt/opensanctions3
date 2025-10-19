@@ -1,0 +1,165 @@
+type: external
+title: Wikidata
+entry_point: zavod.runner.enrich:enrich
+prefix: wd
+disabled: false
+coverage:
+  frequency: daily
+  start: 2022-05-26
+exports:
+  - statistics.json
+  - entities.ftm.json
+deploy:
+  schedule: "1 0 * * *"
+  memory: "5000Mi"
+load_statements: true
+ci_test: false
+summary: >-
+  Wikidata is the structured data project of the Wikipedia community,
+  providing fact-based information edited by humans and machines
+description: |
+  Wikidata serves as the source of much of the OpenSanctions data related to
+  politically exposed persons (PEPs). We also link up entities that are
+  sanctioned whenever a relevant Wikidata item is available.
+
+  The Wikidata importer will also traverse family and personal relationships
+  that are documented in the database and import relatives and close associates
+  whereever these are stated.
+
+  ### Limitations
+
+  There is no attempt to link companies and organizations from sanctions lists
+  to Wikidata, as the way that an encyclopedia describes such legal entities is
+  not granular enough for due diligence use cases.
+
+  We also remove any person born before 1900, or who has died before 2000 from
+  the dataset in order to avoid outdated profiles that could lead to false
+  positives.
+url: https://www.wikidata.org/wiki/Wikidata:Main_Page
+publisher:
+  name: Wikidata
+  description: |
+    Wikidata is a free and open knowledge base that can be read and edited by both humans
+    and machines. It acts as central storage for the structured data of its Wikimedia
+    sister projects including Wikipedia, Wikivoyage, Wiktionary, Wikisource, and others.
+  url: https://www.wikidata.org
+  official: false
+
+http:
+  total_retries: 5
+  backoff_factor: 2
+  retry_statuses: [413, 429, 503, 500]
+  retry_methods:
+    - GET
+    - POST
+
+inputs:
+  - interpol_red_notices
+  - peps
+  - sanctions
+  - special_interest
+  - us_fbi_most_wanted
+  - us_klepto_hr_visa
+  - wanted
+  - enforcement
+  - wd_categories
+  - wd_curated
+  - wd_oligarchs
+  - wd_peps
+
+config:
+  type: nomenklatura.enrich.wikidata:WikidataEnricher
+  label_cache_days: 90
+  cache_days: 14
+  schemata:
+    - Person
+
+assertions:
+  min:
+    schema_entities:
+      Person: 330000
+  max:
+    schema_entities:
+      Person: 875000
+
+lookups:
+  type.name:
+    options:
+      - match: "..."
+        value: null
+  type.date:
+    options:
+      - match:
+          - "8034-06-14"
+          - "0011-06-04"
+          - "3004-03-14"
+        value: null
+      - match: "1949-02-29"
+        value: 1949-02
+      - match: "1821-02-29"
+        value: 1821-02
+      - match: "1930-02-30"
+        value: 1930-02
+      - match: "1935-06-31"
+        value: 1935-06
+      - match: "1973-09-31"
+        value: 1973-09
+      - match: "1765-09-31"
+        value: 1765-09
+      - match: "2018-02-29"
+        value: 2018-02
+      - match: "1999-06-31"
+        value: 1999-06
+      - match: "2004-04-31"
+        value: 2004-04
+      - match: "2011-02-31"
+        value: 2011-02
+      - match: "1991-02-29"
+        value: 1991-02
+      - match: "1885-02-29"
+        value: 1885-02
+  type.gender:
+    lowercase: true
+    normalize: true
+    options:
+      - match:
+          - Female
+          - trans woman
+          - intersex woman
+          - cisgender woman
+          - transfeminine
+          - non-binary woman
+          - female organism
+          - feminine
+        value: female
+      - match:
+          - genderfluid
+          - genderqueer
+          - neutrois
+          - non-binary
+          - travesti
+          - two-spirit
+          - intersex
+          - eunuch
+          - muxe
+          - bigender
+          - neutral sex
+          - non-binary gender
+          - hijra # third gender of South Asian cultures
+          - kathoey # third gender of Thai culture
+        value: other
+      - match:
+          - MALE
+          - trans man
+          - cisgender male
+          - cisgender man
+          - transmasculine
+          - intersex man
+          - male organism
+        value: male
+      - match:
+          - transgender
+          - agender
+          - Curis
+          - undisclosed gender
+        value: null

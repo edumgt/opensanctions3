@@ -1,0 +1,153 @@
+title: "Canadian Consolidated Autonomous Sanctions List"
+entry_point: crawler.py
+prefix: ca-sema
+coverage:
+  schedule: "0 */3 * * *"
+  frequency: daily
+  start: 2021-02-12
+load_statements: true
+summary: >-
+  Sanctions imposed by Canada on specific countries, organizations, or individuals
+  under the Special Economic Measures Act (SEMA) and JVCFOA
+description: |
+  Sanctions imposed by Canada on specific countries, organizations, or individuals vary
+  and can encompass a variety of measures, including restricting or prohibiting trade,
+  financial transactions or other economic activity between Canada and the target state;
+  or the seizure or freezing of property situated in Canada.
+
+  The Consolidated Canadian Autonomous Sanctions List includes individuals and
+  entities subject to specific sanctions regulations made under the Special
+  Economic Measures Act (SEMA) and the Justice for Victims of Corrupt Foreign
+  Officials Act (JVCFOA).
+
+  * [Types of sanctions](https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/types.aspx?lang=eng)
+  * [Frequently Asked Questions](https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/faq.aspx?lang=eng)
+  * [Contact Global Affairs Canada](https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/contact_us-communiquez_avec_nous.aspx?lang=eng)
+  * [Justice for Victims of Corrupt Foreign Officials Regulations (SOR/2017-233)](https://laws-lois.justice.gc.ca/eng/regulations/SOR-2017-233/page-2.html#h-842596)
+  * [JVCFOA XML data](https://laws-lois.justice.gc.ca/eng/XML/SOR-2017-233.xml)
+url: https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/consolidated-consolide.aspx?lang=eng
+tags:
+  - list.sanction
+  - issuer.west
+  - sector.maritime
+publisher:
+  name: "Global Affairs Canada"
+  description: |
+    The Canadian government body responsible for trade, travel, foreign affairs and
+    international development.
+  country: ca
+  url: https://www.international.gc.ca/global-affairs-affaires-mondiales/home-accueil.aspx?lang=eng
+  official: true
+data:
+  url: "https://www.international.gc.ca/world-monde/assets/office_docs/international_relations-relations_internationales/sanctions/sema-lmes.xml"
+  format: XML
+dates:
+  formats: ["%Y", "%d-%m-%Y", "%b-%y"]
+
+assertions:
+  min:
+    schema_entities:
+      Person: 2760
+      LegalEntity: 1050
+    entities_with_prop:
+      Sanction:
+        listingDate: 2500
+  max:
+    schema_entities:
+      Person: 6500
+      LegalEntity: 2480
+
+lookups:
+  sanction.program:
+    options:
+      - match:
+          - "Russia / Russie"
+          - "Myanmar (Burma) / Myanmar (Birmanie)"
+          - "Nicaragua"
+          - "Belarus / Bélarus"
+          - "Syria / Syrie"
+          - "Ukraine"
+          - "Venezuela "
+          - "Zimbabwe"
+          - "Moldova"
+          - "Iran"
+          - "Haiti / Haïti"
+          - "Guatemala"
+          - "China / Chine"
+          - "South Sudan / Soudan du sud"
+          - "Sri Lanka"
+          - "Sudan / Soudan"
+          - "Hamas Terrorist Attacks / Attaques terroristes du Hamas"
+          - "Extremist Settler Violence / Violence extrémiste des colons"
+        value: CA-SEMA
+      - match: "Justice for Victims of Corrupt Foreign Officials Regulations (JVCFOR) / Règlement relatif à la justice pour les victimes de dirigeants étrangers corrompus (RJVDEC)"
+        value: CA-JVCFOA
+  type.country:
+    lowercase: true
+    normalize: true
+    options:
+      - contains: (JVCFOR)
+        value: null
+      - match: Special Economic Measures (Hamas Terrorist Attacks) Regulations
+        value: PS
+      - match:
+          - Special Economic Measures (Extremist Settler Violence) Regulations
+          - Extremist Settler Violence
+        value: IL
+      - match: Hamas Terrorist Attacks
+        value: PS
+  type.date:
+    options:
+      - match: 1972-08-10 or 1972-08-11
+        values:
+          - 1972-08-10
+          - 1972-08-11
+      - match: 1963-1964
+        values:
+          - 1963
+          - 1964
+      - match:
+          - "31801"
+          - "31948"
+        value: null
+      - match: born in the early 1970s
+        values: [1970, 1971, 1972, 1973, 1974]
+      - match: "1975-19-25"
+        value: "1975"
+  type.name:
+    normalize: true
+    lowercase: true
+    options:
+      - match: >
+          Беларускi народны банк) (Russian: Открытое акционерное общество "Белорусский народный банк"/ ОАО "БНБ-Банк"
+        values:
+          - Беларускi народны банк
+          - Открытое акционерное общество "Белорусский народный банк"
+          - ОАО "БНБ-Банк"
+      - match: >
+          Адкрытае акцыянернае таварыства «Парытэтбанк» (ААТ «Парытэтбанк»)
+        values:
+          - Адкрытае акцыянернае таварыства «Парытэтбанк»
+          - ААТ «Парытэтбанк»
+      - match: >
+          закрытое акционерное общество "МТБанк" (ЗАО "МТБанк")
+        values:
+          - закрытое акционерное общество "МТБанк"
+          - ЗАО "МТБанк"
+      - match: >
+          Aleh Ryhoravich MISHCHANKA, Belarusian: Алег Рыгоравiч МIШЧАНКА, Russian: Олег Григорьевич Мищенко
+        values:
+          - Aleh Ryhoravich MISHCHANKA
+          - Алег Рыгоравiч МIШЧАНКА
+          - Олег Григорьевич Мищенко
+      - match: >
+          Открытое акционерное общество "ВОЛАТАВТО"/ ОАО "ВОЛАТАВТО"
+        values:
+          - Открытое акционерное общество "ВОЛАТАВТО"
+          - ОАО "ВОЛАТАВТО"
+      - contains: MEC Steel Mills (Hmaw
+        value: MEC Steel Mills (Hmaw Bi/Pyi/Ywama)
+      - match: Pyi
+        value: null
+      - match: Ywama
+        value: null

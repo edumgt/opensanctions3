@@ -1,0 +1,42 @@
+title: Navalny 35 List of Individuals for Sanctioning
+entry_point: crawler.py
+prefix: nv
+coverage:
+  frequency: never
+  end: "2021-02-08"
+  start: 2022-02-24
+deploy:
+  schedule: "0 8 * * 4"
+load_statements: true
+exports:
+  - statistics.json
+summary: >
+  A list of suggested sanctions targets published by Navalny's FBK in a letter
+  to Dominic Raab.
+description: |
+  This list was created in response to the poisining of Alexei Navalny by the
+  Russian security services. It designates individuals who are directly or
+  indirectly responsible for the attack.
+publisher:
+  name: Anti-Corruption Foundation
+  acronym: ACF
+  description: |
+    Фонд борьбы с коррупцией is an anti-corruption NGO linked to the political
+    network of imprisoned Russian opposition leader Alexei Navalny.
+  url: https://fbk.info
+  official: false
+  country: ru
+url: https://drive.google.com/file/d/1A9l5SqqbFBw3kGkQzWKfSyI-qQXBFme3/edit?fbclid=IwAR0Fp9sn9UGiX_St6i-_GrhIKvrdyhVtaXB3TRfskPCjuC5U5QTEnmuuyEQ
+data:
+  url: https://docs.google.com/spreadsheets/d/e/2PACX-1vQsmLFolFMG4eKTx9rEoJEoZEYjOlO1Vorw_wCc4rCEZCbC_0eNHGjgg57WjBDghnsQuIFRsuUTNyfu/pub?gid=110001778&output=csv
+  format: CSV
+
+assertions:
+  min:
+    schema_entities:
+      Person: 31
+      Organization: 2
+  max:
+    schema_entities:
+      Person: 35
+      Organization: 4

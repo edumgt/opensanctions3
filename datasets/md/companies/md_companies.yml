@@ -1,0 +1,120 @@
+name: md_companies
+title: State Registers of Legal Entities and Non-Profit Organizations in the Republic of Moldova
+prefix: md
+disabled: false
+entry_point: parse.py
+coverage:
+  frequency: weekly
+  start: 2023-03-21
+deploy:
+  disk: 30Gi
+  memory: 2Gi
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+resolve: false
+ci_test: false
+summary: >-
+  Entities registered in the Republic of Moldova, including both companies and
+  non-profit organizations, with key ownership and registration details.
+description: |
+  This dataset combines two distinct official registers from the Republic of Moldova:
+
+  - **State Register of Legal Entities**: Covers commercial companies, providing information 
+    on founders, beneficial owners, and directors.
+  
+  - **State Register of Non-Profit Organizations**: Includes associations, foundations, 
+    and other nonprofit entities, with data on tax identification numbers, legal form, 
+    registration and liquidation dates, and directors.
+url: https://dataset.gov.md/ro/dataset/11736-date-din-registrul-de-stat-al-unitatilor-de-drept-privind-intreprinderile-inregistrate-in-repu
+publisher:
+  name: Agenția Servicii Publice
+  name_en: Public Services Agency
+  acronym: ASP
+  descrition: |
+    The Public Services Agency (ASP) is a government institution responsible for 
+    implementing public policies in areas such as information technology, state 
+    registration, and business licensing. It manages core national registers, including 
+    those for legal entities, non-profit organizations, and vehicles.
+  country: md
+  url: https://www.asp.gov.md/en
+  official: true
+data:
+  # Legal entities
+  url: "https://dataset.gov.md/ro/dataset/11736-date-din-registrul-de-stat-al-unitatilor-de-drept-privind-intreprinderile-inregistrate-in-repu"
+  lang: ron 
+dates:
+  formats: ["%d.%m.%Y"]
+
+assertions:
+  min:
+    schema_entities:
+      Organization: 16000
+      Person: 15000
+      Company: 250000
+  max:
+    schema_entities:
+      Organization: 25000
+      Person: 25000
+      Company: 500000
+
+lookups:
+  nonprofit_headers:
+    options:
+      - match: IDNO
+        value: tax_number
+      - match: Data înreg.
+        value: incorporation_date
+      - match: Forma juridică
+        value: legal_form
+      - match: Denumirea
+        value: name
+      - match: CUATM
+        value: admin_unit_code
+      - match: Adresa
+        value: address
+      - match: Conducător
+        value: director
+      - match: Data lichidării
+        value: dissolution_date
+  type.date:
+    options:
+      - match:
+          - "20.08.1111"
+        value: null
+  type.name:
+    options:
+      - match: 'COOPERATIVA AGRICOLA DE PRODUCTIE "BUCHET", COOPERATIVA AGRICOLA DE PRODUCTIE, PASTRARE, PRELUCRARE SI COMERCIALIZARE A PRODUCTIEI  AGRICOLE "PASC-MLAD", FIRMA "DIMTACT-AGRO" S.R.L., FIRMA "PALMAV-AGRO" SRL, FIRMA "PROCULT-AGRO" S.R.L., SOCIETATEA CU RASPUNDERE LIMITATA "CEDALIA-A.D.", SOCIETATEA CU RASPUNDERE LIMITATA "CHIPAGRO", SOCIETATEA CU RASPUNDERE LIMITATA "CORJOVANCA", SOCIETATEA CU RASPUNDERE LIMITATA "MAZARESTI-RURAL", SOCIETATEA CU RASPUNDERE LIMITATA "STRUGURAS-PRIM", SOCIETATEA PE ACTIUNI DE TIP INCHIS "1 MAIA"'
+        values:
+          - COOPERATIVA AGRICOLA DE PRODUCTIE "BUCHET"
+          - COOPERATIVA AGRICOLA DE PRODUCTIE, PASTRARE, PRELUCRARE SI COMERCIALIZARE A PRODUCTIEI AGRICOLE "PASC-MLAD"
+          - FIRMA "DIMTACT-AGRO" S.R.L.
+          - FIRMA "PALMAV-AGRO" SRL
+          - FIRMA "PROCULT-AGRO" S.R.L.
+          - SOCIETATEA CU RASPUNDERE LIMITATA "CEDALIA-A.D."
+          - SOCIETATEA CU RASPUNDERE LIMITATA "CHIPAGRO"
+          - SOCIETATEA CU RASPUNDERE LIMITATA "CORJOVANCA"
+          - SOCIETATEA CU RASPUNDERE LIMITATA "MAZARESTI-RURAL"
+          - SOCIETATEA CU RASPUNDERE LIMITATA "STRUGURAS-PRIM"
+          - SOCIETATEA PE ACTIUNI DE TIP INCHIS "1 MAIA"
+      - match: '"BIRCA ZINAIDA ION", "BORTA VASILE TIMOFEI", "BORTA VICTOR ION", "CIMPOACA VALENTINA LUCA", "CIORBA IACOB PAVEL", "COLTA MARIA MIHAI", "DIACONU NICANOR GHEORGHE", "DONCILA VALENTINA ION", "GARABAGIU ELEONORA CONSTANTIN", "GHENITA FEODORA S.", "MARDARI ALEXANDRA IACOB", "MEREACRE VASILISA ION", "MUNTEAN ANA VASILE", "SULA ELENA ILIE", "URSU FIODOR PR.", G.T."TURCAN F.P.", IONAS NICOLAI ION", PAVALACHE DOMENTI FEODOSEI"'
+        values:
+          - "BIRCA ZINAIDA ION"
+          - "BORTA VASILE TIMOFEI"
+          - "BORTA VICTOR ION"
+          - "CIMPOACA VALENTINA LUCA"
+          - "CIORBA IACOB PAVEL"
+          - "COLTA MARIA MIHAI"
+          - "DIACONU NICANOR GHEORGHE"
+          - "DONCILA VALENTINA ION"
+          - "GARABAGIU ELEONORA CONSTANTIN"
+          - "GHENITA FEODORA S."
+          - "MARDARI ALEXANDRA IACOB"
+          - "MEREACRE VASILISA ION"
+          - "MUNTEAN ANA VASILE"
+          - "SULA ELENA ILIE"
+          - "URSU FIODOR PR."
+          - G.T."TURCAN F.P."
+          - "IONAS NICOLAI ION"
+          - "PAVALACHE DOMENTI FEODOSEI"

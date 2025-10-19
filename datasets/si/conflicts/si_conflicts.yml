@@ -1,0 +1,76 @@
+title: Slovenia Business Restrictions
+entry_point: crawler.py
+prefix: si-conflicts
+url: https://registri.kpk-rs.si/registri/omejitve_poslovanja/seznam/
+summary: List of Business restrictions preventing conflict of interest in Slovenia
+coverage:
+  frequency: daily
+  start: 2024-01-24
+load_statements: true
+description: >
+  Under Slovenia’s Integrity and Prevention of Corruption Act (IPCA), public-sector bodies and 
+  organizations are prohibited from doing business with entities where an official from that body, 
+  or their family member, is a manager, legal representative, or holds 5% or more of the shares. 
+  This dataset lists such entities. The restrictions aim to protect public funds by preventing 
+  transactions that could cause a conflict of interest.
+  [Source: KPK Official Website](https://www.kpk-rs.si/en/restrictions-of-business-activities/)
+publisher:
+  name: Komisija za preprečevanje korupcije
+  acronym: KPK
+  description: >
+    The Commission for the Prevention of Corruption of the Republic of Slovenia is an independent state body in the Republic of Slovenia whose task is detection 
+    and prosecution in pre-criminal or criminal proceedings in the field of corruption. [Source: Wikipedia](https://sl.wikipedia.org/wiki/Komisija_za_prepre%C4%8Devanje_korupcije)
+  url: https://www.kpk-rs.si/
+  country: si
+  official: true
+data:
+  url: https://registri.kpk-rs.si/registri/omejitve_poslovanja/seznam/omejitve.json
+  format: JSON
+
+assertions:
+  min:
+    schema_entities:
+      LegalEntity: 5200
+  max:
+    schema_entities:
+      LegalEntity: 10000
+
+lookups:
+  columns:
+    options:
+      - match: organ
+        value: org_name
+      - match: maticna
+        value: org_reg_number
+      - match: davcna
+        value: org_tax_number
+      - match: sifra_pu
+        value: org_internal_id
+      - match: naslov
+        value: org_address
+      - match: posta
+        value: org_place
+      - match: tip_omejitve
+        value: restriction_type
+      - match: ps_naziv
+        value: entity_name
+      - match: drzava
+        value: country
+      - match: ps_maticna
+        value: entity_reg_number
+      - match: ps_davcna
+        value: entity_tax_number
+      - match: ps_naslov
+        value: entity_address
+      - match: ps_posta
+        value: entity_place
+      - match: datum_od
+        value: start_date
+      - match: datum_do
+        value: end_date
+      - match: mid
+        value: mid
+  type.country:
+    options:
+      - match: Srbija in Črna gora
+        values: ["RS", "ME"]

@@ -1,0 +1,22 @@
+type: collection
+title: "Non-deduplicated sanctioned entities"
+hidden: true
+coverage:
+  start: "2023-12-04"
+  frequency: monthly
+deploy:
+  memory: "1500Mi"
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - senzing.json
+resolve: false
+summary: >
+  Includes all entities from the sanctions collection without any de-duplication
+description: |
+  A version of [the sanctions dataset](/datasets/sanctions/) where no 
+  de-duplication has been applied.
+
+children:
+  - sanctions
+ci_test: false

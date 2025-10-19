@@ -1,0 +1,81 @@
+title: "EU ESMA Suspensions and Removals"
+entry_point: crawler.py
+prefix: eu-saris
+coverage:
+  frequency: daily
+  start: 2024-03-12
+load_statements: true
+summary: >-
+  List of suspended and removed financial instruments, as published by the
+  European Securities and Markets Authority (ESMA).
+description: |
+  Register on suspensions and removals of financial instruments from trading,
+  according to articles 32 and 52 of Directive 2014/65/EU (MIFID II). Where
+  possible, the listing includes the suspending authority.
+
+  > ESMA is responsible only for the accurate reproduction of the relevant part
+  > of the notifications received from the national competent authorities. 
+  > ESMA does not provide any representation or warranty that the content of the
+  > notification is complete, accurate or up to date. National competent
+  > authorities are responsible for the content of the information shown on this
+  > website. Any queries regarding the content should be addressed directly to
+  > the competent authority for that financial instrument. In addition, attention
+  > is drawn also to the Legal Notice of ESMA website.
+  > Please note that following this/these suspension/s, other market/s or
+  > national competent authority/ies may suspend the same or related financial
+  > instruments as well, according to Articles 32 and 52 MiFID. 
+  > No information about those follow-up suspensions will be displayed on this website.
+publisher:
+  name: European Securities and Markets Authority
+  acronym: ESMA
+  description: |
+    ESMA is the EU’s financial markets regulator and supervisor. It publishes a
+    number of databases and registers, including the Financial Instruments Reference
+    Data System (FIRDS).
+  country: eu
+  url: https://www.esma.europa.eu/
+  official: true
+url: https://registers.esma.europa.eu/publication/searchRegister?core=esma_registers_saris_new
+data:
+  url: https://registers.esma.europa.eu/publication/searchRegister/doExportSarisCsv?core=esma_registers_saris_new
+  format: CSV
+tags:
+  - list.sanction
+  - sector.financial
+  - sector.securities
+  - issuer.west
+
+assertions:
+  min:
+    schema_entities:
+      Security: 2000
+      LegalEntity: 1700
+  max:
+    schema_entities:
+      Security: 4800
+      LegalEntity: 3900
+
+lookups:
+  reason_topic:
+    options:
+      - match:
+          - "01. Inside Info"
+          - "02. Market Abuse"
+          - "4_OLD_Suspected market abuse"
+        value: "crime.fin"
+      - match:
+          - "03. Other suspension"
+          - "04. Take-over bid"
+          - "1_OLD_Market management arrangements"
+          - "2_OLD_Undisclosed price sensitive information (awaiting public release)"
+          - "3_OLD_Issuers failure to disclose periodic information on time"
+          - "5_OLD_Other noncompliance with rules of regulated market"
+          - "6_OLD_Filling of tender offers and related events"
+          - "7_OLD_Other disorderly trading conditions"
+          - "Removal"
+          - null
+        value: "reg.warn"
+      - match:
+          - "Trading ban - EU sanctions"
+          - "Trading ban - indirect effect of sanctions"
+        value: "sanction"

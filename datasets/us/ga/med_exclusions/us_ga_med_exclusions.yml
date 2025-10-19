@@ -1,0 +1,62 @@
+title: US Georgia Healthcare provider exclusions
+entry_point: crawler.py
+prefix: us-medga
+coverage:
+  start: "2024-09-06"
+  schedule: "8 4 1,15 * *"
+load_statements: true
+summary: >
+  Providers who have been terminated for cause from Georgia's Medicaid program.
+description: |
+  > The Georgia Department of Community Health is authorized to exclude certain individuals and entities (providers)
+  > from participating in federally funded health care programs, including Medicaid. Excluded individuals and
+  > entities are not permitted to receive reimbursement for providing Medicare and Medicaid services in all categories
+  > of service and in any capacity, including managed care.
+tags:
+  - sector.medical
+  - sector.usmed.debarment
+publisher:
+  name: Georgia Department of Community Health
+  description: |
+    The Georgia Department of Community Health (DCH) manages Georgia's Medicaid, State Health Benefit Plan,
+    and healthcare regulations.
+  acronym: DCH
+  url: https://dch.georgia.gov
+  official: true
+  country: "us"
+url: "https://dch.georgia.gov/office-inspector-general/georgia-oig-exclusions-list"
+data:
+  url: https://dch.georgia.gov/office-inspector-general/georgia-oig-exclusions-list
+  format: HTML
+  lang: eng
+
+dates:
+  formats: ["%Y%m%d"]
+assertions:
+  min:
+    schema_entities:
+      Person: 1100
+      Company: 80
+  max:
+    schema_entities:
+      Person: 1500
+      # They've previously put middle names and aliases in the business name field
+      # adding about 140 mistaken companies to the roughly 105 real companies.
+      Company: 200
+lookups:
+  type.identifier:
+    options:
+      - match: "01/**/1964"
+        value: null
+  type.date:
+    options:
+      - match: "20223108"
+        value: "2022-08-31"
+      - match: "20222109"
+        value: "2022-09-21"
+      - match: "20222209"
+        value: "2022-09-22"
+      - match: "20222311"
+        value: "2022-11-23"
+      - match: "20212309"
+        value: "2021-09-23"

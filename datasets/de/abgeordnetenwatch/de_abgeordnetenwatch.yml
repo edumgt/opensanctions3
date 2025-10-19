@@ -1,0 +1,56 @@
+name: de_abgeordnetenwatch
+title: "German Legislators from AbgeordnetenWatch"
+url: https://www.abgeordnetenwatch.de
+entry_point: crawler
+prefix: de-aw
+coverage:
+  frequency: daily
+  start: 2023-08-24
+load_statements: true
+summary: >
+  Members of the German national legislature (The Bundestag)
+  and state legislatures (Landstag).
+description: |
+  Members of the German national legislature (The Bundestag)
+  and state legislatures (Landstag) and the positions they occupy
+  in the legislature, provided by the [Abgeordenetenwatch API](https://www.abgeordnetenwatch.de/api).
+
+  Data released under CC0 1.0 license.
+tags:
+  - list.pep
+publisher:
+  name: Parlamentwatch e.V.
+  official: false
+  description: |
+    On abgeordnetenwatch.de (which translates as “member of parliament watch”)
+    users can find all politicial representatives and ask them questions, read
+    investigative research and support their demands towards politics for more
+    transparency.
+  country: de
+  url: https://www.abgeordnetenwatch.de/ueber-uns/impressum
+data:
+  url: "https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?type=mandate"
+  format: JSON
+  lang: deu
+ci_test: false
+
+assertions:
+  min:
+    schema_entities:
+      Person: 2500
+      Position: 15
+  max:
+    schema_entities:
+      # We kinda wanna see when we need to bump the minimum but it's been fluctuating
+      # inexplicably so we want it a bit tighter than usual
+      Person: 3000
+      Position: 30
+
+lookups:
+  type.string:
+    options:
+      # Geburtsname: 04.12
+      # https://www.abgeordnetenwatch.de/profile/anne-koenig
+      # type.string because it's a lastName
+      - match: '04.12.'
+        value: null

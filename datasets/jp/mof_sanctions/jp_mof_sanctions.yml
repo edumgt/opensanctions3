@@ -1,0 +1,670 @@
+title: Japan Economic Sanctions and List of Eligible People
+entry_point: crawler.py
+prefix: ja-mof
+coverage:
+  schedule: "0 */3 * * *"
+  frequency: daily
+  start: 2021-10-21
+load_statements: true
+summary: >-
+  Sanctions imposed by Japan under its Foreign Exchange and Foreign Trade Law.
+description: |
+  > The Foreign Exchange Law is based on the free conduct of foreign transactions,
+  > but "when we recognize that it is necessary to fulfill our international commitments
+  > in good faith" and "we contribute to international efforts for international
+  > peace." "When we find it particularly necessary to do so" or "when a Cabinet decision
+  > is made to take countermeasures as it is particularly necessary to maintain Japan's
+  > peace and security", the competent minister (Minister of Finance and the Minister of
+  > Economy, Trade and Industry) The Minister) is supposed to be able to implement the
+  > required economic sanctions.
+  >
+  > Currently, as such economic sanctions, weapons bans on the Democratic Republic of
+  > Congo, such as the institutions of the former Iraqi administration, senior officials
+  > of the former Iraqi administration or their related persons, Tulliburn officials,
+  > terrorists, etc. Libya's Kadafi Revolutionary Leaders and their relationships, including
+  > those who violated, those involved in the inhibition of peace in Sudan, those involved
+  > in North Korea's missile or mass destruction weapons program, those who violated weapons
+  > bans against Somalia, etc. , Syrian President Al Assad and his associates, those who
+  > are judged to be directly involved in the "merger" of Crimea or the destabilization
+  > of eastern Ukraine, and those who were involved in acts that impair peace in the
+  > Central African Republic. Persons involved in activities that threaten peace in the
+  > Republic of Yemen, persons involved in acts that threaten peace in South Sudan, persons
+  > involved in nuclear activities in Iraq, and acts that threaten peace in the Republic
+  > of Syria. Asset freeze measures, etc. are being implemented for those involved
+  > in the above.
+publisher:
+  name: "Ministry of Finance"
+  acronym: MoF
+  description: |
+    The Ministry of Finance (財務省) is the Japanese ministry that has
+    jurisdiction over ensuring sound finances, realizing fair taxation,
+    managing national treasury, managing customs operations, and
+    maintaining confidence in currency.
+  country: jp
+  url: https://www.mof.go.jp/
+  official: true
+url: https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/gaiyou.html
+tags:
+  - list.sanction
+  - sector.financial
+  - issuer.west
+data:
+  url: https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html
+  format: XLSX
+  lang: jpn
+dates:
+  formats:
+    [
+      "%Y年%m月%d日",
+      "%Y年%m月%d",
+      "%Y年%m月",
+      "%Y年",
+      "%Y年頃", # approximate year
+      "%Y.%m.%d",
+      "おおよそ%Y年",
+      "、%Y年%m月%d",
+      ":%Y年%m月%d",
+      ",%Y年%m月%d",
+    ]
+
+assertions:
+  min:
+    schema_entities:
+      Person: 1570
+      Address: 870
+      LegalEntity: 520
+      Organization: 130
+      CryptoWallet: 30
+  max:
+    schema_entities:
+      Person: 3700
+      Address: 2040
+      LegalEntity: 1200
+      Organization: 300
+      CryptoWallet: 80
+
+lookups:
+  schema:
+    options:
+      - match:
+          - マリ共和国における平和等を脅かす行為等に関与した者等
+          - 南スーダンにおける平和等を脅かす行為等に関与した者等
+          - イエメン共和国における平和等を脅かす活動に関与した者等
+          - イラク前政権の機関、高官又はその関係者等 （Ⅰ．決議第1483号23(b)の対象となる個人）
+          - ミロシェビッチ前ユーゴスラビア大統領及び関係者
+          - ハイチにおける平和等を脅かす行為等に関与した者等
+          - 暴力的行為に関与するイスラエルの入植者
+          - 資産凍結等の措置の対象となるロシア連邦及びベラルーシ共和国以外の国・地域の個人
+        contains:
+          - （個人）
+          - （Ⅰ．国際連合安全保障理事会決議第2009号主文15に従い、資産凍結の措置が緩和されて適用される個人又は団体 ）
+          - タリバーン関係者等
+        # value: Person
+        value: LegalEntity
+      - match:
+          - 中央アフリカ共和国における平和等を損なう行為等に関与した者等（団体及びその他のグループ）
+          - イラク前政権の機関、高官又はその関係者等 （Ⅱ．決議第1483号23(a)の対象となる団体）
+          - コンゴ民主共和国に対する武器禁輸措置等に違反した者等（団体とその他のグループ）
+          - イラク前政権の機関、高官又はその関係者等 （Ⅲ．決議第1483号23(b）の対象となる団体）
+          - 資産凍結等の措置の対象となるロシア連邦及びベラルーシ共和国以外の国の団体
+          - 資産凍結等の措置の対象となるロシア連邦及びベラルーシ共和国以外の国・地域の団体
+          - 資産凍結等の措置の対象となるロシア連邦及びベラルーシ共和国以外の国・地域の特定銀行
+        contains:
+          - （団体）
+        value: Organization
+      - match:
+          - 国際平和のための国際的な努力に我が国として寄与するために講ずる資産凍結等の措置の対象となる
+          - リビアのカダフィ革命指導者及びその関係者 （Ⅱ その他の個人又は団体）
+          - ソマリアに対する武器禁輸措置等に違反した者等
+          - スーダンにおけるダルフール和平阻害関与者等
+          - 北朝鮮のミサイル又は大量破壊兵器計画に関連する者
+          - テロリスト等 / 米国等が資産凍結等の措置を実施した個人及び団体
+          - テロリスト等 / 先進主要７か国（米、加、英、仏、独、伊、日）が協調して資産凍結の措置を実施する対象となるテロリスト等の個人及び団体
+          - 資産凍結等の措置の対象となるロシア連邦の団体及び個人（団体（特定銀行を除く））
+          - 資産凍結等の措置の対象となるロシア連邦の団体及び個人（特定銀行）
+          - 資産凍結等の措置の対象となるベラルーシ共和国の個人及び団体（団体（特定銀行を除く））
+          - 資産凍結等の措置の対象となるベラルーシ共和国の個人及び団体（特定銀行）
+        contains:
+          - 資産凍結等の措置の対象となるロシア連邦の団体及び個人（団体（特定銀行を除く））
+          - 資産凍結等の措置の対象となるロシア連邦の団体及び個人（特定銀行）
+          - 資産凍結等の措置の対象となるベラルーシ共和国の個人及び団体（団体（特定銀行を除く））
+          - 資産凍結等の措置の対象となるベラルーシ共和国の個人及び団体（特定銀行）
+        value: LegalEntity
+  columns:
+    options:
+      - match:
+          - 告示日付
+        value: notification_date
+      - match:
+          - 確定に十分でない別名
+        value: weak_alias
+      - match:
+          - 日 本 語 表 記
+        value: name_japanese
+      - match: 英 語 表 記
+        value: name_english
+      - match:
+          - 告示 番号
+          - 告示番号
+        value: notification_number
+      - match:
+          - 別 名
+          - 別 称 ・ 別 名
+          - 別称・旧称
+          - 別称
+          - 別名
+        value: alias
+      - match:
+          - 称 号
+          - 称号
+          - 別 称 ・ 旧 称
+        value: title
+      - match:
+          - 役 職
+          - 役職
+        value: position
+      - match:
+          - そ の 他 の 情 報
+          - その他の情報
+        value: other_information
+      - match:
+          - リスト掲載日
+          - リ ス ト 掲 載 日
+        value: publication_date
+      - match:
+          - 住 所
+          - 住所・所在地
+          - 住 所 ・ 所 在 地
+          - 住 所・所在地
+          - 住所等  # residence, etc.
+          - 住所  # residence
+          # activity area - residence:
+          - 活 動 地 域 ・ 住 所
+          - 所在地・住所 登録された事務所の住所
+          - 所在地
+        value: address
+      - match:
+          - 所 在 地
+        value: where
+      - match:
+          - 過去の別名
+          - 以 前 の 別 名
+        value: past_alias
+      - match:
+          - 旧 称
+          - 旧称
+          - 旧 称 ・ 以 前 の 呼 称
+        value: old_name
+      - match:
+          - 電話番号
+          - 電話
+        value: phone
+      - match:
+          - 生 年 月 日
+          - 生年月日
+          # w/ place:
+          - 生 年 月 日・出生地
+        value: birth_date
+      - match:
+          - 出 生 地
+          - 出生地
+          - 出 生 地・出 身 地
+        value: birth_place
+      - match:
+          - 国 籍
+          - 国籍
+        value: citizenship
+      - match:
+          - 旅 券 番 号
+          - 旅券番号
+        # wtf? travel_voucher_number
+        value: passport_number
+      - match:
+          - 身分登録番号
+        value: identification_number
+      - match:
+          - I D 番 号
+          - ＩＤ番号
+          - 身分証番号
+        value: id_number
+      - match: 確定可能な別名
+        value: known_alias
+      - match: 指 定 の 根 拠
+        # maybe means "reason"?
+        value: root_nomination
+      - match:
+          - 肩 書
+          - 肩 書 等
+          - 肩 書 等
+        # literally: shoulder book? facebook?
+        value: position
+      - match:
+          - 別 称
+          - 別 名 ・ 別 称
+        value: nickname
+      - match: FAX
+        value: fax
+      - match:
+          - 国連制裁委員会による指定日
+          - 国連制裁員会による指定日
+        value: designated_date_un
+      - match:
+          - 国 連 参 照 番 号
+          - 国連参照番号
+        value: unsc_id
+      - match: 決議1483上の根拠
+        value: reason_res1483
+      - match: 詳 細
+        value: details
+      - match: 活 動 地 域
+        value: activity_area
+  type.address:
+    lowercase: true
+    options:
+      - match:
+          - Philippines
+          - Russia
+        value: null
+      - match: "Branch Office 6: Shop number 237, Shah Zada Market (also known as Sarai Shahzada), Puli Khishti area, Police District 1, Kabul, Afghanistan, Telephone: +93-202-103386, +93-202-101714, 0202-104748, Mobile: +93-797-059059, +93-702-222222, e-mail: helmand_exchange_msp@yahoo.com"
+        value: Shop number 237, Shah Zada Market (also known as Sarai Shahzada), Puli Khishti area, Police District 1, Kabul, Afghanistan
+  type.country:
+    lowercase: true
+    normalize: true
+    options:
+      - match:
+          - Commune of Bouhechana, Daïra de Lakhezara, Guelma, Algeria
+        value: Algeria
+      - match: 米国。また、シリア国籍も所持していると見られる。
+        values:
+          - US
+          - SY
+      - match: エチオピアと思われる
+        value: Ethiopia
+      - match: インドネシア（2003年12月時点）
+        value: Indonesia
+      - match: スーダン人（生まれ）
+        value: Sudan
+      - match: ソビエト社会主義共和国連邦（1991年まで）
+        value: SUHH
+      - match: 2002年にクウェート国籍を剥奪された。
+        value: null
+      - match: サウディ・アラビア
+        value: Saudi Arabia
+      - match: スロバキア共和国
+        value: Slovakia
+      - match: トルコ、ヨルダン
+        values:
+          - Turkey
+          - Jordan
+      - match: ハイチ共和国
+        value: China
+      - match: タンザニア共和国
+        value: tz
+      - match: タジキスタン Tajikistan
+        value: Tajikistan
+      - match: クウェート Kuwait
+        value: Kuwait
+      - match: チュニジア Tunisia
+        value: Tunisia
+      - match: リビア Libya
+        value: Libya
+      - match: エジプトEgypt
+        value: Egypt
+      - match: インドネシア Indonesia
+        value: Indonesia
+  type.date:
+    options:
+      - match:
+          - 10月10
+          - 10月22
+          - "59"
+          - "31"
+          - 6月14
+          - 7月10
+          - おおむね30～35歳
+          - ３月13
+          - ９月28
+          - "1402-06-24"
+          # "From the forged passport"
+          - （偽造旅券より）
+          # "Hijiri calendar"
+          - "（ヒジュラ暦）"
+          - "の間"
+          - "から"
+          - "10月17"
+          - "10月19"
+          - "10月3"
+          - "11月14"
+          - "11月24"
+          - "11月26"
+          - "11月29"
+          - "12月10"
+          - "12月2"
+          - "12月20"
+          - "12月21"
+          - "12月23"
+          - "12月29"
+          - "12月30"
+          - "12月31"
+          - "3月15"
+          - "3月18"
+          - "4月20"
+          - "5月1"
+          - "5月18"
+          - "5月29"
+          - "5月31"
+          - "6月2"
+          - "6月3"
+          - "7月18"
+          - "7月21"
+          - "7月23"
+          - "7月25"
+          - "7月27"
+          - "7月31"
+          - "8月13"
+          - "9月1"
+          - "9月21"
+          - "9月27"
+          - yearunknown
+          - 9月28
+          - 3月13
+          - おおむね30~35歳
+          - 7月17
+          - 3月25
+          - 6月10
+          - 、11月15
+          - 、5月1
+          - 、3月24
+          - 訂
+        value: null
+      - match: Born on 10 July 1942
+        value: "1942-07-10"
+      - match: Born at Ravni, Republic of Serbia, on 1 June 1941
+        value: "1941-06-01"
+      # Ravni, Republic of Serbia
+      - match: セルビア共和国ラヴニ
+        value: null
+      - match: Born at Pozarevac, Republic of Serbia, on 20 August 1941
+        value: "1941-08-20"
+      # Pozarevac, Republic of Serbia
+      - match: セルビア共和国ポジャレヴァッツ
+        value: null
+      - match: ©1979年3月3
+        value: "1979-03-03"
+      - match: 1977年8月から9月の間
+        values:
+          - 1977-08
+          - 1977-09
+      - match: Born at Bor, Republic of Serbia, on 7 December 1948
+        value: "1948-12-07"
+      # Bor, Republic of Serbia
+      - match: セルビア共和国ボル
+        value: null
+      - match: Born on 2 July 1974
+        value: "1974-07-02"
+      - match: 60年
+        value: "1960"
+      - match: "2007.713"
+        value: "2007-07-13"
+      - match: 1983年2(3)月10
+        values:
+          - 1983-02-10
+          - 1983-03-10
+      - match: Born at Belgrade, Republic of Serbia, on 19 December 1942
+        value: "1942-12-19"
+      # Belgrade, Republic of Serbia
+      - match: セルビア共和国ベオグラード
+        value: null
+      - match: "200812.19"
+        value: "2008-12-19"
+      # Around 1955-1958
+      - match: 1955年-1958年頃
+        values:
+          - 1955
+          - 1958
+      # Around 1945-1950
+      - match: 1945年-1950年頃
+        values:
+          - 1945
+          - 1950
+      # Between 1963 and 1968
+      - match: 1963年から1968年の間
+        values:
+          - 1963
+          - 1968
+      - match: 1958年から1963年の間
+        values:
+          - 1958
+          - 1963
+      - match: 1968年から1973年の間
+        values:
+          - 1968
+          - 1973
+      - match: 1966年から1967年頃
+        values:
+          - 1966
+          - 1967
+      - match: 1962年-1963年頃
+        values:
+          - 1962
+          - 1963
+      - match: 1953年から1958年の間
+        values:
+          - 1953
+          - 1958
+      - match: 1956年から1957年の間
+        values:
+          - 1956
+          - 1957
+      - match: 1972年から1973年までの間
+        values:
+          - 1972
+          - 1973
+      - match: 1954年-1955年
+        values:
+          - 1954
+          - 1955
+      - match: 1940年-1941年
+        values:
+          - 1940
+          - 1941
+      - match: 1978年の頃
+        values:
+          - 1978
+      - match: 1967年から1969年までの間
+        values:
+          - 1967
+          - 1969
+      - match: 1946年から1956年
+        values:
+          - 1946
+          - 1956
+      - match: 2000年2月20/29
+        values:
+          - "2000-02-20"
+          - "2000-02-29"
+      - match: 1984年から1986年までの間
+        values:
+          - 1984
+          - 1986
+      - match: 1983年23月10
+        values:
+          - "1983-02-10"
+          - "1983-03-10"
+      - match: 1960年-1962年頃
+        values:
+          - 1960
+          - 1962
+      - match: （year unknown）
+        value: null
+      - match: "BornatPozarevac,RepublicofSerbia,on20August1941"
+        value: "1941-08-20"
+      - match: "Born1970"
+        value: "1970"
+      - match: "Bornon10July1942"
+        value: "1942-07-10"
+      - match: "Born1936"
+        value: "1936"
+      - match: "Born1965"
+        value: "1965"
+      - match: "Bornon2July1974"
+        value: "1974-07-02"
+      - match: "BornatBelgrade,RepublicofSerbia,on19December1942"
+        value: "1942-12-19"
+      - match: "BornatRavni,RepublicofSerbia,on1June1941"
+        value: "1941-06-01"
+      - match: "BornatBor,RepublicofSerbia,on7December1948"
+        value: "1948-12-07"
+      - match: "1937年セルビア共和国マーラ・クルスナ"
+        value: "1937"
+      - match: "BornatMalaKrsna,RepublicofSerbia,in1937"
+        value: "1937"
+      - match: "1937年~1945年"
+        values:
+          - 1937
+          - 1945
+      - match: "1958年から1964年までの間"
+        values:
+          - 1958
+          - 1964
+      - match: "ヒジュラ暦"
+        value: null
+      - match: "偽造旅券より"
+        value: null
+      - match: "1968年から1970年の間"
+        values:
+          - 1968
+          - 1970
+      - match: "1969年から1971年の間"
+        values:
+          - 1969
+          - 1971
+      - match: "1975年から1976年の間"
+        values:
+          - 1975
+          - 1976
+      - match: "1977年-1982年"
+        values:
+          - 1977
+          - 1982
+      - match: "1975年から1979年の間"
+        values:
+          - 1975
+          - 1979
+      - match: "1965年から1969年の間"
+        values:
+          - 1965
+          - 1969
+      - match: "およそ1970年"
+        value: "1970"
+      - match: "1973年から1974年までの間"
+        values:
+          - 1973
+          - 1974
+      - match: "1979年から1982年頃"
+        values:
+          - 1979
+          - 1982
+      - match: "1957年から1962年までの間"
+        values:
+          - 1957
+          - 1962
+      - match: "1957年から1959年の間"
+        values:
+          - 1957
+          - 1959
+  type.identifier:
+    options:
+      - match:
+          - アルジェリア出生証明書、１９７３年９月２５日に Mehdia, Tiaret Province, Algeria で出生した Djamel Mostefa について発行
+          - （Vedensiky District, Repubic of Chechnya, Russian Federationにて、内務省により発行）
+          - N°235/MISPAT/DIRCAB/DGPC/DGAEI/SI/SP、2019年3月15日発行（中央アフリカ共和国内務大臣発行）
+          - （2003年8月15日、Department of the Federal Migration Service of the Russian Federation for the Republic Karachayevo-Cherkessiaにて発行）
+        value: null
+      - match: アフガニスタン旅券番号：OR1961825（2003年2月4日に発行、2006年2月2日に失効、Akhter Mohmadの名義で発行)
+        value: OR1961825
+      - match: アフガニスタン旅券番号：TR024417（2003年12月20日に発行、2006年12月29日に失効、Haji Gulab Gulの名義で発行)
+        value: TR024417
+      - match: イエメン旅券 541939 （2000年7月31日Al-Hudaydah, YemenにおいてMuhammad Muhammad Abdullah Al-Ahdalの名前に対して発行）
+        value: 541939
+      - match: デンマーク偽造運転免許証 no. 20645897、１９７３年８月２２日にモロッコで出生した Ali Barkani に対して発給
+        value: 20645897
+      - match: ドイツ連邦ＩＤカード 1007850441 （2001年3月27日ドイツのキール（Kiel）市当局が発行、2011年3月26日失効）
+        value: 1007850441
+      - match: パキスタン旅券 4117921 （Dilawar Khan Zain Khanの名義で2008年9月9日に発行、2013年9月9日に失効）
+        value: 4117921
+      - match: クウェート国民ID番号（Kuwaiti Civil Identification number） 281020505755 （Said Jan 'Abd al-Salamの名義）
+        value: 281020505755
+      - match: =サウジアラビア旅券　F654645（2005年4月30日発行、2010年3月7日失効、ヒジュラ暦では、1426年6月24日発行、1431年3月21日失効）
+        value: F654645
+      - match: パキスタン旅券 FA0157612（2009年7月23日発行、2014年7月22日失効、2013年時点で公式に失効措置済み。アラー・ムハンマドの名義で発行されている）
+        value: FA0157612
+      - match: アフガニスタン国民IDカード（tazkira）番号 57388（Lashkar Gah District, Helmand Province, Afghanistanにて発行
+        value: 57388
+      - match: パキスタン旅券 NC5140251 （2009年10月23日発行、2014年10月22日失効、2013年時点で公式に失効措置済み）
+        value: NC5140251
+      - match: フランス旅券05AT521433（2005年11月30日Sous-Prefecture of police of Lorient, Franceにより発行)
+        value: 05AT521433
+      - match: フランス国民IDカード番号050456101445（2005年5月19日Sous-Prefecture of police of Lorient, Franceにより発行）
+        value: 050456101445
+      - match: インドネシア旅券番号 W344982（1985年3月4日Jakarta, Indonesia生まれのAngga Dimas Peshadaとして発行）
+        value: W344982
+      - match: インドネシア旅券番号 A2823222（1975年7月14日Rembang, Jawa Tengah, Indonesia生まれのWiji Joko Santosoとして2012年5月28日発行、2017年5月28日失効）
+        value: A2823222
+      - match: ロシア外国人旅行旅券番号 514448632（2010年9月8日にAlexandria, Egyptにて、ロシア連邦総領事館により発行）
+        value: 514448632
+      - match: トリニダード・トバゴ旅券番号TA959547、2013年11月19日発行（トリニダード・トバゴ移民局発行､2018年11月18日失効）
+        value: TA959547
+      - match: トリニダード・トバゴ旅券番号T1071839、2004年11月8日発行（トリニダード・トバゴ入国管理部門発行、2014年11月7日失効）
+        value: T1071839
+      - match: イラク番号 A6489694、2013年9月2日発行（2021年8月31日失効；氏名のアラビア語表記：منصور ال محمد مصطفى سالم）
+        value: A6489694
+      - match: イラク国民ＩＤカード番号00813602、2011年9月18日発行（氏名のアラビア語表記：منصور ال محمد مصطفى سالم）
+        value: 00813602
+      - match: イラク国民ＩＤカード番号00405771、2013年5月20日にイラクにて発行（氏名のアラビア語表記：عمر محمود إرحيم الفياض）
+        value: 00405771
+      - match: 199110092、旅券失効日：2014年3月17日（北朝鮮旅券）；472220503、旅券失効日：2018年6月6日（北朝鮮旅券）；654220197、旅券失効日：2019年5月7日（北朝鮮旅券）
+        values:
+          - 199110092
+          - 472220503
+          - 654220197
+      - match: 108220348（北朝鮮旅券）、旅券失効日：2023年5月18日; 745220480（北朝鮮旅券）、旅券失効日：2020年1月2日
+        values:
+          - 108220348
+          - 745220480
+      - match: D00002264、2013年6月11日発行（南スーダン共和国ジュバにて外務省が発行したサミュエル・ペーター・ムデ（Samuel Peter Mudde）名義の外交旅券。有効期限は2017年6月11日）
+        value: D00002264
+      - match: Ｐ04838205（2018年6月10日発行（スーダン共和国バフリで発行。2023年6月9日に失効。旅券番号はモハメド・アダム・ブレマ・アブダラ（Mohamed Adam Brema Abdallah）の名義で発行。）。）
+        value: P04838205
+      - match: イエメン旅券17979(Ahmed Ali Abdullah Saleh名義)（下記の外交官身分証明書番号31/2013/20/003140に言及あり。）
+        values:
+          - 17979
+          - 31/2013/20/003140
+      - match: アフガニスタン旅券 OR801168 （Said Jan ‘Abd al-Salamの名義で2006年2月28日に発行、2011年2月27日に失効）
+        value: OR801168
+      - match: サウジアラビア旅券 F654645（2005年4月30日発行、2010年3月7日失効、ヒジュラ暦では、1426年6月24日発行、1431年3月21日失効）
+        value: F654645
+      - match: アフガニスタン国民IDカード（tazkira）番号 57388（Lashkar Gah District, Helmand Province, Afghanistanにて発行）
+        value: 57388
+      - match: フランス旅券05AT521433（2005年11月30日Sous-Prefecture of police of Lorient, Franceにより発行）
+        value: 05AT521433
+      - match: 旅券番号：927234267；108120258（北朝鮮旅券）、旅券発行日：2018年2月14日、旅券失効日：2023年2月14日
+        values:
+          - 927234267
+          - 108120258
+      - match: イラク番号 A6489694、2013年9月2日発行（2021年8月31日失効；氏名のアラビア語表記：سالم مصطفى محمد ال منصور）
+        value: A6489694
+      - match: イラク国民ＩＤカード番号00813602、2011年9月18日発行（氏名のアラビア語表記：سالم مصطفى محمد ال منصور）
+        value: 00813602
+      - match: リビア旅券203037（リビア、トリポリにて発行）； （リビア旅券347834、Ibrahim Ali Tantoushの名で発行、２０１４年２月２１日失効）
+        values:
+          - 203037
+          - 347834
+  type.name:
+    lowercase: true
+    normalize: true
+    options:
+      - match: Federal State Unitary Enterprise Russian Federal Nuclear Center-Academician　E.I. Zababakhin All-Russian Scientific Research Institute of Technical Physics, RFNC - All-Russia Research Institute of Technical Physics named after Academician E.I. Zababakhin
+        values:
+          - "Federal State Unitary Enterprise Russian Federal Nuclear Center-Academician　E.I. Zababakhin All-Russian Scientific Research Institute of Technical Physics"
+          - RFNC - All-Russia Research Institute of Technical Physics named after Academician E.I. Zababakhin

@@ -1,0 +1,82 @@
+type: external
+title: Register of Enterprises of the Republic of Latvia (Uzņēmumu reģistrs)
+entry_point: zavod.runner.local_enricher:enrich
+full_dataset: lv_business_register
+disabled: false
+coverage:
+  frequency: weekly
+  start: 2023-03-21
+exports:
+  - statistics.json
+  - entities.delta.json
+deploy:
+  memory: "4000Mi"
+  memory_limit: "6000Mi"
+  disk: "100Gi"
+load_statements: true
+ci_test: false
+summary: >-
+  Directors, shareholders and beneficial owners
+  as well as bank accounts for companies and traders in the country's Register of Enterprises
+  which match or are related to entities in the OpenSanctions database
+publisher:
+  name: Latvijas Republikas Uzņēmumu reģistrs
+  acronym: UR
+  url: https://www.ur.gov.lv/lv/
+  country: lv
+  description: |
+    The Register of Enterprises of the Republic of Latvia is a state
+    institution that registers enterprises, merchants, their branches
+    and representative offices, as well as all changes in the basic documents of
+    their operation, and performs other activities provided for by legislative acts
+    in the territory of the Republic of Latvia.
+  official: true
+
+inputs:
+  - ann_graph_topics
+  - debarment
+  - ext_cy_companies
+  - ext_cz_business_register
+  - ext_ee_ariregister
+  - ext_gb_coh_psc
+  - ext_gleif
+  - ext_icij_offshoreleaks
+  - ext_lv_business_register
+  - ext_md_companies
+  - ext_ru_egrul
+  - ext_ua_edr
+  - opencorporates
+  - sanctions
+
+config:
+  dataset: lv_business_register
+  memory: 3500
+  strip_namespace: true
+  threshold: 0.7
+  algorithm: regression-v1
+  topics:
+    - role.pep
+    - role.rca
+    - sanction
+    - sanction.linked
+    - debarment
+    - asset.frozen
+    - poi
+    - gov.soe
+  schemata:
+    - Company
+    - Organization
+    - LegalEntity
+    - Person
+
+assertions:
+  min:
+    schema_entities:
+      Person: 70
+      Company: 50
+      LegalEntity: 10
+  max:
+    schema_entities:
+      Person: 150
+      Company: 120
+      LegalEntity: 100

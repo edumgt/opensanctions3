@@ -1,0 +1,110 @@
+title: ACF List of War Enablers
+entry_point: crawler.py
+prefix: acf
+coverage:
+  frequency: daily
+  start: 2022-05-05
+load_statements: true
+summary: >
+  A list of Russian decision-makers from government and business
+  composed by ACF/FBK, the anti-corruption organization
+  founded by Alexei Navalny
+description: |
+  > The Sanctions Tracker website collects the names of those people
+  > who should be subject to international sanctions for participating
+  > in the criminal war against Ukraine, for supporting Russian aggression,
+  > or for aiding the Putin regime. Here is a simple and convenient
+  > mechanism to work with the complete categorized list, which is
+  > posted on the ACF website.
+  >
+  > This list is the result of the work of the Anti-Corruption Foundation,
+  > founded in 2011 by Alexei Navalny, a leading opponent of the Putin
+  > regime. We have invested in the list more than a decade of experience
+  > in anti-corruption investigations and a deep understanding of how the
+  > Russian government functions and at what point a blow to it can be
+  > most painful.
+publisher:
+  name: Anti-Corruption Foundation
+  acronym: ACF
+  description: |
+    ACF is the international division of Фонд борьбы с коррупцией (FBK), the anti-corruption
+    investigative team founded by Alexei Navalny.
+  url: https://acf.international/
+  official: false
+  country: ru
+url: https://acf.international/bribetakers-list
+data:
+  url: https://sanctions.acf.international/api/villains/
+  format: JSON
+dates:
+  formats: ["%d.%m.%Y", "%d-%m-%Y", "%Y-%m-%d"]
+
+assertions:
+  min:
+    schema_entities:
+      Person: 6850
+  max:
+    schema_entities:
+      Person: 16000
+
+lookups:
+  censored:
+    normalize: true
+    lowercase: true
+    options:
+      - match:
+          - "Usmanov Alisher Burkhanovich"
+        value: null
+  descriptions:
+    normalize: true
+    options:
+      - contains:
+          - he remains involved in the system
+        value: null
+  tags:
+    lowercase: true
+    options:
+      - match:
+          - war-arrangers
+          - warmongers
+          - individuals-involved-in-corruption
+          - sellout-opinion-leaders
+          - Top-bribetakers-and-warmongers
+        value: null
+
+  type.date:
+    options:
+      - match:
+          - 8 сентября
+          - 10 октября
+        value: null
+      - match: "10.20.1976"
+        value: 1976-10-20
+      - match: ".05.1959"
+        value: "1959-05"
+      - match: "06.09.964"
+        value: 1964-09-06
+      - match: "24 .08.1973"
+        value: 1973-08-24
+      - match: 15.05.1960 (07.07.1977)
+        values:
+          - 1960-05-15
+          - 1977-07-07
+      - match: "03.10.52"
+        value: 1952-10-03
+      - match: 17.09.1961 г.
+        value: 1961-09-17
+      - match: 16.11.1956 (?)
+        value: 1956-11-16
+      - match: "11.27.1963"
+        value: 1963-11-27
+      - match: "01.08.1980."
+        value: 1980-08-01
+      - match: 11.02.1961 года
+        value: 1961-02-11
+      - match: "05.25.1969"
+        value: 1969-05-25
+      - match: ".12.1975"
+        value: 1975-12
+      - match: "07.04. 1961"
+        value: 1961-04-07

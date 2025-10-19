@@ -1,0 +1,24 @@
+import json
+from rigour.mime.types import JSON
+
+from zavod import Context, helpers as h
+
+
+def crawl(context: Context):
+    path = context.fetch_resource("source.json", context.data_url)
+    context.export_resource(path, JSON, title=context.SOURCE_TITLE)
+    with open(path, "r") as fh:
+        data = json.load(fh)
+    for entry in data.get("result", []):
+        wallet = context.make("CryptoWallet")
+        wallet.id = context.make_slug(entry.get("address"))
+        wallet.add("publicKey", entry.pop("address"))
+        wallet.add("topics", "crime.theft")
+        wallet.add("createdAt", entry.pop("createdAt"))
+        wallet.add("modifiedAt", entry.pop("updatedAt"))
+        wallet.add("alias", entry.pop("family"))
+        h.apply_number(wallet, "balance", entry.pop("balance"))
+        h.apply_number(wallet, "amountUsd", entry.pop("balanceUSD"))
+        wallet.add("currency", entry.pop("blockchain"))
+        context.audit_data(entry, ignore=["transactions"])
+        context.emit(wallet)

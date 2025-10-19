@@ -1,0 +1,55 @@
+name: lv_business_register
+title: Register of Enterprises of the Republic of Latvia (Uzņēmumu reģistrs)
+prefix: lv
+entry_point: crawler.py
+coverage:
+  frequency: weekly
+  start: 2023-03-21
+deploy:
+  disk: 50Gi
+  memory: 2Gi
+  premium: true
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+  - senzing.json
+resolve: false
+ci_test: false
+summary: >-
+  The Latvian company registry lists directors, shareholders and beneficial owners
+  as well as bank accounts for all companies and traders in the country.
+url: https://data.gov.lv/dati/lv/dataset/uz
+publisher:
+  name: Latvijas Republikas Uzņēmumu reģistrs
+  acronym: UR
+  url: https://www.ur.gov.lv/lv/
+  country: lv
+  description: |
+    The Register of Enterprises of the Republic of Latvia is a state
+    institution that registers enterprises, merchants, their branches
+    and representative offices, as well as all changes in the basic documents of
+    their operation, and performs other activities provided for by legislative acts
+    in the territory of the Republic of Latvia.
+  official: true
+
+lookups:
+  type.name:
+    options:
+      - match: 
+          - 2017
+          - '"2015"'
+          - "000000"
+          - 185+
+          - '"421"'
+          - 1887
+          - '"155"'
+          - 2016
+          - "-"
+        value: null
+  # null falsy first/lastName(s)
+  type.string:
+    options:
+      - match: "-"
+        value: null
+

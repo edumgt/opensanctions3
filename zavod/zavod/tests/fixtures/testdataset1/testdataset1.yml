@@ -1,0 +1,70 @@
+entry_point: testentrypoint1
+title: OpenSanctions Validation Dataset
+prefix: osv
+hidden: true
+resolve: false
+summary: >
+  This dataset is used to validate and test the OpenSanctions data processing pipeline.
+description: |
+  **Do not include this data in production screening**
+
+  This dataset contains a series of fictional characters. It is used to test the proper
+  functioning of the OpenSanctions data delivery mechanism.
+publisher:
+  name: OpenSanctions
+  description: |
+    Manually created by the project team.
+  url: https://www.opensanctions.org
+  official: false
+url: https://github.com/opensanctions/opensanctions
+data:
+  url: https://docs.google.com/spreadsheets/d/e/2PACX-1vTYliJOm1mk2PrsL0m_BVn2sEbpHIdQ2fuzavp0gqOLndgzCw7gtr9Npqwa_FerVrQBfYFiDeKuwfV-/pub?gid=0&single=true&output=csv
+  format: CSV
+http:
+  total_retries: 1
+  backoff_factor: 0.5
+  retry_methods: [POST]
+  retry_statuses: [418]
+dates:
+  formats:
+    - "%d. %b %Y"
+  months:
+    mar: März
+
+lookups:
+  plants:
+    options:
+      - match:
+          - null
+          - banana
+          - apple
+        value: Fruit
+      - match:
+          - potato
+          - carrot
+        value: Vegetable
+      - match:
+          - oak
+          - pine
+        value: Tree
+
+  comma_names:
+    lowercase: true
+    options:
+      - match: A B and C, D E F, John Lookups Smith
+        names:
+          - A B and C
+          - D E F
+          - John Lookups Smith
+
+  type.address:
+    normalize: true
+    lowercase: true
+    options:
+      - match:
+          - congo
+        values:
+          - DR Congo
+          - Congo Brazzaville
+      - match: Moscou
+        value: Moscow

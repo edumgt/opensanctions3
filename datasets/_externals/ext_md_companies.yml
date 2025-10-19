@@ -1,0 +1,82 @@
+type: external
+title: State Registers of Legal Entities and Non-Profit Organizations in the Republic of Moldova
+entry_point: zavod.runner.local_enricher:enrich
+full_dataset: md_companies
+disabled: false
+hidden: false
+coverage:
+  schedule: "@weekly"
+  start: 2023-03-21
+exports:
+  - statistics.json
+  - entities.delta.json
+deploy:
+  memory: "6000Mi"
+  disk: "100Gi"
+load_statements: true
+ci_test: false
+summary: >-
+  Entities registered in the Republic of Moldova, including both companies and
+  non-profit organizations, which match or are related to entities in the OpenSanctions database.
+url: https://date.gov.md/ckan/ro/dataset/11736-date-din-registrul-de-stat-al-unitatilor-de-drept-privind-intreprinderile-inregistrate-in-repu
+publisher:
+  name: Agenția Servicii Publice
+  name_en: Public Services Agency
+  acronym: ASP
+  descrition: |
+    The Public Services Agency (ASP) is a government institution responsible for
+    implementing public policies in areas such as information technology, state
+    registration, and business licensing. It manages core national registers, including
+    those for legal entities, non-profit organizations, and vehicles.
+  country: md
+  url: https://www.asp.gov.md/en
+  official: true
+
+inputs:
+  - ann_graph_topics
+  - debarment
+  - ext_cy_companies
+  - ext_cz_business_register
+  - ext_ee_ariregister
+  - ext_gb_coh_psc
+  - ext_ge_company_registry
+  - ext_gleif
+  - ext_icij_offshoreleaks
+  - ext_lv_business_register
+  - ext_md_companies
+  - ext_ru_egrul
+  - ext_ua_edr
+  - opencorporates
+  - sanctions
+  - special_interest
+
+config:
+  dataset: md_companies
+  strip_namespace: true
+  memory: 3000
+  threshold: 0.7
+  algorithm: regression-v1
+  topics:
+    - role.pep
+    - role.rca
+    - sanction
+    - sanction.linked
+    - debarment
+    - asset.frozen
+    - poi
+    - gov.soe
+  schemata:
+    - Company
+    - Organization
+    - LegalEntity
+    - Person
+
+assertions:
+  min:
+    schema_entities:
+      LegalEntity: 40
+      Company: 25
+  max:
+    schema_entities:
+      LegalEntity: 100
+      Company: 100

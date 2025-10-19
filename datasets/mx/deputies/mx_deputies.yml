@@ -1,0 +1,44 @@
+title: Mexico Chamber of Deputies
+entry_point: crawler.py
+prefix: mx-dep
+coverage:
+  frequency: weekly
+  start: 2024-03-07
+load_statements: true
+ci_test: false # No Zyte in CI
+summary: >-
+  Current members of the Mexican lower house, the Chamber of Deputies
+description: |
+  This dataset comprises information about current deputies in Mexico who
+  represent the lower house of the Mexican Congress, known as the House of
+  Representatives.
+
+  It is constituted with a total of 500 seats. Of these, 300 "majority deputies"
+  are directly elected by plurality from single-member districts, the federal
+  electoral districts (with each state divided into at least two districts).
+  The remaining 200 "party deputies" are assigned through rules of proportional
+  representation. Each deputy serves a three-year term.
+publisher:
+  name: Cámara de Diputados
+  description: Mexico's Chamber of Deputies
+  url: https://www.diputados.gob.mx/
+  official: true
+  country: "mx"
+tags:
+  - list.pep
+url: "https://web.diputados.gob.mx/inicio/tusDiputados/listadoDiputadosBuscador;nombre=;estado=;cabeceraMunicipal=;grupoParlamentario=;mail="
+data:
+  url: https://micrositios.diputados.gob.mx:4001/graphql
+  format: JSON
+
+assertions:
+  min:
+    schema_entities:
+      Person: 495
+      Position: 1
+    country_entities:
+      mx: 495
+    countries: 1
+  max:
+    schema_entities:
+      Person: 600

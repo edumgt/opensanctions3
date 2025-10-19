@@ -1,0 +1,127 @@
+type: collection
+title: Consolidated Sanctions
+coverage:
+  start: "2021-09-01"
+  schedule: "0 1,7,13,19 * * *"
+deploy:
+  memory: "1500Mi"
+  command: /etl/scripts/export-sanctions.sh
+  # premium: true
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+  - names.txt
+  - senzing.json
+  - targets.nested.json
+  - targets.simple.csv
+summary: >
+  Consolidated list of sanctioned entities designated by different
+  countries and international organisations. This can include military,
+  trade and travel restrictions.
+description: |
+  This collection combines all designated entities from the various sanctions
+  lists included in OpenSanctions. It represents the broadest set of
+  sanctioned people, companies and other assets that is designated globally.
+
+  Virtually all sanctions lists are based on the [UN Security Council List](/datasets/un_sc_sanctions/),
+  and add further listings based on national policies.
+
+  The sanctions included here generally impose one or more restrictions like
+
+  * freezing of assets
+  * banning financial transactions, except sometimes for personal living expenses
+  * travel bans
+
+  They may be imposed as a consequence of activities such as funding or association
+  with organisations involved in terrorism or human rights abuses, or for other
+  geopolitical reasons.
+
+  This excludes restrictions sometimes termed as sanctions such as those imposed
+  by financial regulators for financial misconduct, or debarments restricting procurement.
+  Those are included in the [Crime collection](/datasets/crime) instead.
+
+children:
+  - ae_local_terrorists
+  - ar_repet
+  - at_nbter_sanctions
+  - au_dfat_sanctions
+  - au_listed_terrorist_orgs
+  - az_fiu_sanctions
+  - be_fod_sanctions
+  - bg_omnio_poi
+  - ca_dfatd_sema_sanctions
+  - ca_facfoa
+  - ca_listed_terrorists
+  - ca_named_research_orgs
+  - ch_seco_sanctions
+  - cn_sanctions
+  - cz_national_sanctions
+  - cz_terrorists
+  - ee_international_sanctions
+  - eu_esma_saris
+  - eu_fsf
+  - eu_journal_sanctions
+  - eu_sanctions
+  - eu_sanctions_map
+  - eu_travel_bans
+  - fr_tresor_gels_avoir
+  - gb_fcdo_sanctions
+  - gb_hmt_invbans
+  - gb_hmt_sanctions
+  - ge_ot_list
+  - id_dttot
+  - ie_unlawful_organizations
+  - il_mod_crypto
+  - il_mod_terrorists
+  - il_wmd_sanctions
+  - in_mha_banned
+  - iq_aml_list
+  - ir_sanctions
+  - jp_meti_eul
+  - jp_meti_ru
+  - jp_mof_sanctions
+  - kg_fiu_national
+  - kz_afmrk_sanctions
+  - lt_fiu_freezes
+  - lt_magnitsky_amendments
+  - lv_fiu_sanctions
+  - lv_magnitsky_list
+  - mc_fund_freezes
+  - md_terror_sanctions
+  - my_moha_sanctions
+  - ng_nigsac_sanctions
+  - nl_terrorism_list
+  - np_mha_sanctions
+  - nz_designated_terrorists
+  - nz_russia_sanctions
+  - ph_amlc_sanctions
+  - pl_finanse_sanctions
+  - pl_mswia_sanctions
+  - ps_local_freezing
+  - qa_nctc_sanctions
+  - ro_onpcsb_sanctions
+  - rs_apml_domestic
+  - ru_mfa_sanctions
+  - sg_terrorists
+  - th_designated_person
+  - tr_fcib
+  - tw_shtc
+  - ua_nsdc_sanctions
+  - ua_sfms_blacklist
+  - un_1718_vessels
+  - un_sc_sanctions
+  - us_bis_denied
+  - us_cbp_forced_labor
+  - us_cuba_sanctions
+  - us_dhs_uflpa
+  - us_fincen_special_measures
+  - us_klepto_hr_visa
+  - us_ofac_cons
+  - us_ofac_sdn
+  - us_sanctions
+  - us_state_terrorist_exclusion
+  - us_state_terrorist_orgs
+  - us_trade_csl
+  - za_fic_sanctions
+ci_test: false

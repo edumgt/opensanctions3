@@ -1,0 +1,56 @@
+type: external
+title: Graph-based entity tagging
+entry_point: analyzer
+prefix: gra
+disabled: false
+hidden: true
+coverage:
+  frequency: daily
+  start: 2023-12-21
+  schedule: "0 */6 * * *"
+exports:
+  - statistics.json
+deploy:
+  memory: "1500Mi"
+  memory_limit: "2500Mi"
+load_statements: true
+ci_test: false
+summary: >
+  Automatically generated graph-based topic annotations
+description: |
+  This data sources stores annotations of entities which are adjacent to other
+  risk-linked entities. For example, a person linked via a family bond to a PEP
+  is considered a "relative or close associate" (RCA). Similarly, entities
+  linked to sanctioned entities (especially subsidiaries) are tagges as
+  "sanction-linked".
+url: https://opensanctions.org/datasets/graphtopics
+publisher:
+  name: OpenSanctions
+  description: |
+    OpenSanctions is the company behind the OpenSanctions database of persons
+    and companies of political, criminal, or economic interest.
+  url: https://opensanctions.org
+  official: false
+
+inputs:
+  - default
+  # - sanctions
+  # - ru_rupep
+
+assertions:
+  min:
+    schema_entities:
+      Company: 50000
+      Person: 12200
+      LegalEntity: 1300
+      Organization: 300
+      Vessel: 15
+      PublicBody: 5
+  max:
+    schema_entities:
+      Company: 110000
+      Person: 30000
+      LegalEntity: 3000
+      Organization: 3000
+      Vessel: 200
+      PublicBody: 100

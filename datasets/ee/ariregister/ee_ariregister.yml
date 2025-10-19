@@ -1,0 +1,118 @@
+name: ee_ariregister
+title: Estonia e-Business Register (E-äriregister)
+prefix: ee
+entry_point: crawler.py
+coverage:
+  frequency: weekly
+  start: 2023-01-01
+deploy:
+  disk: 50Gi
+  memory: 2Gi
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+resolve: false
+ci_test: false
+summary: >-
+  A collection of all companies registered in Estonia, including directors and
+  beneficial owners
+publisher:
+  name: Registrite ja Infosüsteemide Keskus
+  name_en: Centre of Registers and Information Systems
+  acronym: RIK
+  url: https://www.rik.ee/en/e-business-register
+  description: |
+    The e-Business Register issues free legal and statistical data about all
+    Estonian companys, non-profit associations, foundations, state and local
+    governmental agencies and self-employed persons.
+  country: ee
+  official: true
+data:
+  url: https://avaandmed.ariregister.rik.ee/en/downloading-open-data
+  lang: est
+
+dates:
+  formats: ["%d.%m.%Y"]
+
+lookups:
+  type.email:
+    options:
+      - match: ylo@mooste..ee
+        value: ylo@mooste.ee
+      - match: ylarisaviste@hotmail.com>
+        value: ylarisaviste@hotmail.com
+      - match: annelymetste@gmail.com>
+        value: annelymetste@gmail.com
+      - match: vip69lf@.mail.ru
+        value: vip69lf@mail.ru
+      - match: kaja.joerandvahur@gmai. com
+        value: kaja.joerandvahur@gmail.com
+      - match: Urmas.tammsaa@.eesti.ee
+        value: urmas.tammsaa@eesti.ee
+      - match: valentina_ _1947@mail.ru
+        value: null
+      - contains: elev.eks@skf.com
+        value: elev.eks@skf.com
+      - match: contact@1office.co,
+        value: contact@1office.co
+      - match: 'tatjana_nikitina"@hotmail.com'
+        value: tatjana_nikitina@hotmail.com
+      - match: see.kes.kirjutab.sellel.eposti.adressile.votab.tagasivotmatu.kohustuse.maksta.ekirja.eest.100.eurot@mailinator.com
+        value: null
+  type.name:
+    options:
+      - match: 
+          - '-'
+          - '.'
+        value: null
+  type.country:
+    options:
+      - match: GER
+        value: DE
+      - match: ANT
+        value: AG
+      - match: DEN
+        value: DK
+      - match: LAT
+        value: LV
+      - match: LIT
+        value: LT
+      - match: NED
+        value: NL
+      - match: SUI
+        value: CH
+      - match: SLO
+        value: SI
+      - match: SVB
+        value: SE
+      - match: BUL
+        value: BG
+      - match: XXX
+        value: null
+      - match: KSA
+        value: SA
+      - match: SCG
+        value: RS
+      - match: ICX
+        value: CY
+      - match: GRE
+        value: GR
+      - match: POR
+        value: PT
+      - match: XXK
+        value: XK
+      - match: LIB
+        value: LB
+      - match: XXS
+        value: SS
+      - match: XYY
+        value: SY
+      - match: CHI
+        value: CL
+      - match: IVB
+        value: VG
+      - match: XKX
+        value: XK
+      - match: MON # Monaco
+        value: MC

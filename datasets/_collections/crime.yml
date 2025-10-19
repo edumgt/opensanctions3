@@ -1,0 +1,40 @@
+type: collection
+title: Warrants and Criminal Entities
+coverage:
+  start: "2023-08-09"
+  frequency: daily
+deploy:
+  memory: "1500Mi"
+ci_test: false
+summary: >
+  Companies and people implicated in or convicted of criminal activity, including
+  the "Most Wanted" lists of various countries and international authorities.
+description: |
+  This collection combines entities which have been involved in some form of
+  criminal proceeding. The focus lies on corporate and financial fraud, and
+  political crimes. These actions can be considered adjacent to economic
+  and military sanctions and be included in the same vetting process.
+
+  In the future, we hope to expand into several deep dives on specific subject
+  areas:
+
+  * Procurement exclusion (debarment) of companies involved in irregularities
+    in state contracts.
+  * Individuals or companies banned from operating as corporate officers in
+    one or more jurisdictions.
+  * Companies involved in corruption in their own country or abroad (FCPA).
+  * Companies known the be used to facilitate money laundering (laundromats).
+  * Individuals or companies that have declared bankruptcy or insolvency in
+    some sensational way.
+children:
+  - wanted
+  - regulatory
+  - ransomwhere
+  - br_bcb_disqualified_persons
+  - br_tcu_disqualified
+  - eg_terrorists
+  - gg_disqualified_directors
+  - gb_coh_disqualified
+  - gb_proscribed_orgs
+  - im_disqualified_directors
+  - us_fbi_lazarus_crypto

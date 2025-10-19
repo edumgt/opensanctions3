@@ -1,0 +1,39 @@
+name: cy_companies
+title: Cyprus company registry
+prefix: cy
+disabled: false
+entry_point: crawler.py
+coverage:
+  frequency: weekly
+  start: 2023-07-28
+deploy:
+  disk: 30Gi
+  memory: 2Gi
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - entities.delta.json
+resolve: false
+ci_test: false
+summary: >-
+  Cypriot open data on companies, which names their officers but not any shareholders.
+publisher:
+  name: Department of the Registrar of Companies and Intellectual Property
+  acronym: DRCIP
+  description: |
+    Competent Service for the registration and maintenance of the register
+    of Companies, Cooperatives, Trade Names, Trade Marks, Patents,
+    Industrial Designs, etc.
+  url: https://www.companies.gov.cy/en/
+  country: cy
+  official: true
+url: https://data.gov.cy/el/dataset/mitroo-eggegrammenon-etaireion-emporikon-eponymion-kai-synetairismon-stin-kypro
+data:
+  url: "https://data.gov.cy/el/dataset/1026/dcat-ap-2.0/json"
+  format: CSV
+  lang: ell
+http:
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+
+dates:
+  formats: ["%d/%m/%Y"]

@@ -1,0 +1,351 @@
+name: ru_egrul
+title: Russian Unified State Register of Legal Entities (EGRUL)
+entry_point: crawler.py
+prefix: ru
+# disabled: true
+deploy:
+  schedule: "@monthly"
+  premium: true
+  cpu: "1000m"
+  cpu_limit: "2000m"
+  memory: 5Gi
+  disk: 250Gi
+exports:
+  - statistics.json
+  - entities.ftm.json
+  - senzing.json
+resolve: false
+ci_test: false
+summary: >-
+  Companies database of the Russian Federation as maintained and published by
+  the Federal Tax Service
+description: |
+  The tax database of legal entities is probably the most detailed part of the
+  companies registry (other fragments are maintained by the statistics body and
+  others). The registry data must be purchased from the tax authority, but a
+  full version of it has been released online by a Russian IT entrepreneur.
+
+  This dataset contains entities up to the latest snapshot available to
+  OpenSanctions. Additionally, it is augmented with historic ownership and
+  directorship data, sourced from snapshots of the source database dating back to
+  2022-01-01. This is to compensate any information loss due to intra-war data
+  removals, as the Government of the Russian Federation has [limited reporting duties for
+  legal entities that are subject to foreign restrictive measures](http://publication.pravo.gov.ru/Document/View/0001202203180028?index=1).
+
+url: https://www.nalog.gov.ru/rn77/service/egrip2/egrip_vzayim/
+publisher:
+  name: Федеральная Налоговая Служба
+  name_en: Federal Taxation Service
+  acronym: FNS
+  description: |
+    The Federal Tax Service of the Russian Federation is an authorized federal
+    executive body that carries out state registration of legal entities, individuals
+    as individual entrepreneurs and peasant (farm) enterprises, an authorized
+    federal executive body that accredits branches, representative offices of
+    foreign legal entities (with the exception of representative offices of foreign
+    credit institutions)
+  url: https://www.nalog.gov.ru/eng/aboutfts/mission/
+  country: ru
+  official: true
+coverage:
+  start: 2022-01-01
+  frequency: never
+data:
+  url: https://egrul.itsoft.ru/
+  format: XML
+
+lookups:
+  type.country:
+    lowercase: true
+    options:
+      - match:
+          - НОРМАНДСКИЕ ОСТРОВА
+          - НИДЕРЛАНДСКИЕ АНТИЛЫ
+        value: null
+      - match: Киргизская Республика
+        value: KG
+      - match: Республика Казахстан
+        value: KZ
+      - match: Республика Таджикистан
+        value: TJ
+      - match: Государство Израиль
+        value: IL
+      - match: Федеративная Республика Германия
+        value: DE
+      - match: Республика Болгария
+        value: BG
+      - match: Республика Армения
+        value: AM
+      - match: Сирийская Арабская Республика
+        value: SY
+      - match: Латвийская Республика
+        value: LV
+      - match: ВИРГИНСКИЕ ОСТРОВА (БРИТАНСКИЕ)
+        value: VG
+      - match: СЕЙШЕЛЫ
+        value: SC
+      - match: ЧЕШСКАЯ РЕСПУБЛИКА
+        value: CZ
+      - match: Турецкая Республика
+        value: TR
+      - match:
+          - Китайская Народная Республика
+          - КИТАЙСКАЯ НАРОДНАЯ РЕСПУБЛИКА (КНР)
+        value: CN
+      - match: Республика Корея
+        value: KR
+      - match: Республика Индия
+        value: IN
+      - match:
+          - СОЕДИНЕННОЕ КОРОЛЕВСТВО
+          - Соединенное Королевство Великобритании и Северной Ирландии
+        value: GB
+      - match: ОСТРОВА ТЕРКС И КАЙКОС
+        value: TC
+      - match: Республика Черногория
+        value: ME
+      - match: Тайвань (Китай)
+        value: TW
+      - match: Республика Узбекистан
+        value: UZ
+      - match: КОРЕЯ, РЕСПУБЛИКА
+        value: South Korea
+      - match: КОРЕЯ, НАРОДНО-ДЕМОКРАТИЧЕСКАЯ РЕСПУБЛИКА
+        value: North Korea
+      - match:
+          - Республика Азербайджан
+          - Азербайджанская Республика
+        value: AZ
+      - match: Эстонская Республика
+        value: EE
+      - match: Австрийская Республика
+        value: AT
+      - match:
+          - Республика Молдова
+          - МОЛДОВА, РЕСПУБЛИКА
+        value: MD
+      - match: Греческая Республика
+        value: GR
+      - match: Словацкая Республика
+        value: SK
+      - match: Литовская Республика
+        value: LT
+      - match: Королевство Нидерландов
+        value: NL
+      - match:
+          - Королевство Бельгии
+          - Королевство Бельгия
+        value: BE # Belgium
+      - match: Республика Куба
+        value: CU
+      - match: Королевство Норвегия
+        value: "NO"
+      - match: Венесуэла (Боливарианская Республика)
+        value: VE
+      - match: Итальянская Республика
+        value: IT
+      - match: Республика Сербия
+        value: Serbia
+      - match: Социалистическая Республика Вьетнам
+        value: VN
+      - match:
+          - Соединенные Штаты Америки
+        value: US
+      - match: ВИРГИНСКИЕ ОСТРОВА (США)
+        value: VI
+      - match:
+          - Арабская Республика Египет
+          - АРАБСКАЯ РЕСПУБЛИКА ЕГИПЕТ (АРЕ)
+        value: EG
+      - match: Французская Республика
+        value: FR
+      - match:
+          - Республика Беларусь
+          - Республика Белоруссия
+        value: BY
+      - match: Королевство Дания
+        value: DK
+      - match: Остров Джерси
+        value: JE
+      - match: Королевство Испания
+        value: ES
+      - match:
+          - Исламская Республика Афганистан
+          - Переходное Исламское Государство Афганистан
+        value: AF # Afghanistan
+      - match: Восточная Республика Уругвай
+        value: UY
+      - match: СЕВЕРНЫЕ МАРИАНСКИЕ ОСТРОВА
+        value: MP
+      - match:
+          - Республика Македония
+          - РЕСПУБЛИКА МАКЕДОНИЯ
+        value: MK
+      - match: Республика Эквадор
+        value: EC
+      - match: Республика Чили
+        value: CL
+      - match: Алжирская Народная Демократическая Республика
+        value: DZ
+      - match: Республика Кот д`Ивуар
+        value: CI
+      - match: Демократическая Социалистическая Республика Шри-Ланка
+        value: LK
+      - match: Демократическая Республика Конго
+        value: CG
+      - match: Венгерская Республика
+        value: HU
+      - match: Республика Польша
+        value: PL
+      - match: Республика Кирибати
+        value: KI
+      - match: Республика Камерун
+        value: CM
+      - match: Народная Республика Бангладеш
+        value: BD
+      - match: Республика Колумбия
+        value: CO
+      - match: Республика Словения
+        value: SI
+      - match: Федеративная Республика Нигерия
+        value: NG
+      - match: Республика Маврикий
+        value: MU
+      - match: Республика Мальта
+        value: MT
+      - match: Республика Мозамбик
+        value: MZ
+      - match: Швейцарская Конфедерация
+        value: CH
+      - match: Королевство Швеция
+        value: SE
+      - match: Республика Филиппины
+        value: PH
+      - match: ЮЖНАЯ АФРИКА
+        value: ZA
+      - match: Республика Кения
+        value: KE
+      - match: Республика Уганда
+        value: UG
+      - match: Республика Сейшелы
+        value: SC
+      - match: Республика Хорватия
+        value: HR
+      - match: Иорданское Хашимитское Королевство
+        value: JO
+      - match: Великое Герцогство Люксембург
+        value: LU
+      - match: Ливанская Республика
+        value: LB
+      - match: Республика Судан
+        value: SD
+      - match: Мальдивская Республика
+        value: MV
+      - match: Республика Ирак
+        value: IQ
+      - match: Республика Перу
+        value: PE
+      - match: Аргентинская Республика
+        value: AR
+      - match: Республика Мадагаскар
+        value: MG
+      - match: Исламская Республика Пакистан
+        value: PK
+      - match: Мексиканские Соединенные Штаты
+        value: MX
+      - match: Республика Коста-Рика
+        value: CR
+      - match: Тунисская Республика
+        value: TN
+      - match: Финляндская Республика
+        value: FI
+      - match: Абхазия
+        value: GE-AB
+      - match: Кокосовые (Килинг) Острова
+        value: CC
+      - match: Папский Престол (Государство-Город Ватикан)
+        value: VA
+      - match: Фарерские Острова
+        value: FO
+      - match: Центрально-Африканская Республика
+        value: CF
+      - match: Южная Осетия
+        value: X-SO
+      - match: Гвинейская Республика
+        value: GN # Guinea
+      - match: Государство Катар
+        value: QA # Qatar
+      - match: Государство Кувейт
+        value: KW # Kuwait
+      - match: Йеменская Республика
+        value: YE # Yemen
+      - match: Княжество Монако
+        value: MC # Monaco
+      - match: Королевство Марокко
+        value: MA # Morocco
+      - match: Королевство Саудовская Аравия
+        value: SA # Saudi Arabia
+      - match: Королевство Таиланд
+        value: TH # Thailand
+      - match: Объединенная Республика Танзания
+        value: TZ # Tanzania
+      - match: Оккупированная Палестинская территория
+        value: PS # Occupied Palestinian Territory
+      - match: Португальская Республика
+        value: PT # Portugal
+      - match: Республика Албания
+        value: AL # Albania
+      - match: Республика Ангола
+        value: AO # Angola
+      - match:
+          - Республика Бенин
+          - Народная Республика Бенин
+        value: BJ # Benin
+      - match: Республика Ботсвана
+        value: BW # Botswana
+      - match: Республика Вануату
+        value: VU # Vanuatu
+      - match: Республика Гана
+        value: GH # Ghana
+      - match: Республика Гватемала
+        value: GT # Guatemala
+      - match: Республика Гвинея-Бисау
+        value: GW # Guinea-Bissau
+      - match: Республика Гондурас
+        value: HN # Honduras
+      - match: Республика Замбия
+        value: ZM # Zambia
+      - match: Республика Зимбабве
+        value: ZW # Zimbabwe
+      - match: Республика Индонезия
+        value: ID # Indonesia
+      - match: Республика Исландия
+        value: IS # Iceland
+      - match: Республика Либерия
+        value: LR # Liberia
+      - match: Республика Никарагуа
+        value: NI # Nicaragua
+      - match: Республика Сенегал
+        value: SN # Senegal
+      - match: Республика Сингапур
+        value: SG # Singapore
+      - match: Республика Сьерра-Леоне
+        value: SL # Sierra Leone
+      - match: Содружество Доминики
+        value: DM # Dominica
+      - match: Султанат Оман
+        value: OM # Oman
+      - match: Федеративная Демократическая Республика Эфиопия
+        value: ET # Ethiopia
+      - match: Федеративная Республика Бразилия
+        value: BR # Brazil
+      - match: Эландские острова
+        value: AX # Åland Islands
+      - match: Южно-Африканская Республика
+        value: ZA # South Africa
+      - match: Исламская Республика Иран
+        value: IR # Iran
+      - match: Республика Панама
+        value: PA # Panama
+      - match: РУАНДИЙСКАЯ РЕСПУБЛИКА
+        value: RW # Rwanda
