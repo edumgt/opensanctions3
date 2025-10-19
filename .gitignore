@@ -87,3 +87,5 @@ apicache-py3
 *~
 
 /postgres-data
+# PostgreSQL 데이터 폴더 무시
+postgres-data/
