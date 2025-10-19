@@ -7,8 +7,8 @@ __pycache__/
 *.sqlite3
 *.perf
 *.csv
-*.sql
-.env
+
+
 .envrc
 .vscode/launch.json
 .vscode/settings.json
@@ -25,7 +25,7 @@ venv/
 build/
 develop-eggs/
 dist/
-data/
+
 downloads/
 eggs/
 .eggs/
