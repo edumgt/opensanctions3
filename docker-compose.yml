@@ -26,28 +26,28 @@ services:
 
   zavod:
     image: ghcr.io/opensanctions/opensanctions:latest
-    container_name: opensanctions-etl
+    # container_name: opensanctions-etl   # ⚠️ 충돌 방지를 위해 생략
     depends_on:
       db:
         condition: service_healthy
     env_file:
-      - .env              # ✅ .env 파일을 자동 로드
-    environment:
-      ZAVOD_DATABASE_URI: postgresql://postgres:password@db:5432/dev
-    command: >
-      bash -c "
-        echo '🚀 Running Zavod pipeline...' &&
-        zavod crawl datasets/ae/local_terrorists/ae_local_terrorists.yml &&
-        zavod export datasets/ae/local_terrorists/ae_local_terrorists.yml &&
-        zavod load-db datasets/ae/local_terrorists/ae_local_terrorists.yml &&
-        echo '✅ Done. Data written to Postgres.'
-      "
+      - .env
     volumes:
-      - ./datasets:/opensanctions/datasets
-      - ./data:/opensanctions/data
-      - ./zavod:/opensanctions/zavod
+      - .:/opensanctions
     networks:
       - appnet
+    command: >
+      bash -c "
+        echo '🚀 Scanning datasets (excluding underscore folders)...' &&
+        for file in $(find /opensanctions/datasets -type f -name '*.yml' ! -path '*/_*/*'); do
+          echo '⚙️  Running ETL for: '$$file &&
+          zavod crawl $$file &&
+          zavod export $$file &&
+          zavod load-db $$file &&
+          echo '✅ Completed: '$$file || echo '❌ Failed: '$$file;
+        done &&
+        echo '🎉 All datasets processed.'
+      "
 
   web:
     build:

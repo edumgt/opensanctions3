@@ -67,3 +67,5 @@ The code within this repository is licensed under the MIT License. For content a
 
 
 ## 1019 test
+## 1021 docker-compose.yml 을 사용하는데, 오류 사항 체크하면서
+## docker compose up zavod 으로 사용
