@@ -2,28 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
 const pool = new Pool({
-  host: process.env.DB_HOST || "db",
+  host: process.env.DB_HOST || "sa.edumgt.co.kr",
   port: 5432,
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "password",
   database: process.env.DB_NAME || "dev",
 });
 
-// ✅ 상세 필드 포함 인터페이스
 interface SanctionRecord {
   entity_id: string;
   name: string;
+  other_name?: string;
   birth_date?: string;
-  place_of_birth?: string;
+  gender?: string;
   nationality?: string;
   country?: string;
-  id_number?: string;
+  first_name?: string;
+  last_name?: string;
+  middle_name?: string;
   passport_number?: string;
-  authority?: string;
+  id_number?: string;
   source_url?: string;
 }
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim().toLowerCase() || "";
 
@@ -32,22 +34,29 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const client = await pool.connect();
   try {
     const sql = `
-      SELECT
-        e.entity_id,
-        MAX(CASE WHEN s.prop = 'name' THEN s.value END) AS name,
-        MAX(CASE WHEN s.prop = 'birthDate' THEN s.original_value END) AS birth_date,
-        MAX(CASE WHEN s.prop = 'birthPlace' THEN s.value END) AS place_of_birth,
-        MAX(CASE WHEN s.prop = 'nationality' THEN s.value END) AS nationality,
-        MAX(CASE WHEN s.prop = 'country' THEN s.value END) AS country,
-        MAX(CASE WHEN s.prop = 'id' THEN s.value END) AS id_number,
-        MAX(CASE WHEN s.prop = 'passportNumber' THEN s.value END) AS passport_number,
-        MAX(CASE WHEN s.prop = 'authority' THEN s.value END) AS authority,
-        MAX(CASE WHEN s.prop = 'sourceUrl' THEN s.value END) AS source_url
-      FROM statement s
-      JOIN statement e ON e.entity_id = s.entity_id
-      WHERE LOWER(s.value) LIKE $1
-         OR LOWER(e.value) LIKE $1
-      GROUP BY e.entity_id
+      WITH base AS (
+        SELECT
+          canonical_id AS entity_id,
+          MAX(CASE WHEN prop = 'name' THEN value END) AS name,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'alias' THEN value END, ''), ' · ') AS other_name,
+          MAX(CASE WHEN prop = 'birthDate' THEN value END) AS birth_date,
+          MAX(CASE WHEN prop = 'gender' THEN value END) AS gender,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'country' THEN value END, ''), ' · ') AS country,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'nationality' THEN value END, ''), ' · ') AS nationality,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'firstName' THEN value END, ''), ' · ') AS first_name,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'lastName' THEN value END, ''), ' · ') AS last_name,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'middleName' THEN value END, ''), ' · ') AS middle_name,
+          MAX(CASE WHEN prop = 'passportNumber' THEN value END) AS passport_number,
+          MAX(CASE WHEN prop = 'id' THEN value END) AS id_number,
+          MAX(CASE WHEN prop = 'sourceUrl' THEN value END) AS source_url
+        FROM statement
+        GROUP BY canonical_id
+      )
+      SELECT *
+      FROM base
+      WHERE LOWER(name) LIKE $1
+         OR LOWER(other_name) LIKE $1
+         OR LOWER(entity_id) LIKE $1
       ORDER BY name
       LIMIT 50;
     `;
@@ -55,11 +64,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const result = await client.query(sql, [`%${q}%`]);
     return NextResponse.json(result.rows);
   } catch (err) {
-    console.error("❌ Sanction query error:", err);
-    return NextResponse.json(
-      { error: (err as Error).message },
-      { status: 500 }
-    );
+    console.error("❌ Query failed:", err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   } finally {
     client.release();
   }
