@@ -106,9 +106,9 @@ export default function SanctionsPage() {
       )}
 
       {/* 🔵 상단 검색 영역 */}
-      <section className="bg-[#2156d4] py-14 text-center">
+      <section className="bg-[#2156d4] py-8 text-center">
         <h1 className="text-white text-3xl font-bold mb-4">
-          Search OpenSanctions
+          Search SanctionsLab
         </h1>
         <p className="text-blue-100 mb-6 text-sm md:text-base">
           Search people, companies and other entities of interest.
@@ -122,7 +122,8 @@ export default function SanctionsPage() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && fetchData()}
               placeholder="Search people, companies and other entities..."
-              className="flex-grow px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none text-base"
+              className="flex-grow px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none text-base"
+              style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
             />
             <button
               onClick={fetchData}
@@ -155,7 +156,8 @@ export default function SanctionsPage() {
             const id = r.entity_id || r.name;
             const isCompany =
               (r.type || "").toLowerCase() === "company" ||
-              (r.name?.toLowerCase() || "").includes("condominio");
+              (r.name?.toLowerCase() || "").includes("corporation") ||
+              (r.name?.toLowerCase() || "").includes("ltd");
 
             return (
               <div
