@@ -4,6 +4,7 @@ import React, { useState } from "react";
 interface SanctionRecord {
   entity_id: string;
   name: string;
+  type?: string;
   other_name?: string;
   birth_date?: string;
   gender?: string;
@@ -14,6 +15,7 @@ interface SanctionRecord {
   middle_name?: string;
   passport_number?: string;
   id_number?: string;
+  address?: string;
   source_url?: string;
 }
 
@@ -24,7 +26,7 @@ export default function SanctionsPage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
 
-  // ✅ Fetch logic
+  // 🔍 데이터 가져오기
   const fetchData = async () => {
     if (!query.trim()) return;
     setLoading(true);
@@ -34,13 +36,12 @@ export default function SanctionsPage() {
       setResults(data);
       setSearched(true);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Key-safe 토글 처리
   const toggleAccordion = (record: SanctionRecord) => {
     const id = record.entity_id || record.name;
     setOpenId(openId === id ? null : id);
@@ -58,7 +59,7 @@ export default function SanctionsPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-white">
-      {/* 🔵 검색 영역 */}
+      {/* 🔵 상단 검색 영역 */}
       <section className="bg-[#2156d4] py-14 text-center">
         <h1 className="text-white text-3xl font-bold mb-4">
           Search OpenSanctions
@@ -88,7 +89,7 @@ export default function SanctionsPage() {
         </div>
       </section>
 
-      {/* 🔍 결과 */}
+      {/* 🔎 결과 목록 */}
       <div className="flex-grow w-full mx-auto mt-10 px-4">
         {searched && results.length === 0 && (
           <p className="text-center text-red-500 font-medium">
@@ -98,6 +99,10 @@ export default function SanctionsPage() {
 
         {results.map((r) => {
           const id = r.entity_id || r.name;
+          const isCompany =
+            (r.type || "").toLowerCase() === "company" ||
+            (r.name?.toLowerCase() || "").includes("condominio");
+
           return (
             <div
               key={id}
@@ -116,7 +121,7 @@ export default function SanctionsPage() {
                 </span>
               </button>
 
-              {/* 상세 */}
+              {/* 상세 내용 */}
               <div
                 className={`transition-all duration-500 ease-in-out ${
                   openId === id
@@ -124,59 +129,128 @@ export default function SanctionsPage() {
                     : "max-h-0 opacity-0"
                 } overflow-hidden px-6 pb-6`}
               >
-                <table className="w-full text-sm border-t border-gray-200 mt-3">
-                  <tbody>
-                    {[
-                      ["Type", "Person"],
-                      ["Name", r.name],
-                      ["Other name", r.other_name],
-                      ["Birth date", r.birth_date],
-                      ["Gender", r.gender],
-                      ["Country", r.country],
-                      ["Nationality", r.nationality],
-                      ["First name", r.first_name],
-                      ["Last name", r.last_name],
-                      ["Middle name", r.middle_name],
-                      ["Passport number", r.passport_number],
-                      ["ID Number", r.id_number],
-                      ["Source link", r.source_url || "(No link)"],
-                    ].map(([label, value]) => (
-                      <tr key={label} className="border-b border-gray-100">
-                        <td className="py-2 font-medium w-52 text-gray-700">
-                          {label}
-                        </td>
-                        <td className="py-2 text-gray-800 break-words">
-                          {label === "Source link" && r.source_url ? (
-                            <a
-                              href={toUrl(r.source_url)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              {hostOf(r.source_url)}
-                            </a>
-                          ) : (
-                            value || "-"
-                          )}
-                        </td>
-                        <td className="text-right text-blue-600 text-xs pr-2">
-                          {r.source_url ? (
-                            <a
-                              href={r.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline"
-                            >
-                              [sources]
-                            </a>
-                          ) : (
-                            <span className="text-gray-300">[no source]</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {isCompany ? (
+                  <>
+                    {/* 🟡 Company 전용 UI */}
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4 rounded-sm">
+                      <span className="bg-yellow-200 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">
+                        Sanctioned entity
+                      </span>
+                      <p className="text-sm mt-2 text-gray-700">
+                        {r.name} is subject to sanctions. See the individual
+                        program listings below.
+                      </p>
+                    </div>
+
+                    <table className="w-full text-sm border-t border-gray-200">
+                      <tbody>
+                        {[
+                          ["Type", "Company"],
+                          ["Name", r.name],
+                          ["Country", r.country || "-"],
+                          ["Address", r.address || "-"],
+                          [
+                            "Source link",
+                            r.source_url ? (
+                              <a
+                                href={toUrl(r.source_url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                {hostOf(r.source_url)}
+                              </a>
+                            ) : (
+                              "-"
+                            ),
+                          ],
+                        ].map(([label, value]) => (
+                          <tr key={label} className="border-b border-gray-100">
+                            <td className="py-2 font-medium w-52 text-gray-700">
+                              {label}
+                            </td>
+                            <td className="py-2 text-gray-800 break-words">
+                              {value}
+                            </td>
+                            <td className="text-right text-blue-600 text-xs pr-2">
+                              {r.source_url ? (
+                                <a
+                                  href={r.source_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline"
+                                >
+                                  [sources]
+                                </a>
+                              ) : (
+                                <span className="text-gray-300">
+                                  [no source]
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                ) : (
+                  <>
+                    {/* 👤 Person 기본 UI */}
+                    <table className="w-full text-sm border-t border-gray-200 mt-3">
+                      <tbody>
+                        {[
+                          ["Type", "Person"],
+                          ["Name", r.name],
+                          ["Other name", r.other_name],
+                          ["Birth date", r.birth_date],
+                          ["Gender", r.gender],
+                          ["Country", r.country],
+                          ["Nationality", r.nationality],
+                          ["First name", r.first_name],
+                          ["Last name", r.last_name],
+                          ["Middle name", r.middle_name],
+                          ["Passport number", r.passport_number],
+                          ["ID Number", r.id_number],
+                          ["Source link", r.source_url || "(No link)"],
+                        ].map(([label, value]) => (
+                          <tr key={label} className="border-b border-gray-100">
+                            <td className="py-2 font-medium w-52 text-gray-700">
+                              {label}
+                            </td>
+                            <td className="py-2 text-gray-800 break-words">
+                              {label === "Source link" && r.source_url ? (
+                                <a
+                                  href={toUrl(r.source_url)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  {hostOf(r.source_url)}
+                                </a>
+                              ) : (
+                                value || "-"
+                              )}
+                            </td>
+                            <td className="text-right text-blue-600 text-xs pr-2">
+                              {r.source_url ? (
+                                <a
+                                  href={r.source_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline"
+                                >
+                                  [sources]
+                                </a>
+                              ) : (
+                                <span className="text-gray-300">[no source]</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                )}
               </div>
             </div>
           );
