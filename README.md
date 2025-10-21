@@ -70,3 +70,4 @@ The code within this repository is licensed under the MIT License. For content a
 ## 1021 docker-compose.yml 을 사용하는데, 오류 사항 체크하면서
 ## docker compose up zavod 으로 사용
 ## https://chatgpt.com/c/68f649fa-5f9c-8320-a65e-d432d096a15c 의 내용 확인 필요
+## server 에서 실행 시 docker compose up -d zavod 으로
