@@ -1,3 +1,4 @@
+// app/api/sanctions/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
@@ -23,6 +24,7 @@ interface SanctionRecord {
   passport_number?: string;
   id_number?: string;
   source_url?: string;
+  topics?: string[];
 }
 
 export async function GET(req: NextRequest) {
@@ -50,22 +52,36 @@ export async function GET(req: NextRequest) {
           MAX(CASE WHEN prop = 'id' THEN value END) AS id_number,
           MAX(CASE WHEN prop = 'sourceUrl' THEN value END) AS source_url
         FROM statement
+        WHERE prop IN (
+          'name','alias','birthDate','gender','country','nationality',
+          'firstName','lastName','middleName','passportNumber','id','sourceUrl'
+        )
+        GROUP BY canonical_id
+      ),
+      topics_agg AS (
+        SELECT canonical_id, ARRAY_AGG(DISTINCT value) AS topics
+        FROM statement
+        WHERE prop = 'topics'
         GROUP BY canonical_id
       )
-      SELECT *
-      FROM base
-      WHERE LOWER(name) LIKE $1
-         OR LOWER(other_name) LIKE $1
-         OR LOWER(entity_id) LIKE $1
-      ORDER BY name
+      SELECT b.*, t.topics
+      FROM base b
+      LEFT JOIN topics_agg t ON b.entity_id = t.canonical_id
+      WHERE LOWER(b.name) LIKE $1
+         OR LOWER(b.other_name) LIKE $1
+         OR LOWER(b.entity_id) LIKE $1
+      ORDER BY b.name
       LIMIT 50;
     `;
 
     const result = await client.query(sql, [`%${q}%`]);
-    return NextResponse.json(result.rows);
+    return NextResponse.json(result.rows as SanctionRecord[]);
   } catch (err) {
     console.error("❌ Query failed:", err);
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
