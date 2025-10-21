@@ -106,13 +106,10 @@ export default function SanctionsPage() {
       )}
 
       {/* 🔵 검색 영역 */}
-      <section className="bg-[#2156d4] py-8 text-center">
-        <h1 className="text-white text-3xl font-bold mb-4">
+      <section className="bg-[#2156d4] py-6 text-center">
+        <h1 className="text-white text-2xl font-bold mb-4">
           Search SanctionsLab
         </h1>
-        <p className="text-blue-100 mb-6 text-sm md:text-base">
-          Search people, companies and other entities of interest.
-        </p>
         <div className="flex justify-center px-4">
           <div className="flex w-full max-w-2xl bg-white rounded-md overflow-hidden shadow-md">
             <input
@@ -122,8 +119,8 @@ export default function SanctionsPage() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && fetchData()}
               placeholder="Search by name or entity..."
-              className="flex-grow px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none"
-              style={{ fontSize: "1.5rem", fontWeight: "bold" }}
+              className="flex-grow px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none"
+              style={{ fontSize: "1.1rem", fontWeight: "bold" }}
             />
             <button
               onClick={fetchData}
