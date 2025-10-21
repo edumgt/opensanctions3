@@ -97,6 +97,14 @@ export default function SanctionsPage() {
         </div>
       )}
 
+      {/* 🌀 로딩 오버레이 (옅은 회색 배경) */}
+      {loading && (
+        <div className="fixed inset-0 bg-gray-200/80 z-50 flex flex-col justify-center items-center transition-opacity duration-300">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-gray-500 border-solid mb-6"></div>
+          <p className="text-gray-700 text-xl font-semibold">검색 중입니다...</p>
+        </div>
+      )}
+
       {/* 🔵 검색 영역 */}
       <section className="bg-[#2156d4] py-8 text-center">
         <h1 className="text-white text-3xl font-bold mb-4">
@@ -114,7 +122,8 @@ export default function SanctionsPage() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && fetchData()}
               placeholder="Search by name or entity..."
-              className="flex-grow px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none text-lg font-semibold"
+              className="flex-grow px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none"
+              style={{ fontSize: "1.5rem", fontWeight: "bold" }}
             />
             <button
               onClick={fetchData}
