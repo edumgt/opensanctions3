@@ -1,6 +1,6 @@
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
-import version from "../version.json";
+
 
 export const metadata = {
   title: "SanctionLab | Entity Intelligence Platform",

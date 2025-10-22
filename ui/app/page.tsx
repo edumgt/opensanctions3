@@ -242,7 +242,7 @@ export default function SanctionsPage() {
                               ),
                             ],
                           ].map(([label, value]) => (
-                            <tr key={label} className="border-b border-gray-100">
+                            <tr key={String(label)} className="border-b border-gray-100">
                               <td className="py-2 font-medium w-40 text-gray-700">
                                 {label}
                               </td>
@@ -307,7 +307,7 @@ export default function SanctionsPage() {
                               ),
                             ],
                           ].map(([label, value]) => (
-                            <tr key={label} className="border-b border-gray-100">
+                            <tr key={String(label)} className="border-b border-gray-100">
                               <td className="py-2 font-medium w-40 text-gray-700">
                                 {label}
                               </td>
