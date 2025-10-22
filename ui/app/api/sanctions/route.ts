@@ -30,6 +30,9 @@ interface SanctionRecord {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim().toLowerCase() || "";
+  const page = Number(searchParams.get("page") || "1");
+  const limit = Number(searchParams.get("limit") || "10");
+  const offset = (page - 1) * limit;
 
   if (!q) return NextResponse.json([]);
 
@@ -71,11 +74,32 @@ export async function GET(req: NextRequest) {
          OR LOWER(b.other_name) LIKE $1
          OR LOWER(b.entity_id) LIKE $1
       ORDER BY b.name
-      LIMIT 50;
+      LIMIT $2 OFFSET $3;
     `;
 
-    const result = await client.query(sql, [`%${q}%`]);
-    return NextResponse.json(result.rows as SanctionRecord[]);
+    const result = await client.query(sql, [`%${q}%`, limit, offset]);
+
+    // 전체 개수 계산 (페이지 수 계산용)
+    const countResult = await client.query(
+      `
+      SELECT COUNT(*) AS total
+      FROM (
+        SELECT canonical_id
+        FROM statement
+        WHERE prop = 'name' AND LOWER(value) LIKE $1
+        GROUP BY canonical_id
+      ) AS sub;
+    `,
+      [`%${q}%`]
+    );
+
+    const total = Number(countResult.rows[0]?.total || 0);
+    const totalPages = Math.ceil(total / limit);
+
+    return NextResponse.json({
+      data: result.rows as SanctionRecord[],
+      pagination: { total, page, totalPages },
+    });
   } catch (err) {
     console.error("❌ Query failed:", err);
     return NextResponse.json(
