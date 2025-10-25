@@ -1,49 +1,35 @@
 version: "3.9"
 
 networks:
-  appnet:           
+  appnet:
     driver: bridge
 
 services:
-  db:
-    image: postgres:15
-    container_name: opensanctions-db
-    environment:
-      POSTGRES_DB: dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    networks:
-      - appnet
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "dev"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-
   zavod:
     image: ghcr.io/opensanctions/opensanctions:latest
-    depends_on:
-      db:
-        condition: service_healthy
     env_file:
       - .env
     volumes:
-      - .:/opensanctions   # ✅ 로컬 윈도우 경로와 매핑됨
+      - .:/opensanctions
     networks:
       - appnet
     command: >
       bash -c "
-        echo '🚀 Scanning datasets (excluding _ folders & GCS-dependent)...' &&
+        echo '🚀 Scanning datasets (excluding _ folders, GCS-dependent, and ru_nsd_isin)...' &&
         FAILED_FILE=/opensanctions/failed_datasets.md &&
         echo '# ❌ Failed Datasets (Zavod Batch Run)' > $$FAILED_FILE &&
         echo '' >> $$FAILED_FILE &&
 
         for file in $(find /opensanctions/datasets -type f -name '*.yml' ! -path '*/_*/*'); do
-          # 내부 데이터(GCS) 의존성 검사
+          BASENAME=$(basename $$file)
+          
+          # ✅ 특정 dataset 제외 (ru_nsd_isin.yml)
+          if [[ $$BASENAME == 'ru_nsd_isin.yml' ]]; then
+            echo '🚫 Skipping excluded dataset: '$$file;
+            continue;
+          fi
+
+          # ⚠️ 내부 데이터(GCS) 의존성 검사
           if grep -q 'fetch_internal_data' $$file; then
             echo '⚠️  Skipping GCS-dependent dataset: '$$file;
             continue;
@@ -66,23 +52,3 @@ services:
 
         echo '🎉 All datasets processed. Failures logged in failed_datasets.md (host directory)'
       "
-
-  web:
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    container_name: zavod-ui
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "80:3000"
-    networks:
-      - appnet
-    environment:
-      ZAVOD_DATABASE_URI: postgresql://postgres:password@db:5432/dev
-      ZAVOD_ALLOW_UNAUTHENTICATED: "true"
-      LANG: en_US.UTF-8
-      TZ: UTC
-    working_dir: /app
-    command: npm run start
