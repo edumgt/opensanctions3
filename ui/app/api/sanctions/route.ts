@@ -56,8 +56,7 @@ export async function GET(req: NextRequest) {
           MAX(CASE WHEN prop = 'sourceUrl' THEN value END) AS source_url
         FROM statement
         WHERE prop IN (
-          'name','alias','birthDate','gender','country','nationality',
-          'firstName','lastName','middleName','passportNumber','id','sourceUrl','address'
+          'name','alias','firstName','lastName'
         )
         GROUP BY canonical_id
       ),
