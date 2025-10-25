@@ -6,8 +6,8 @@ const pool = new Pool({
   host: process.env.DB_HOST || "sa.edumgt.co.kr",
   port: 5432,
   user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "password",
-  database: process.env.DB_NAME || "dev",
+  password: process.env.DB_PASSWORD || "star##!!5836",
+  database: process.env.DB_NAME || "postgres",
 });
 
 interface SanctionRecord {
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
         FROM statement
         WHERE prop IN (
           'name','alias','birthDate','gender','country','nationality',
-          'firstName','lastName','middleName','passportNumber','id','sourceUrl'
+          'firstName','lastName','middleName','passportNumber','id','sourceUrl','address'
         )
         GROUP BY canonical_id
       ),
