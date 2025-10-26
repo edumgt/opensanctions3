@@ -51,12 +51,13 @@ export async function GET(req: NextRequest) {
           STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'firstName' THEN value END, ''), ' · ') AS first_name,
           STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'lastName' THEN value END, ''), ' · ') AS last_name,
           STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'middleName' THEN value END, ''), ' · ') AS middle_name,
+          STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'address' THEN value END, ''), ' · ') AS address,
           MAX(CASE WHEN prop = 'passportNumber' THEN value END) AS passport_number,
           MAX(CASE WHEN prop = 'id' THEN value END) AS id_number,
           MAX(CASE WHEN prop = 'sourceUrl' THEN value END) AS source_url
         FROM statement
         WHERE prop IN (
-          'name','alias','firstName','lastName'
+          'name','alias','firstName','lastName','address'
         )
         GROUP BY canonical_id
       ),
@@ -72,6 +73,7 @@ export async function GET(req: NextRequest) {
       WHERE LOWER(b.name) LIKE $1
          OR LOWER(b.other_name) LIKE $1
          OR LOWER(b.entity_id) LIKE $1
+         OR LOWER(b.address) LIKE $1
       ORDER BY b.name
       LIMIT $2 OFFSET $3;
     `;
@@ -85,7 +87,9 @@ export async function GET(req: NextRequest) {
       FROM (
         SELECT canonical_id
         FROM statement
-        WHERE prop = 'name' AND LOWER(value) LIKE $1
+        WHERE prop IN (
+          'name','alias','firstName','lastName','address'
+        ) AND LOWER(value) LIKE $1
         GROUP BY canonical_id
       ) AS sub;
     `,
