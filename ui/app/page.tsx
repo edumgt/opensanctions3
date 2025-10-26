@@ -64,7 +64,6 @@ export default function SanctionsPage() {
       setPagination(data.pagination);
       setSearched(true);
       setOpenId(null);
-      setSelectedTopic(null); // 검색 시 topic 필터 초기화
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setToast("데이터를 불러오는 중 오류가 발생했습니다.");
@@ -75,18 +74,8 @@ export default function SanctionsPage() {
 
   // ✅ 페이지 이동 시 fetch
   useEffect(() => {
-    if (searched) fetchData(page);
+    if (query.trim().length >= 3) fetchData(page);
   }, [page]);
-
-  // ✅ entity_id 기준 그룹화
-  const groupedData = useMemo(() => {
-    const grouped: Record<string, SanctionRecord[]> = {};
-    results.forEach((r) => {
-      if (!grouped[r.entity_id]) grouped[r.entity_id] = [];
-      grouped[r.entity_id].push(r);
-    });
-    return grouped;
-  }, [results]);
 
   // ✅ Topic 카운트
   const topicCounts = useMemo(() => {
@@ -101,33 +90,6 @@ export default function SanctionsPage() {
     return results.filter((r) => (r.topics || []).includes(selectedTopic));
   }, [results, selectedTopic]);
 
-  // ✅ Pagination 렌더링
-  const renderPagination = () => {
-    if (!pagination) return null;
-    const { page: current, totalPages } = pagination;
-    return (
-      <div className="flex justify-center items-center gap-3 mt-8">
-        <button
-          onClick={() => setPage(current - 1)}
-          disabled={current <= 1 || loading}
-          className="px-3 py-1 border rounded disabled:opacity-40"
-        >
-          ◀ Prev
-        </button>
-        <span className="text-gray-700 font-semibold">
-          {current} / {totalPages}
-        </span>
-        <button
-          onClick={() => setPage(current + 1)}
-          disabled={current >= totalPages || loading}
-          className="px-3 py-1 border rounded disabled:opacity-40"
-        >
-          Next ▶
-        </button>
-      </div>
-    );
-  };
-
   const toggleAccordion = (id: string) => {
     setOpenId(openId === id ? null : id);
   };
@@ -141,7 +103,84 @@ export default function SanctionsPage() {
     }
   };
 
-  // ✅ 실제 렌더링
+  // ✅ 숫자 페이지네이션 (Prev / 1 / 2 / 3 ... / Next)
+  const renderPagination = () => {
+    if (!pagination) return null;
+    const { page: current, totalPages } = pagination;
+    const safeTotal = Math.max(totalPages, 1);
+
+    // ✅ 페이지 범위 계산 (현재 페이지 중심으로 5개 표시)
+    const start = Math.max(1, current - 2);
+    const end = Math.min(safeTotal, current + 2);
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    return (
+      <div className="flex justify-center items-center flex-wrap gap-2 mt-8">
+        {/* Prev 버튼 */}
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={current <= 1 || loading}
+          className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100"
+        >
+          ◀ Prev
+        </button>
+
+        {/* 첫 페이지로 점프 */}
+        {start > 1 && (
+          <>
+            <button
+              onClick={() => setPage(1)}
+              className="px-3 py-1 border rounded hover:bg-blue-100 text-blue-700"
+            >
+              1
+            </button>
+            {start > 2 && <span className="px-2 text-gray-400">...</span>}
+          </>
+        )}
+
+        {/* 페이지 번호 버튼 */}
+        {pages.map((num) => (
+          <button
+            key={num}
+            onClick={() => setPage(num)}
+            disabled={num === current || loading}
+            className={`px-3 py-1 border rounded ${
+              num === current
+                ? "bg-blue-600 text-white border-blue-600"
+                : "hover:bg-blue-50 text-gray-700"
+            }`}
+          >
+            {num}
+          </button>
+        ))}
+
+        {/* 마지막 페이지로 점프 */}
+        {end < safeTotal && (
+          <>
+            {end < safeTotal - 1 && <span className="px-2 text-gray-400">...</span>}
+            <button
+              onClick={() => setPage(safeTotal)}
+              className="px-3 py-1 border rounded hover:bg-blue-100 text-blue-700"
+            >
+              {safeTotal}
+            </button>
+          </>
+        )}
+
+        {/* Next 버튼 */}
+        <button
+          onClick={() => setPage((p) => Math.min(safeTotal, p + 1))}
+          disabled={current >= safeTotal || loading}
+          className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100"
+        >
+          Next ▶
+        </button>
+      </div>
+    );
+  };
+
+  // ✅ 렌더링
   return (
     <main className="min-h-screen flex flex-col bg-white relative">
       {/* 🚨 Toast */}
@@ -159,7 +198,7 @@ export default function SanctionsPage() {
         </div>
       )}
 
-      {/* 🔵 검색 */}
+      {/* 🔵 검색 영역 */}
       <section className="bg-[#2156d4] py-6 text-center">
         <h1 className="text-white text-2xl font-bold mb-4">Search SanctionLab.</h1>
         <div className="flex justify-center px-4">
@@ -247,12 +286,17 @@ export default function SanctionsPage() {
             ];
 
             return (
-              <div key={r.entity_id} className="bg-white border border-gray-200 rounded-md mb-6 shadow-sm">
+              <div
+                key={r.entity_id}
+                className="bg-white border border-gray-200 rounded-md mb-6 shadow-sm"
+              >
                 <button
                   onClick={() => toggleAccordion(r.entity_id)}
                   className="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50"
                 >
-                  <span className="text-xl font-bold text-gray-900">{r.name || r.entity_id}</span>
+                  <span className="text-xl font-bold text-gray-900">
+                    {r.name || r.entity_id}
+                  </span>
                   <span className="text-gray-400 text-sm">
                     {openId === r.entity_id ? "▲" : "▼"}
                   </span>
@@ -260,7 +304,9 @@ export default function SanctionsPage() {
 
                 <div
                   className={`transition-all duration-500 ease-in-out ${
-                    openId === r.entity_id ? "max-h-[1500px] opacity-100" : "max-h-0 opacity-0"
+                    openId === r.entity_id
+                      ? "max-h-[1500px] opacity-100"
+                      : "max-h-0 opacity-0"
                   } overflow-hidden px-6 pb-6`}
                 >
                   <table className="w-full text-sm border-t border-gray-200 mt-3">
