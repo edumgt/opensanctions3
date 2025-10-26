@@ -1,4 +1,3 @@
-// app/api/sanctions/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 
@@ -10,24 +9,6 @@ const pool = new Pool({
   database: process.env.DB_NAME || "postgres",
 });
 
-interface SanctionRecord {
-  entity_id: string;
-  name: string;
-  alias?: string;
-  type?: string; // Organization | Person
-  first_name?: string;
-  last_name?: string;
-  birth_date?: string;
-  gender?: string;
-  nationality?: string;
-  country?: string;
-  address?: string;
-  passport_number?: string;
-  id_number?: string;
-  source_url?: string;
-  topics?: string[];
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim().toLowerCase() || "";
@@ -35,22 +16,32 @@ export async function GET(req: NextRequest) {
   const limit = Number(searchParams.get("limit") || "10");
   const offset = (page - 1) * limit;
 
-  if (!q) return NextResponse.json([]);
+  if (!q)
+    return NextResponse.json({
+      data: [],
+      pagination: { total: 0, page, totalPages: 0 },
+    });
 
   const client = await pool.connect();
-
   try {
-    // ✅ entity_flattened 테이블에서 바로 조회
-    const sql = `
+    const baseSql = `
+      FROM public.entity_flattened
+      WHERE (
+        LOWER(name) LIKE $1::text OR
+        LOWER(alias) LIKE $1::text OR
+        LOWER(entity_id) LIKE $1::text OR
+        LOWER(address) LIKE $1::text
+      )
+    `;
+
+    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
+
+    const dataSql = `
       SELECT
         entity_id,
+        schema,
         name,
         alias,
-        CASE 
-          WHEN LOWER(schema) = 'organization' THEN 'Organization'
-          WHEN LOWER(schema) = 'person' THEN 'Person'
-          ELSE 'Unknown'
-        END AS type,
         first_name,
         last_name,
         birth_date,
@@ -61,46 +52,32 @@ export async function GET(req: NextRequest) {
         passport_number,
         id_number,
         source_url,
-        topics
-      FROM public.entity_flattened
-      WHERE 
-        LOWER(name) LIKE $1 OR
-        LOWER(alias) LIKE $1 OR
-        LOWER(entity_id) LIKE $1 OR
-        LOWER(address) LIKE $1
+        CASE
+          WHEN topics IS NULL OR trim(topics::text) = '' THEN ARRAY[]::text[]
+          WHEN left(topics::text, 1) = '{' AND right(topics::text, 1) = '}' THEN topics::text[]
+          ELSE string_to_array(replace(topics::text, '"', ''), ',')
+        END AS topics
+      ${baseSql}
       ORDER BY name
-      LIMIT $2 OFFSET $3;
+      LIMIT $2::int OFFSET $3::int;
     `;
 
-    const result = await client.query(sql, [`%${q}%`, limit, offset]);
+    const countParams = [`%${q}%`];
+    const dataParams = [`%${q}%`, limit, offset];
 
-    // ✅ Pagination count
-    const countResult = await client.query(
-      `
-      SELECT COUNT(*) AS total
-      FROM public.entity_flattened
-      WHERE 
-        LOWER(name) LIKE $1 OR
-        LOWER(alias) LIKE $1 OR
-        LOWER(entity_id) LIKE $1 OR
-        LOWER(address) LIKE $1;
-      `,
-      [`%${q}%`]
-    );
-
-    const total = Number(countResult.rows[0]?.total || 0);
+    const countRes = await client.query(countSql, countParams);
+    const total = Number(countRes.rows[0]?.total || 0);
     const totalPages = Math.ceil(total / limit);
 
+    const result = await client.query(dataSql, dataParams);
+
     return NextResponse.json({
-      data: result.rows as SanctionRecord[],
+      data: result.rows,
       pagination: { total, page, totalPages },
     });
   } catch (err) {
     console.error("❌ Query failed:", err);
-    return NextResponse.json(
-      { error: (err as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   } finally {
     client.release();
   }

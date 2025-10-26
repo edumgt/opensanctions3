@@ -45,7 +45,7 @@ export default function SanctionsPage() {
     }
   }, [toast]);
 
-  // ✅ fetchData
+  // ✅ 서버 검색
   const fetchData = async (pageNum = 1) => {
     if (query.trim().length < 3) {
       setToast("3글자 이상 입력하세요");
@@ -64,6 +64,7 @@ export default function SanctionsPage() {
       setPagination(data.pagination);
       setSearched(true);
       setOpenId(null);
+      setSelectedTopic(null); // 검색 시 topic 필터 초기화
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setToast("데이터를 불러오는 중 오류가 발생했습니다.");
@@ -72,12 +73,12 @@ export default function SanctionsPage() {
     }
   };
 
-  // ✅ 페이지 이동 시 자동 fetch
+  // ✅ 페이지 이동 시 fetch
   useEffect(() => {
     if (searched) fetchData(page);
   }, [page]);
 
-  // ✅ entity_id 기준으로 그룹화
+  // ✅ entity_id 기준 그룹화
   const groupedData = useMemo(() => {
     const grouped: Record<string, SanctionRecord[]> = {};
     results.forEach((r) => {
@@ -94,20 +95,13 @@ export default function SanctionsPage() {
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
   }, [results]);
 
-  const toggleAccordion = (id: string) => {
-    setOpenId(openId === id ? null : id);
-  };
+  // ✅ topic 필터 적용된 데이터
+  const filteredResults = useMemo(() => {
+    if (!selectedTopic) return results;
+    return results.filter((r) => (r.topics || []).includes(selectedTopic));
+  }, [results, selectedTopic]);
 
-  const toUrl = (u?: string) => (u ? (/^https?:\/\//i.test(u) ? u : `https://${u}`) : "");
-  const hostOf = (u?: string) => {
-    try {
-      return new URL(toUrl(u)).host;
-    } catch {
-      return u || "";
-    }
-  };
-
-  // ✅ Pagination 버튼
+  // ✅ Pagination 렌더링
   const renderPagination = () => {
     if (!pagination) return null;
     const { page: current, totalPages } = pagination;
@@ -134,6 +128,20 @@ export default function SanctionsPage() {
     );
   };
 
+  const toggleAccordion = (id: string) => {
+    setOpenId(openId === id ? null : id);
+  };
+
+  const toUrl = (u?: string) => (u ? (/^https?:\/\//i.test(u) ? u : `https://${u}`) : "");
+  const hostOf = (u?: string) => {
+    try {
+      return new URL(toUrl(u)).host;
+    } catch {
+      return u || "";
+    }
+  };
+
+  // ✅ 실제 렌더링
   return (
     <main className="min-h-screen flex flex-col bg-white relative">
       {/* 🚨 Toast */}
@@ -184,14 +192,12 @@ export default function SanctionsPage() {
       <div className="flex flex-col md:flex-row flex-grow w-full">
         {/* 왼쪽 카드 목록 */}
         <div className="w-full md:w-3/5 p-6 overflow-y-auto">
-          {searched && Object.keys(groupedData).length === 0 && !loading && (
+          {searched && filteredResults.length === 0 && !loading && (
             <p className="text-center text-red-500 font-medium">No results found.</p>
           )}
 
-          {Object.entries(groupedData).map(([entityId, records]) => {
-            const r = records[0];
-            const topics = Array.from(new Set(records.flatMap((r) => r.topics || [])));
-
+          {filteredResults.map((r) => {
+            const topics = Array.from(new Set(r.topics || []));
             const rows: [string, React.ReactNode][] = [
               ["Entity ID", r.entity_id],
               ["Schema", r.schema],
@@ -241,41 +247,28 @@ export default function SanctionsPage() {
             ];
 
             return (
-              <div
-                key={entityId}
-                className="bg-white border border-gray-200 rounded-md mb-6 shadow-sm"
-              >
-                {/* 제목 */}
+              <div key={r.entity_id} className="bg-white border border-gray-200 rounded-md mb-6 shadow-sm">
                 <button
-                  onClick={() => toggleAccordion(entityId)}
+                  onClick={() => toggleAccordion(r.entity_id)}
                   className="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50"
                 >
-                  <span className="text-xl font-bold text-gray-900">
-                    {r.name || r.entity_id}
-                  </span>
+                  <span className="text-xl font-bold text-gray-900">{r.name || r.entity_id}</span>
                   <span className="text-gray-400 text-sm">
-                    {openId === entityId ? "▲" : "▼"}
+                    {openId === r.entity_id ? "▲" : "▼"}
                   </span>
                 </button>
 
-                {/* 상세 */}
                 <div
                   className={`transition-all duration-500 ease-in-out ${
-                    openId === entityId
-                      ? "max-h-[1500px] opacity-100"
-                      : "max-h-0 opacity-0"
+                    openId === r.entity_id ? "max-h-[1500px] opacity-100" : "max-h-0 opacity-0"
                   } overflow-hidden px-6 pb-6`}
                 >
                   <table className="w-full text-sm border-t border-gray-200 mt-3">
                     <tbody>
                       {rows.map(([label, value]) => (
                         <tr key={label} className="border-b border-gray-100">
-                          <td className="py-2 font-medium w-40 text-gray-700">
-                            {label}
-                          </td>
-                          <td className="py-2 text-gray-800 break-words">
-                            {value || "-"}
-                          </td>
+                          <td className="py-2 font-medium w-40 text-gray-700">{label}</td>
+                          <td className="py-2 text-gray-800 break-words">{value || "-"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -288,7 +281,7 @@ export default function SanctionsPage() {
           {renderPagination()}
         </div>
 
-        {/* 오른쪽 토픽 필터 */}
+        {/* 오른쪽 Topic 필터 */}
         <aside className="w-full md:w-2/5 border-l border-gray-200 p-6 bg-gray-50">
           <h2 className="text-lg font-bold mb-4 text-gray-800">Topics</h2>
           <div className="space-y-2 overflow-y-auto max-h-[80vh] pr-2">
