@@ -15,7 +15,7 @@ services:
       - appnet
     command: >
       bash -c "
-        echo '🚀 Scanning datasets (excluding _ folders, GCS-dependent, and ru_nsd_isin)...' &&
+        echo '🚀 Scanning datasets (excluding _ folders, GCS-dependent, ru_nsd_isin, and cz_business_register)...' &&
         FAILED_FILE=/opensanctions/failed_datasets.md &&
         echo '# ❌ Failed Datasets (Zavod Batch Run)' > $$FAILED_FILE &&
         echo '' >> $$FAILED_FILE &&
@@ -23,8 +23,8 @@ services:
         for file in $(find /opensanctions/datasets -type f -name '*.yml' ! -path '*/_*/*'); do
           BASENAME=$(basename $$file)
           
-          # ✅ 특정 dataset 제외 (ru_nsd_isin.yml)
-          if [[ $$BASENAME == 'ru_nsd_isin.yml' ]]; then
+          # ✅ 특정 dataset 제외 (ru_nsd_isin.yml, cz_business_register.yml)
+          if [[ $$BASENAME == 'ru_nsd_isin.yml' || $$BASENAME == 'cz_business_register.yml' ]]; then
             echo '🚫 Skipping excluded dataset: '$$file;
             continue;
           fi
