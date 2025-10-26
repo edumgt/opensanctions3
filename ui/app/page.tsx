@@ -3,19 +3,18 @@ import React, { useState, useEffect, useMemo } from "react";
 
 interface SanctionRecord {
   entity_id: string;
+  schema?: string;
   name: string;
-  type?: string;
-  other_name?: string;
+  alias?: string;
+  first_name?: string;
+  last_name?: string;
   birth_date?: string;
   gender?: string;
   nationality?: string;
   country?: string;
-  first_name?: string;
-  last_name?: string;
-  middle_name?: string;
+  address?: string;
   passport_number?: string;
   id_number?: string;
-  address?: string;
   source_url?: string;
   topics?: string[];
 }
@@ -29,7 +28,6 @@ interface Pagination {
 export default function SanctionsPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SanctionRecord[]>([]);
-  const [filtered, setFiltered] = useState<SanctionRecord[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [page, setPage] = useState(1);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -47,7 +45,7 @@ export default function SanctionsPage() {
     }
   }, [toast]);
 
-  // ✅ fetchData (페이지 & 검색어 변경 시 호출)
+  // ✅ fetchData
   const fetchData = async (pageNum = 1) => {
     if (query.trim().length < 3) {
       setToast("3글자 이상 입력하세요");
@@ -63,10 +61,8 @@ export default function SanctionsPage() {
       const data = await res.json();
 
       setResults(data.data);
-      setFiltered(data.data);
       setPagination(data.pagination);
       setSearched(true);
-      setSelectedTopic(null);
       setOpenId(null);
     } catch (err) {
       console.error("❌ Fetch error:", err);
@@ -79,8 +75,17 @@ export default function SanctionsPage() {
   // ✅ 페이지 이동 시 자동 fetch
   useEffect(() => {
     if (searched) fetchData(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
+
+  // ✅ entity_id 기준으로 그룹화
+  const groupedData = useMemo(() => {
+    const grouped: Record<string, SanctionRecord[]> = {};
+    results.forEach((r) => {
+      if (!grouped[r.entity_id]) grouped[r.entity_id] = [];
+      grouped[r.entity_id].push(r);
+    });
+    return grouped;
+  }, [results]);
 
   // ✅ Topic 카운트
   const topicCounts = useMemo(() => {
@@ -88,12 +93,6 @@ export default function SanctionsPage() {
     results.forEach((r) => (r.topics || []).forEach((t) => (acc[t] = (acc[t] || 0) + 1)));
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
   }, [results]);
-
-  // ✅ Topic 필터링
-  useEffect(() => {
-    if (!selectedTopic) setFiltered(results);
-    else setFiltered(results.filter((r) => r.topics?.includes(selectedTopic)));
-  }, [selectedTopic, results]);
 
   const toggleAccordion = (id: string) => {
     setOpenId(openId === id ? null : id);
@@ -144,7 +143,7 @@ export default function SanctionsPage() {
         </div>
       )}
 
-      {/* 🌀 로딩 오버레이 */}
+      {/* 🌀 로딩 */}
       {loading && (
         <div className="fixed inset-0 bg-gray-200/70 z-50 flex flex-col justify-center items-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-gray-500 mb-4"></div>
@@ -152,7 +151,7 @@ export default function SanctionsPage() {
         </div>
       )}
 
-      {/* 🔵 검색 영역 */}
+      {/* 🔵 검색 */}
       <section className="bg-[#2156d4] py-6 text-center">
         <h1 className="text-white text-2xl font-bold mb-4">Search SanctionLab.</h1>
         <div className="flex justify-center px-4">
@@ -165,7 +164,7 @@ export default function SanctionsPage() {
               onKeyDown={(e) => e.key === "Enter" && fetchData(1)}
               placeholder="Search by name or entity..."
               className="flex-grow px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none"
-              style={{ fontSize: "1.1rem", fontWeight: "bold",imeMode: "inactive" }}
+              style={{ fontSize: "1.1rem", fontWeight: "bold", imeMode: "inactive" }}
             />
             <button
               onClick={() => {
@@ -181,135 +180,102 @@ export default function SanctionsPage() {
         </div>
       </section>
 
-      {/* 🧩 본문 */}
+      {/* 🧩 결과 */}
       <div className="flex flex-col md:flex-row flex-grow w-full">
-        {/* 왼쪽 결과 */}
+        {/* 왼쪽 카드 목록 */}
         <div className="w-full md:w-3/5 p-6 overflow-y-auto">
-          {searched && filtered.length === 0 && !loading && (
+          {searched && Object.keys(groupedData).length === 0 && !loading && (
             <p className="text-center text-red-500 font-medium">No results found.</p>
           )}
 
-          {filtered.map((r) => {
-            const id = r.entity_id || r.name;
-            const isCompany =
-              (r.type || "").toLowerCase() === "company" ||
-              (r.name?.toLowerCase() || "").includes("corp") ||
-              (r.name?.toLowerCase() || "").includes("ltd");
+          {Object.entries(groupedData).map(([entityId, records]) => {
+            const r = records[0];
+            const topics = Array.from(new Set(records.flatMap((r) => r.topics || [])));
 
-            const rows: [string, React.ReactNode][] = isCompany
-              ? [
-                ["Type", "Company"],
-                ["Entity ID", r.entity_id],
-                ["Country", r.country],
-                ["Address", r.address],
-                [
-                  "Source link",
-                  r.source_url ? (
-                    <a
-                      href={toUrl(r.source_url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {hostOf(r.source_url)}
-                    </a>
-                  ) : (
-                    "-"
-                  ),
-                ],
-                [
-                  "Topics",
-                  r.topics?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {r.topics.map((t) => (
-                        <span
-                          key={t}
-                          className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    "-"
-                  ),
-                ],
-              ]
-              : [
-                ["Type", "Person"],
-                ["Entity ID", r.entity_id],
-                ["Name", r.name],
-                ["Other name", r.other_name],
-                ["Birth date", r.birth_date],
-                ["Gender", r.gender],
-                ["Nationality", r.nationality],
-                ["Country", r.country],
-                ["First name", r.first_name],
-                ["Last name", r.last_name],
-                ["Middle name", r.middle_name],
-                ["Passport number", r.passport_number],
-                ["ID Number", r.id_number],
-                ["Address", r.address],
-                [
-                  "Source link",
-                  r.source_url ? (
-                    <a
-                      href={toUrl(r.source_url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {hostOf(r.source_url)}
-                    </a>
-                  ) : (
-                    "-"
-                  ),
-                ],
-                [
-                  "Topics",
-                  r.topics?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {r.topics.map((t) => (
-                        <span
-                          key={t}
-                          className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded border border-gray-200"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    "-"
-                  ),
-                ],
-              ];
+            const rows: [string, React.ReactNode][] = [
+              ["Entity ID", r.entity_id],
+              ["Schema", r.schema],
+              ["Name", r.name],
+              ["Alias", r.alias],
+              ["First name", r.first_name],
+              ["Last name", r.last_name],
+              ["Birth date", r.birth_date],
+              ["Gender", r.gender],
+              ["Nationality", r.nationality],
+              ["Country", r.country],
+              ["Address", r.address],
+              ["Passport number", r.passport_number],
+              ["ID number", r.id_number],
+              [
+                "Source URL",
+                r.source_url ? (
+                  <a
+                    href={toUrl(r.source_url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {hostOf(r.source_url)}
+                  </a>
+                ) : (
+                  "-"
+                ),
+              ],
+              [
+                "Topics",
+                topics.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {topics.map((t) => (
+                      <span
+                        key={t}
+                        className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded border border-gray-200"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  "-"
+                ),
+              ],
+            ];
 
             return (
               <div
-                key={id}
+                key={entityId}
                 className="bg-white border border-gray-200 rounded-md mb-6 shadow-sm"
               >
                 {/* 제목 */}
                 <button
-                  onClick={() => toggleAccordion(id)}
+                  onClick={() => toggleAccordion(entityId)}
                   className="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50"
                 >
-                  <span className="text-xl font-bold text-gray-900">{r.name}</span>
+                  <span className="text-xl font-bold text-gray-900">
+                    {r.name || r.entity_id}
+                  </span>
                   <span className="text-gray-400 text-sm">
-                    {openId === id ? "▲" : "▼"}
+                    {openId === entityId ? "▲" : "▼"}
                   </span>
                 </button>
 
-                {/* 상세정보 */}
+                {/* 상세 */}
                 <div
-                  className={`transition-all duration-500 ease-in-out ${openId === id ? "max-h-[1300px] opacity-100" : "max-h-0 opacity-0"} overflow-hidden px-6 pb-6`}
+                  className={`transition-all duration-500 ease-in-out ${
+                    openId === entityId
+                      ? "max-h-[1500px] opacity-100"
+                      : "max-h-0 opacity-0"
+                  } overflow-hidden px-6 pb-6`}
                 >
                   <table className="w-full text-sm border-t border-gray-200 mt-3">
                     <tbody>
                       {rows.map(([label, value]) => (
-                        <tr key={String(label)} className="border-b border-gray-100">
-                          <td className="py-2 font-medium w-40 text-gray-700">{label}</td>
-                          <td className="py-2 text-gray-800 break-words">{value || "-"}</td>
+                        <tr key={label} className="border-b border-gray-100">
+                          <td className="py-2 font-medium w-40 text-gray-700">
+                            {label}
+                          </td>
+                          <td className="py-2 text-gray-800 break-words">
+                            {value || "-"}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -335,7 +301,11 @@ export default function SanctionsPage() {
                   onClick={() =>
                     setSelectedTopic(selectedTopic === topic ? null : topic)
                   }
-                  className={`w-full flex justify-between items-center text-left px-3 py-2 rounded-md transition ${selectedTopic === topic ? "bg-blue-600 text-white" : "bg-white hover:bg-blue-50 text-gray-800"}`}
+                  className={`w-full flex justify-between items-center text-left px-3 py-2 rounded-md transition ${
+                    selectedTopic === topic
+                      ? "bg-blue-600 text-white"
+                      : "bg-white hover:bg-blue-50 text-gray-800"
+                  }`}
                 >
                   <span className="font-medium">{topic}</span>
                   <span className="text-sm opacity-70">{count}</span>
