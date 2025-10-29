@@ -13,6 +13,7 @@ DB_CONFIG = {
 
 
 def main():
+    conn = None
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         cur = conn.cursor()
@@ -22,6 +23,7 @@ def main():
         CREATE TABLE IF NOT EXISTS public.entity_flattened (
             entity_id VARCHAR(255) PRIMARY KEY,
             schema VARCHAR(255),
+            dataset VARCHAR(255),
             name VARCHAR(65535),
             alias VARCHAR(65535),
             first_name VARCHAR(65535),
@@ -43,9 +45,9 @@ def main():
         SELECT
             canonical_id AS entity_id,
             MAX(schema) AS schema,
+            MAX(dataset) AS dataset,
             MAX(CASE WHEN prop = 'name' THEN value END) AS name,
 
-            -- ✅ alias 여러 개를 ','로 구분 병합
             STRING_AGG(DISTINCT NULLIF(CASE WHEN prop = 'alias' THEN value END, ''), ', ') AS alias,
 
             MAX(CASE WHEN prop = 'firstName' THEN value END) AS first_name,
@@ -72,12 +74,13 @@ def main():
         print("🚀 Upserting into entity_flattened table...")
         insert_sql = """
         INSERT INTO public.entity_flattened (
-            entity_id, schema, name, alias, first_name, last_name, birth_date, country,
+            entity_id, schema, dataset, name, alias, first_name, last_name, birth_date, country,
             nationality, gender, address, passport_number, id_number, source_url, topics
         ) VALUES %s
         ON CONFLICT (entity_id)
         DO UPDATE SET
             schema = EXCLUDED.schema,
+            dataset = EXCLUDED.dataset,
             name = EXCLUDED.name,
             alias = EXCLUDED.alias,
             first_name = EXCLUDED.first_name,
@@ -100,7 +103,8 @@ def main():
     except Exception as e:
         print("❌ Error during batch processing:")
         traceback.print_exc(file=sys.stdout)
-        conn.rollback()
+        if conn:
+            conn.rollback()
     finally:
         if conn:
             cur.close()
