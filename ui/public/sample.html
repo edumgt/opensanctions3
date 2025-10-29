@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>사업관리 시스템</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-grid.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-theme-alpine.css" />
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Pretendard','Noto Sans KR',sans-serif;
+  background-color: #f9fafc;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header / LNB */
+header{display:flex;justify-content:space-between;align-items:center;background:#1e293b;color:#fff;padding:12px 24px;font-size:16px;}
+.hamburger{font-size:22px;cursor:pointer;margin-right:20px;}
+nav.gnb{display:flex;gap:32px;}
+nav.gnb a{color:#cbd5e1;text-decoration:none;}
+nav.gnb a.active{color:#fff;border-bottom:2px solid #60a5fa;padding-bottom:2px;}
+aside{position:fixed;top:0;left:0;height:100%;width:240px;background:#f1f5f9;border-right:1px solid #e2e8f0;padding-top:70px;transform:translateX(-100%);transition:.3s;}
+aside.active{transform:translateX(0);}
+aside a{display:block;padding:12px 18px;color:#334155;text-decoration:none;}
+aside a.active{background:#e0f2fe;border-left:4px solid #0ea5e9;font-weight:600;}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.3);display:none;}
+.overlay.active{display:block;}
+
+/* Search */
+main{flex:1;padding:20px;overflow:auto;}
+.search-box{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;background:#fff;padding:14px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:12px;}
+.search-row{display:flex;align-items:center;gap:6px;}
+.search-box label{font-size:13px;color:#374151;font-weight:500;min-width:60px;}
+.search-box input,.search-box select{flex:1;padding:5px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:13px;}
+.search-box button{background:#3b82f6;border:none;color:#fff;border-radius:4px;padding:6px 10px;cursor:pointer;}
+.search-box button:hover{background:#2563eb;}
+
+/* Status Filter */
+.status-filter{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;}
+.status-list{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.status-filter label{font-size:13px;display:flex;align-items:center;gap:4px;}
+.status-filter input[type="checkbox"]{accent-color:#2563eb;transform:scale(1.1);}
+.toggle-all{background:#2563eb;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:13px;}
+.toggle-all:hover{background:#1e40af;}
+
+/* Grid */
+.ag-theme-alpine{height:calc(100vh - 360px);width:100%;}
+.status-green{color:#22c55e;font-weight:600;}
+.status-blue{color:#0ea5e9;font-weight:600;}
+.status-yellow{color:#facc15;font-weight:600;}
+.status-orange{color:#f97316;font-weight:600;}
+.status-purple{color:#8b5cf6;font-weight:600;}
+.status-pink{color:#ec4899;font-weight:600;}
+.status-red{color:#e11d48;font-weight:600;}
+.status-indigo{color:#2563eb;font-weight:600;}
+.status-teal{color:#10b981;font-weight:600;}
+.status-brown{color:#7f1d1d;font-weight:600;}
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;">
+    <span class="hamburger" id="menuToggle">☰</span>
+    <strong>사업관리 시스템</strong>
+  </div>
+  <nav class="gnb">
+    <a href="#" class="active">협력업체관리</a>
+    <a href="#">수주관리</a>
+    <a href="#">예산관리</a>
+    <a href="#">사업관리</a>
+  </nav>
+</header>
+
+<aside id="sidebar">
+  <a href="#" class="active">프로젝트완료보고</a>
+  <a href="#">중점이슈대상관리</a>
+</aside>
+<div class="overlay" id="overlay"></div>
+
+<main>
+  <!-- 검색박스 -->
+  <div class="search-box">
+    <div class="search-row"><label>부서</label><select><option>전체</option></select></div>
+    <div class="search-row"><label>진행상태</label><select><option>전체</option></select></div>
+    <div class="search-row"><label>영업책임자</label><input type="text"><button>🔍</button></div>
+    <div class="search-row"><label>견적책임자</label><input type="text"><button>🔍</button></div>
+    <div class="search-row"><label>프로젝트</label><input type="text"><button>🔍</button></div>
+  </div>
+
+  <!-- 상태 필터 -->
+  <div class="status-filter">
+    <div class="status-list" id="statusFilter">
+      <label><input type="checkbox" value="계약문의" checked> <span style="color:#22c55e;">계약문의</span></label>
+      <label><input type="checkbox" value="계약승인" checked> <span style="color:#0ea5e9;">계약승인</span></label>
+      <label><input type="checkbox" value="예산" checked> <span style="color:#facc15;">예산</span></label>
+      <label><input type="checkbox" value="예산승인" checked> <span style="color:#f97316;">예산승인</span></label>
+      <label><input type="checkbox" value="계약완료" checked> <span style="color:#8b5cf6;">계약완료</span></label>
+      <label><input type="checkbox" value="계약변경승인" checked> <span style="color:#ec4899;">계약변경승인</span></label>
+      <label><input type="checkbox" value="종료" checked> <span style="color:#e11d48;">종료</span></label>
+      <label><input type="checkbox" value="보정" checked> <span style="color:#2563eb;">보정</span></label>
+      <label><input type="checkbox" value="납품" checked> <span style="color:#10b981;">납품</span></label>
+      <label><input type="checkbox" value="타절" checked> <span style="color:#7f1d1d;">타절</span></label>
+    </div>
+    <button class="toggle-all" id="toggleAll">전체 해제</button>
+  </div>
+
+  <!-- GRID -->
+  <div id="myGrid" class="ag-theme-alpine"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/dist/ag-grid-community.min.js"></script>
+<script>
+// ✅ 상태별 색상 클래스
+const statusColors={
+  계약문의:"status-green",계약승인:"status-blue",예산:"status-yellow",예산승인:"status-orange",
+  계약완료:"status-purple",계약변경승인:"status-pink",종료:"status-red",보정:"status-indigo",납품:"status-teal",타절:"status-brown"
+};
+
+// ✅ 다단 헤더 구조
+const columnDefs=[
+  {headerName:"사업실",field:"사업실",width:100},
+  {headerName:"사업부서",field:"사업부서",width:120},
+  {headerName:"PM",field:"PM",width:80},
+  {headerName:"PJT명",field:"PJT명",width:200},
+  {headerName:"CODE",field:"CODE",width:100},
+  {headerName:"발주처",field:"발주처",width:120},
+  {headerName:"계약",children:[
+    {headerName:"시작일",field:"계약시작일",width:120},
+    {headerName:"종료일",field:"계약종료일",width:120},
+    {headerName:"금액",field:"계약금액",width:120},
+    {headerName:"누계청구",field:"누계청구",width:100},
+    {headerName:"누계수금",field:"누계수금",width:100},
+    {headerName:"진도율",field:"진도율",width:80},
+  ]},
+  {headerName:"진행",children:[
+    {headerName:"매출저조",field:"매출저조",width:100},
+    {headerName:"이익감소",field:"이익감소",width:100},
+    {headerName:"중지",field:"중지",width:80},
+    {headerName:"준공지연",field:"준공지연",width:100}
+  ]},
+  {headerName:"채권",children:[
+    {headerName:"일시미수",field:"일시미수",width:100},
+    {headerName:"장기미수",field:"장기미수",width:100},
+    {headerName:"미청구-악성",field:"미청구악성",width:100}
+  ]},
+  {headerName:"기타",children:[
+    {headerName:"소송/가압류/벌점",field:"소송벌점",width:150},
+    {headerName:"대표이슈",field:"대표이슈",width:120}
+  ]},
+  {headerName:"상태",field:"상태",width:120,
+    cellRenderer:(p)=>`<span class="${statusColors[p.value]||""}">${p.value}</span>`}
+];
+
+// ✅ 샘플 데이터
+const rowData=[
+  {사업실:"디지털혁신실",사업부서:"컨설팅본부",PM:"임대웅",PJT명:"대구혁신구 공통서비스",CODE:"210052",발주처:"대구시",계약시작일:"2021-02-25",계약종료일:"2024-12-31",계약금액:1330,누계청구:825,누계수금:435,진도율:"59%",상태:"계약승인"},
+  {사업실:"공공데이터실",사업부서:"AI팀",PM:"이준혁",PJT명:"AI 학습분석 시스템",CODE:"210053",발주처:"교육부",계약시작일:"2022-01-01",계약종료일:"2023-12-31",계약금액:2000,누계청구:1100,누계수금:950,진도율:"82%",상태:"예산승인"},
+  {사업실:"행정정보실",사업부서:"공공사업팀",PM:"박지현",PJT명:"스마트러닝 플랫폼",CODE:"210054",발주처:"행정안전부",계약시작일:"2021-03-15",계약종료일:"2022-12-31",계약금액:1580,누계청구:1400,누계수금:1380,진도율:"100%",상태:"종료"}
+];
+
+// ✅ GRID 초기화
+const gridOptions={columnDefs,rowData,defaultColDef:{resizable:true,sortable:true,filter:true},headerHeight:45,rowHeight:36};
+
+// ✅ 상태 필터
+function applyStatusFilter(){
+  const active=[...document.querySelectorAll('#statusFilter input:checked')].map(i=>i.value);
+  const filtered=rowData.filter(r=>active.includes(r.상태));
+  gridOptions.api.setRowData(filtered);
+}
+document.querySelectorAll('#statusFilter input').forEach(chk=>chk.addEventListener('change',applyStatusFilter));
+document.getElementById('toggleAll').addEventListener('click',()=>{
+  const allChecked=document.querySelectorAll('#statusFilter input:checked').length>0;
+  document.querySelectorAll('#statusFilter input').forEach(c=>c.checked=!allChecked);
+  document.getElementById('toggleAll').textContent=allChecked?"전체 선택":"전체 해제";
+  applyStatusFilter();
+});
+
+// ✅ LNB 메뉴
+document.getElementById('menuToggle').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('active');
+  document.getElementById('overlay').classList.toggle('active');
+});
+document.getElementById('overlay').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.remove('active');
+  document.getElementById('overlay').classList.remove('active');
+});
+
+// ✅ GRID 실행
+document.addEventListener('DOMContentLoaded',()=>new agGrid.Grid(document.getElementById('myGrid'),gridOptions));
+</script>
+</body>
+</html>
