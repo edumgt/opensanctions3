@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";   // ✅ 반드시 추가
 
 interface SanctionRecord {
   entity_id: string;
@@ -37,6 +38,8 @@ export default function SanctionsPage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const LIMIT = 10;
+
+  const router = useRouter();   // ✅ 함수 안에서 선언해야 함
 
   // ✅ 페이지 진입 시 통계만 로드
   useEffect(() => {
@@ -193,7 +196,18 @@ export default function SanctionsPage() {
         {stats ? (
           <div className="flex justify-center gap-8 text-gray-800 font-semibold">
             <span>📄 엔터티 개수: <span className="text-blue-600">{stats.entity_count.toLocaleString()}</span></span>
-            <span>🗂 데이터 소스: <span className="text-green-600">{stats.source_count.toLocaleString()}</span></span>
+            
+            
+            {/* ✅ 데이터 소스 클릭 시 page2로 이동 */}
+            <span
+              className="cursor-pointer hover:text-green-700 transition"
+              onClick={() => router.push("/page2")}
+            >
+              🗂 데이터 소스:{" "}
+              <span className="text-green-600">
+                {stats.source_count.toLocaleString()}
+              </span>
+            </span>
           </div>
         ) : (
           <div className="text-gray-400 text-sm">통계 정보를 불러오는 중...</div>
