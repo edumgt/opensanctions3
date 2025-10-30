@@ -120,32 +120,104 @@ export default function SanctionsPage() {
     fetchStatsOnly();
   }, []);
 
+  // ✅ 1일(24시간) 캐시 유효시간 (밀리초)
+  const CACHE_TTL = 24 * 60 * 60 * 1000; // 1 day
+
   const fetchStatsOnly = async () => {
     try {
+      // ✅ localStorage에서 캐시된 데이터 확인
+      const cached = localStorage.getItem("sanctionStats");
+      const cachedTime = localStorage.getItem("sanctionStats_time");
+
+      if (cached && cachedTime) {
+        const parsed = JSON.parse(cached);
+        const lastFetch = new Date(cachedTime).getTime();
+        const now = Date.now();
+
+        // ✅ 1일 이내면 캐시 사용
+        if (now - lastFetch < CACHE_TTL) {
+          console.log("🟢 Using cached stats from localStorage:", parsed);
+          setStats(parsed);
+          return;
+        }
+      }
+
+      // ✅ 캐시가 없거나 만료된 경우 → 서버에서 새로 가져오기
+      console.log("🔄 Fetching new stats from server...");
       const res = await fetch(`/api/sanctions`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setStats(data.stats || null);
+
+      const newStats = data.stats || null;
+      setStats(newStats);
+
+      // ✅ localStorage에 캐시 저장
+      localStorage.setItem("sanctionStats", JSON.stringify(newStats));
+      localStorage.setItem("sanctionStats_time", new Date().toISOString());
+
+      console.log("✅ Cached new stats at:", new Date().toISOString());
     } catch (err) {
       console.error("❌ Stats fetch error:", err);
     }
   };
 
+
   const fetchData = async (pageNum = 1) => {
-    if (query.trim().length < 3) {
-      setToast("3글자 이상 입력하세요");
+    // ✅ Advanced 조건 확인
+    const filters = {
+      type: typeList.filter((t) => selectedDatasets.includes(t)), // Type 선택 (typeList 내 선택된 것)
+      country: selectedCountry || null,
+      dataset: selectedDatasets || [],
+    };
+
+    const hasAdvanced =
+      filters.type.length > 0 ||
+      !!filters.country ||
+      filters.dataset.length > 0;
+
+    // ✅ 검색어 or Advanced 조건 필수
+    if (!hasAdvanced && query.trim().length < 3) {
+      setToast("3글자 이상 입력하거나 Advanced 조건을 설정하세요");
       return;
     }
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/sanctions?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${LIMIT}`);
+      let res;
+
+      if (hasAdvanced) {
+        // ✅ Advanced 검색 호출
+        res = await fetch(`/api/advanced_search?page=${pageNum}&limit=${LIMIT}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, filters }),
+        });
+      } else {
+        // ✅ 일반 검색
+        res = await fetch(
+          `/api/sanctions?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${LIMIT}`
+        );
+      }
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
-      setResults(data.data);
-      setPagination(data.pagination);
+      console.log("✅ 검색 결과:", data);
+
+      setResults(data.data || []);
+      setPagination(data.pagination || null);
       setStats(data.stats || null);
       setSearched(true);
       setSelectedRecord(null);
       setPage(pageNum);
+
+      // ✅ 검색 완료 후 Advanced 조건 초기화
+      setSelectedCountry(null);
+      setSelectedDatasets([]);
+      setTypeList([]);
+      setActiveMenu("none");
+      localStorage.removeItem("advancedFilters");
+
     } catch (err) {
       console.error("❌ Fetch error:", err);
       setToast("데이터를 불러오는 중 오류가 발생했습니다.");
@@ -153,6 +225,7 @@ export default function SanctionsPage() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (searched) fetchData(page);
@@ -167,9 +240,25 @@ export default function SanctionsPage() {
 
   const topicCounts = useMemo(() => {
     const acc: Record<string, number> = {};
-    results.forEach((r) => (r.topics || []).forEach((t) => (acc[t] = (acc[t] || 0) + 1)));
+
+    (results || []).forEach((r) => {
+      // topics가 배열이 아닐 가능성까지 대비
+      const topics = Array.isArray(r.topics)
+        ? r.topics
+        : typeof r.topics === "string"
+        ? r.topics.split(",").map((t) => t.trim())
+        : [];
+
+      topics.forEach((t) => {
+        if (t) acc[t] = (acc[t] || 0) + 1;
+      });
+    });
+
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
   }, [results]);
+
+
+
 
   const filteredResults = useMemo(() => {
     if (!selectedTopic) return results;
@@ -343,7 +432,7 @@ export default function SanctionsPage() {
                               value={c.code}
                               checked={selectedCountry === c.name}
                               onChange={() => {
-                                setSelectedCountry(c.name);
+                                setSelectedCountry(c.code);
                                 fetchDatasetList(c.code); // ✅ code 기준 dataset 조회
                                 setActiveMenu("dataset"); // ✅ 다음 단계로 이동
                               }}
@@ -419,14 +508,14 @@ export default function SanctionsPage() {
         {stats ? (
           <div className="flex justify-center gap-8 text-gray-800 font-semibold">
             <span>
-              📄 엔터티 개수:{" "}
+              - 엔터티 개수:{" "}
               <span className="text-blue-600">{stats.entity_count.toLocaleString()}</span>
             </span>
             <span
               className="cursor-pointer hover:text-green-700 transition"
               onClick={() => router.push("/page2")}
             >
-              🗂 데이터 소스:{" "}
+              - 데이터 소스:{" "}
               <span className="text-green-600">{stats.source_count.toLocaleString()}</span>
             </span>
           </div>
@@ -448,8 +537,20 @@ export default function SanctionsPage() {
               <>
                 <h2 className="text-2xl font-bold mb-2">{selectedRecord.name}</h2>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {(selectedRecord.topics || []).map((t) => (
-                    <span key={t} className="bg-yellow-200 text-gray-800 text-sm px-2 py-1 rounded">
+                  {(
+                    Array.isArray(selectedRecord.topics)
+                      ? selectedRecord.topics
+                      : typeof selectedRecord.topics === "string"
+                      ? selectedRecord.topics
+                          .replace(/[{}"]/g, "") // PostgreSQL 배열 표기 제거
+                          .split(",")
+                          .map((t) => t.trim())
+                      : []
+                  ).map((t) => (
+                    <span
+                      key={t}
+                      className="bg-yellow-200 text-gray-800 text-sm px-2 py-1 rounded"
+                    >
                       {t}
                     </span>
                   ))}
@@ -508,15 +609,27 @@ export default function SanctionsPage() {
                         <span className="text-sm text-gray-500">{r.country || "-"}</span>
                       </div>
                       <div className="flex flex-wrap gap-1 mt-1 text-sm text-gray-700">
-                        {(r.topics || []).slice(0, 3).map((t) => (
-                          <span
-                            key={t}
-                            className="px-2 py-0.5 bg-yellow-200 rounded border border-yellow-300"
-                          >
-                            {t}
-                          </span>
-                        ))}
+                        {(
+                          Array.isArray(r.topics)
+                            ? r.topics
+                            : typeof r.topics === "string"
+                            ? r.topics
+                                .replace(/[{}"]/g, "") // PostgreSQL 배열 표기 제거
+                                .split(",")
+                                .map((t) => t.trim())
+                            : []
+                        )
+                          .slice(0, 3)
+                          .map((t) => (
+                            <span
+                              key={t}
+                              className="px-2 py-0.5 bg-yellow-200 rounded border border-yellow-300"
+                            >
+                              {t}
+                            </span>
+                          ))}
                       </div>
+
                     </li>
                   ))}
                 </ul>

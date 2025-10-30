@@ -14,10 +14,16 @@ export async function GET() {
   try {
     const client = await pool.connect();
     const result = await client.query(`
-      SELECT code, nation_kor
-      FROM public.nation_code
-      WHERE nation_kor IS NOT NULL AND nation_kor <> ''
-      ORDER BY nation_kor;
+      SELECT 
+        DISTINCT 
+        SUBSTRING(e.dataset FROM 1 FOR 2) AS prefix,
+        n.code,
+        n.nation_kor
+      FROM public.entity_flattened e
+      JOIN public.nation_code n
+        ON LOWER(SUBSTRING(e.dataset FROM 1 FOR 2)) = LOWER(n.code)
+      WHERE e.dataset IS NOT NULL
+      ORDER BY prefix;
     `);
     client.release();
 
