@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 interface SanctionRecord {
   entity_id: string;
   schema?: string;
+  dataset?: string;
   name: string;
   alias?: string;
   first_name?: string;
@@ -41,11 +42,11 @@ export default function SanctionsPage() {
   const router = useRouter();
 
   // ✅ Advanced 검색 관련 상태
-  const [showAdvancedMenu, setShowAdvancedMenu] = useState(false);
+  // const [showAdvancedMenu, setShowAdvancedMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState<"none" | "main" | "type" | "country" | "dataset">("none");
-  const [showCountryPopup, setShowCountryPopup] = useState(false);
-  const [showDatasetPopup, setShowDatasetPopup] = useState(false);
-  const [showTypePopup, setShowTypePopup] = useState(false);
+  // const [showCountryPopup, setShowCountryPopup] = useState(false);
+  // const [showDatasetPopup, setShowDatasetPopup] = useState(false);
+  // const [showTypePopup, setShowTypePopup] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedDatasets, setSelectedDatasets] = useState<string[]>([]);
 
@@ -102,13 +103,13 @@ export default function SanctionsPage() {
 
 
 
-  const datasets = ["US OFAC", "US FBI", "US STATE", "US DOD", "US DHS"];
-  const allSelected = selectedDatasets.length === datasets.length;
+  // const datasets = ["US OFAC", "US FBI", "US STATE", "US DOD", "US DHS"];
+  // const allSelected = selectedDatasets.length === datasets.length;
 
-  const toggleAll = () => {
-    if (allSelected) setSelectedDatasets([]);
-    else setSelectedDatasets([...datasets]);
-  };
+  // const toggleAll = () => {
+  //   if (allSelected) setSelectedDatasets([]);
+  //   else setSelectedDatasets([...datasets]);
+  // };
 
   const toggleDataset = (ds: string) => {
     setSelectedDatasets((prev) =>
@@ -560,7 +561,11 @@ export default function SanctionsPage() {
                     {[
                       ["Entity ID", selectedRecord.entity_id],
                       ["Schema", selectedRecord.schema],
+                      ["Dataset", selectedRecord.dataset],
                       ["Alias", selectedRecord.alias],
+                      ["First name", selectedRecord.first_name],
+                      ["Last name", selectedRecord.last_name],
+                      
                       ["Birth date", selectedRecord.birth_date],
                       ["Gender", selectedRecord.gender],
                       ["Nationality", selectedRecord.nationality],
@@ -591,6 +596,7 @@ export default function SanctionsPage() {
                     ))}
                   </tbody>
                 </table>
+
               </>
             ) : (
               <>
@@ -604,17 +610,41 @@ export default function SanctionsPage() {
                       onClick={() => setSelectedRecord(r)}
                       className="py-4 px-2 hover:bg-gray-50 cursor-pointer transition"
                     >
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                        <span className="font-bold text-blue-700">{r.name}</span>
-                        <span className="text-sm text-gray-500">{r.country || "-"}</span>
+                      {/* 🔹 이름 + schema/dataset */}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                        <div>
+                          {/* 이름 + 뱃지 한 줄 */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-bold text-blue-700 text-base leading-none">
+                              {r.name}
+                            </span>
+                            {r.schema && (
+                              <span className="inline-flex items-center bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md border border-gray-300">
+                                Schema: {r.schema}
+                              </span>
+                            )}
+                            {r.dataset && (
+                              <span className="inline-flex items-center bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md border border-gray-300">
+                                Dataset: {r.dataset}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 국가 */}
+                        <span className="text-sm text-gray-500 mt-1 sm:mt-0">
+                          {r.country || "-"}
+                        </span>
                       </div>
-                      <div className="flex flex-wrap gap-1 mt-1 text-sm text-gray-700">
+
+                      {/* 🔹 토픽 표시 */}
+                      <div className="flex flex-wrap gap-1 mt-2 text-sm text-gray-700">
                         {(
                           Array.isArray(r.topics)
                             ? r.topics
                             : typeof r.topics === "string"
                             ? r.topics
-                                .replace(/[{}"]/g, "") // PostgreSQL 배열 표기 제거
+                                .replace(/[{}"]/g, "")
                                 .split(",")
                                 .map((t) => t.trim())
                             : []
@@ -629,7 +659,6 @@ export default function SanctionsPage() {
                             </span>
                           ))}
                       </div>
-
                     </li>
                   ))}
                 </ul>
