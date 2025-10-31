@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import NewsPanel from "@/components/NewsPanel";
+
 
 interface SanctionRecord {
   entity_id: string;
@@ -40,19 +42,11 @@ export default function SanctionsPage() {
   const [searched, setSearched] = useState(false);
   const LIMIT = 10;
   const router = useRouter();
-
-  // ✅ Advanced 검색 관련 상태
-  // const [showAdvancedMenu, setShowAdvancedMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState<"none" | "main" | "type" | "country" | "dataset">("none");
-  // const [showCountryPopup, setShowCountryPopup] = useState(false);
-  // const [showDatasetPopup, setShowDatasetPopup] = useState(false);
-  // const [showTypePopup, setShowTypePopup] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedDatasets, setSelectedDatasets] = useState<string[]>([]);
-
   const [typeList, setTypeList] = useState<string[]>([]);
   const [loadingType, setLoadingType] = useState(false);
-  // ✅ Type 목록 로드 함수
   const fetchTypeList = async () => {
     setLoadingType(true);
     try {
@@ -66,8 +60,6 @@ export default function SanctionsPage() {
       setLoadingType(false);
     }
   };
-
-
   const [countryList, setCountryList] = useState<{ code: string; name: string }[]>([]);
   const [loadingCountry, setLoadingCountry] = useState(false);
   const fetchCountryList = async () => {
@@ -83,8 +75,6 @@ export default function SanctionsPage() {
       setLoadingCountry(false);
     }
   };
-
-
   const [datasetList, setDatasetList] = useState<string[]>([]);
   const [loadingDataset, setLoadingDataset] = useState(false);
   const fetchDatasetList = async (code: string) => {
@@ -100,73 +90,45 @@ export default function SanctionsPage() {
       setLoadingDataset(false);
     }
   };
-
-
-
-  // const datasets = ["US OFAC", "US FBI", "US STATE", "US DOD", "US DHS"];
-  // const allSelected = selectedDatasets.length === datasets.length;
-
-  // const toggleAll = () => {
-  //   if (allSelected) setSelectedDatasets([]);
-  //   else setSelectedDatasets([...datasets]);
-  // };
-
   const toggleDataset = (ds: string) => {
     setSelectedDatasets((prev) =>
       prev.includes(ds) ? prev.filter((d) => d !== ds) : [...prev, ds]
     );
   };
-
   useEffect(() => {
     fetchStatsOnly();
   }, []);
-
-  // ✅ 1일(24시간) 캐시 유효시간 (밀리초)
-  const CACHE_TTL = 24 * 60 * 60 * 1000; // 1 day
-
+  const CACHE_TTL = 24 * 60 * 60 * 1000;
   const fetchStatsOnly = async () => {
     try {
-      // ✅ localStorage에서 캐시된 데이터 확인
       const cached = localStorage.getItem("sanctionStats");
       const cachedTime = localStorage.getItem("sanctionStats_time");
-
       if (cached && cachedTime) {
         const parsed = JSON.parse(cached);
         const lastFetch = new Date(cachedTime).getTime();
         const now = Date.now();
-
-        // ✅ 1일 이내면 캐시 사용
         if (now - lastFetch < CACHE_TTL) {
           console.log("🟢 Using cached stats from localStorage:", parsed);
           setStats(parsed);
           return;
         }
       }
-
-      // ✅ 캐시가 없거나 만료된 경우 → 서버에서 새로 가져오기
       console.log("🔄 Fetching new stats from server...");
       const res = await fetch(`/api/sanctions`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-
       const newStats = data.stats || null;
       setStats(newStats);
-
-      // ✅ localStorage에 캐시 저장
       localStorage.setItem("sanctionStats", JSON.stringify(newStats));
       localStorage.setItem("sanctionStats_time", new Date().toISOString());
-
       console.log("✅ Cached new stats at:", new Date().toISOString());
     } catch (err) {
       console.error("❌ Stats fetch error:", err);
     }
   };
-
-
   const fetchData = async (pageNum = 1) => {
-    // ✅ Advanced 조건 확인
     const filters = {
-      type: typeList.filter((t) => selectedDatasets.includes(t)), // Type 선택 (typeList 내 선택된 것)
+      type: typeList.filter((t) => selectedDatasets.includes(t)), 
       country: selectedCountry || null,
       dataset: selectedDatasets || [],
     };
@@ -175,26 +137,20 @@ export default function SanctionsPage() {
       filters.type.length > 0 ||
       !!filters.country ||
       filters.dataset.length > 0;
-
-    // ✅ 검색어 or Advanced 조건 필수
     if (!hasAdvanced && query.trim().length < 3) {
       setToast("3글자 이상 입력하거나 Advanced 조건을 설정하세요");
       return;
     }
-
     setLoading(true);
     try {
       let res;
-
       if (hasAdvanced) {
-        // ✅ Advanced 검색 호출
         res = await fetch(`/api/advanced_search?page=${pageNum}&limit=${LIMIT}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query, filters }),
         });
       } else {
-        // ✅ 일반 검색
         res = await fetch(
           `/api/sanctions?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${LIMIT}`
         );
@@ -524,175 +480,174 @@ export default function SanctionsPage() {
           <div className="text-gray-400 text-sm">통계 정보를 불러오는 중...</div>
         )}
       </div>
-
-      {/* 🧩 검색 결과 */}
-      {!searched ? (
-        <div className="text-center text-gray-400 py-10">
-          🔍 검색어를 입력하고 “Search” 버튼을 눌러주세요.
-        </div>
-      ) : (
-        <div className="flex flex-col md:flex-row flex-grow">
-          {/* 왼쪽: 목록 or 상세 */}
-          <div className="w-full md:w-3/5 p-6 overflow-y-auto">
-            {selectedRecord ? (
-              <>
-                <h2 className="text-2xl font-bold mb-2">{selectedRecord.name}</h2>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {(
-                    Array.isArray(selectedRecord.topics)
+      <div className="flex flex-col md:flex-row flex-grow">
+        {/* 왼쪽: 목록 or 상세 */}
+        <div className="w-full md:w-3/5 p-6 overflow-y-auto">
+            
+          {/* 🧩 검색 결과 */}
+          {!searched ? (
+            <div className="text-center text-gray-400 py-10">
+                🔍 검색어를 입력하고 “Search” 버튼을 눌러주세요.
+            </div>
+          ) : selectedRecord ? (
+            <>
+              <h2 className="text-2xl font-bold mb-2">{selectedRecord.name}</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {(
+                  Array.isArray(selectedRecord.topics)
+                    ? selectedRecord.topics
+                    : typeof selectedRecord.topics === "string"
                       ? selectedRecord.topics
-                      : typeof selectedRecord.topics === "string"
-                      ? selectedRecord.topics
-                          .replace(/[{}"]/g, "") // PostgreSQL 배열 표기 제거
-                          .split(",")
-                          .map((t) => t.trim())
+                        .replace(/[{}"]/g, "") // PostgreSQL 배열 표기 제거
+                        .split(",")
+                        .map((t) => t.trim())
                       : []
-                  ).map((t) => (
-                    <span
-                      key={t}
-                      className="bg-yellow-200 text-gray-800 text-sm px-2 py-1 rounded"
-                    >
-                      {t}
-                    </span>
+                ).map((t) => (
+                  <span
+                    key={t}
+                    className="bg-yellow-200 text-gray-800 text-sm px-2 py-1 rounded"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <table className="w-full text-sm border-t border-gray-200">
+                <tbody>
+                  {[
+                    ["Entity ID", selectedRecord.entity_id],
+                    ["Schema", selectedRecord.schema],
+                    ["Dataset", selectedRecord.dataset],
+                    ["Alias", selectedRecord.alias],
+                    ["First name", selectedRecord.first_name],
+                    ["Last name", selectedRecord.last_name],
+                    ["Birth date", selectedRecord.birth_date],
+                    ["Gender", selectedRecord.gender],
+                    ["Nationality", selectedRecord.nationality],
+                    ["Country", selectedRecord.country],
+                    ["Address", selectedRecord.address],
+                    ["Passport number", selectedRecord.passport_number],
+                    ["ID number", selectedRecord.id_number],
+                    [
+                      "Source URL",
+                      selectedRecord.source_url ? (
+                        <a
+                          href={toUrl(selectedRecord.source_url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {hostOf(selectedRecord.source_url)}
+                        </a>
+                      ) : (
+                        "-"
+                      ),
+                    ],
+                  ].map(([label, value]) => (
+                    <tr key={label}>
+                      <td className="py-2 font-medium w-40 text-gray-600">{label}</td>
+                      <td className="py-2 text-gray-800 break-words">{value || "-"}</td>
+                    </tr>
                   ))}
-                </div>
-                <table className="w-full text-sm border-t border-gray-200">
-                  <tbody>
-                    {[
-                      ["Entity ID", selectedRecord.entity_id],
-                      ["Schema", selectedRecord.schema],
-                      ["Dataset", selectedRecord.dataset],
-                      ["Alias", selectedRecord.alias],
-                      ["First name", selectedRecord.first_name],
-                      ["Last name", selectedRecord.last_name],
-                      
-                      ["Birth date", selectedRecord.birth_date],
-                      ["Gender", selectedRecord.gender],
-                      ["Nationality", selectedRecord.nationality],
-                      ["Country", selectedRecord.country],
-                      ["Address", selectedRecord.address],
-                      ["Passport number", selectedRecord.passport_number],
-                      ["ID number", selectedRecord.id_number],
-                      [
-                        "Source URL",
-                        selectedRecord.source_url ? (
-                          <a
-                            href={toUrl(selectedRecord.source_url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            {hostOf(selectedRecord.source_url)}
-                          </a>
-                        ) : (
-                          "-"
-                        ),
-                      ],
-                    ].map(([label, value]) => (
-                      <tr key={label}>
-                        <td className="py-2 font-medium w-40 text-gray-600">{label}</td>
-                        <td className="py-2 text-gray-800 break-words">{value || "-"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-              </>
-            ) : (
-              <>
-                {filteredResults.length === 0 && !loading && (
-                  <p className="text-center text-red-500 font-medium">No results found.</p>
-                )}
-                <ul className="divide-y divide-gray-200">
-                  {filteredResults.map((r) => (
-                    <li
-                      key={r.entity_id}
-                      onClick={() => setSelectedRecord(r)}
-                      className="py-4 px-2 hover:bg-gray-50 cursor-pointer transition"
-                    >
-                      {/* 🔹 이름 + schema/dataset */}
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                        <div>
-                          {/* 이름 + 뱃지 한 줄 */}
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-bold text-blue-700 text-base leading-none">
-                              {r.name}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <>
+              {filteredResults.length === 0 && !loading && (
+                <p className="text-center text-red-500 font-medium">No results found.</p>
+              )}
+              <ul className="divide-y divide-gray-200">
+                {filteredResults.map((r) => (
+                  <li
+                    key={r.entity_id}
+                    onClick={() => setSelectedRecord(r)}
+                    className="py-4 px-2 hover:bg-gray-50 cursor-pointer transition"
+                  >
+                    {/* 🔹 이름 + schema/dataset */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                      <div>
+                        {/* 이름 + 뱃지 한 줄 */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-bold text-blue-700 text-base leading-none">
+                            {r.name}
+                          </span>
+                          {r.schema && (
+                            <span className="inline-flex items-center bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md border border-gray-300">
+                              Schema: {r.schema}
                             </span>
-                            {r.schema && (
-                              <span className="inline-flex items-center bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md border border-gray-300">
-                                Schema: {r.schema}
-                              </span>
-                            )}
-                            {r.dataset && (
-                              <span className="inline-flex items-center bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md border border-gray-300">
-                                Dataset: {r.dataset}
-                              </span>
-                            )}
-                          </div>
+                          )}
+                          {r.dataset && (
+                            <span className="inline-flex items-center bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md border border-gray-300">
+                              Dataset: {r.dataset}
+                            </span>
+                          )}
                         </div>
-
-                        {/* 국가 */}
-                        <span className="text-sm text-gray-500 mt-1 sm:mt-0">
-                          {r.country || "-"}
-                        </span>
                       </div>
-
-                      {/* 🔹 토픽 표시 */}
-                      <div className="flex flex-wrap gap-1 mt-2 text-sm text-gray-700">
-                        {(
-                          Array.isArray(r.topics)
+                      {/* 국가 */}
+                      <span className="text-sm text-gray-500 mt-1 sm:mt-0">
+                        {r.country || "-"}
+                      </span>
+                    </div>
+                    {/* 🔹 토픽 표시 */}
+                    <div className="flex flex-wrap gap-1 mt-2 text-sm text-gray-700">
+                      {(
+                        Array.isArray(r.topics)
+                          ? r.topics
+                          : typeof r.topics === "string"
                             ? r.topics
-                            : typeof r.topics === "string"
-                            ? r.topics
-                                .replace(/[{}"]/g, "")
-                                .split(",")
-                                .map((t) => t.trim())
+                              .replace(/[{}"]/g, "")
+                              .split(",")
+                              .map((t) => t.trim())
                             : []
-                        )
-                          .slice(0, 3)
-                          .map((t) => (
-                            <span
-                              key={t}
-                              className="px-2 py-0.5 bg-yellow-200 rounded border border-yellow-300"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                {renderPagination()}
-              </>
+                      )
+                        .slice(0, 3)
+                        .map((t) => (
+                          <span
+                            key={t}
+                            className="px-2 py-0.5 bg-yellow-200 rounded border border-yellow-300"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {renderPagination()}
+            </>
+          )}
+        </div>
+
+        {/* ✅ 오른쪽: Topics + News (항상 표시됨) */}
+        <aside className="w-full md:w-2/5 border-l border-gray-200 p-6 bg-gray-50">
+          <h2 className="text-lg font-bold mb-4 text-gray-800">Topics</h2>
+          <div className="space-y-2 overflow-y-auto max-h-[45vh] pr-2">
+            {topicCounts.length === 0 ? (
+              <p className="text-gray-400 text-sm">No topics available</p>
+            ) : (
+              topicCounts.map(([topic, count]) => (
+                <button
+                  key={topic}
+                  onClick={() => setSelectedTopic(selectedTopic === topic ? null : topic)}
+                  className={`w-full flex justify-between items-center text-left px-3 py-2 rounded-md transition ${
+                    selectedTopic === topic
+                      ? "bg-blue-600 text-white"
+                      : "bg-white hover:bg-blue-50 text-gray-800"
+                  }`}
+                >
+                  <span className="font-medium">{topic}</span>
+                  <span className="text-sm opacity-70">{count}</span>
+                </button>
+              ))
             )}
           </div>
 
-          {/* 오른쪽: Topics */}
-          <aside className="w-full md:w-2/5 border-l border-gray-200 p-6 bg-gray-50">
-            <h2 className="text-lg font-bold mb-4 text-gray-800">Topics</h2>
-            <div className="space-y-2 overflow-y-auto max-h-[80vh] pr-2">
-              {topicCounts.length === 0 ? (
-                <p className="text-gray-400 text-sm">No topics available</p>
-              ) : (
-                topicCounts.map(([topic, count]) => (
-                  <button
-                    key={topic}
-                    onClick={() => setSelectedTopic(selectedTopic === topic ? null : topic)}
-                    className={`w-full flex justify-between items-center text-left px-3 py-2 rounded-md transition ${
-                      selectedTopic === topic
-                        ? "bg-blue-600 text-white"
-                        : "bg-white hover:bg-blue-50 text-gray-800"
-                    }`}
-                  >
-                    <span className="font-medium">{topic}</span>
-                    <span className="text-sm opacity-70">{count}</span>
-                  </button>
-                ))
-              )}
-            </div>
-          </aside>
-        </div>
-      )}
+          <div className="my-4 border-t border-gray-300"></div>
+
+          <h2 className="text-lg font-bold mb-3 text-gray-800">📰 Latest News</h2>
+          <NewsPanel />
+        </aside>
+      </div>
     </main>
   );
 }
