@@ -159,3 +159,17 @@ footer {
   visibility: hidden !important;
   opacity: 0 !important;
 }
+
+
+/* ✅ Next.js 개발용 Overlay 완전 차단 */
+#__next-dev-overlay,
+[data-next-overlay],
+#__next-build-watcher,
+#__next-build-error,
+#__next-prerender-indicator,
+#__next-build-indicator {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}

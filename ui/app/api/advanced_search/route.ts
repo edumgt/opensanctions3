@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         ? filters.dataset
         : [filters.dataset];
       const datasetConditions = datasetArray
-        .map((_, i) => `LOWER(dataset) LIKE $${params.length + i + 1}`)
+        .map((_: string, i: number) => `LOWER(dataset) LIKE $${params.length + i + 1}`)
         .join(" OR ");
       params.push(...datasetArray.map((d: string) => `%${d.toLowerCase()}%`));
       whereClauses.push(`(${datasetConditions})`);
