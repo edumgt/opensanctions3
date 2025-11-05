@@ -24,7 +24,7 @@ services:
           BASENAME=$(basename $$file)
           
           
-          if [[ $$BASENAME == 'ru_nsd_isin.yml' || $$BASENAME == 'cz_business_register.yml' || $$BASENAME == 'us_corpwatch.yml' || $$BASENAME == 'lv_business_register.yml' || $$BASENAME == 'lv_business_register.yml' || $$BASENAME == 'md_companies.yml' || $$BASENAME == 'gb_fca_firds.yml' ]]; then
+          if [[ $$BASENAME == 'ru_nsd_isin.yml' || $$BASENAME == 'cz_business_register.yml' || $$BASENAME == 'us_corpwatch.yml' || $$BASENAME == 'lv_business_register.yml' || $$BASENAME == 'lv_business_register.yml' || $$BASENAME == 'md_companies.yml' || $$BASENAME == 'gb_fca_firds.yml' || $$BASENAME == 'cy_companies.yml' ]]; then
             echo '🚫 Skipping excluded dataset: '$$file;
             continue;
           fi
