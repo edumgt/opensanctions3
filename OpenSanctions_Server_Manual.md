@@ -32,6 +32,8 @@ sudo vi /etc/postgresql/16/main/pg_hba.conf
 sudo systemctl restart postgresql
 ```
 **설명:** PostgreSQL 16 설치 및 원격 접속 설정.
+### postgres / star##!!5836 으로 접속
+
 
 ---
 
@@ -48,6 +50,7 @@ sudo vi /etc/vsftpd.conf
 sudo systemctl restart vsftpd
 ```
 **설명:** FTP 업로드 전용 사용자 및 디렉토리 구성.
+### ftpuser / star##!!5836 으로 접속
 
 ---
 
