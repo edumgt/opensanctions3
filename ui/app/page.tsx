@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import NewsPanel from "@/components/NewsPanel";
+
 
 
 interface SanctionRecord {
@@ -47,6 +49,9 @@ export default function SanctionsPage() {
   const [selectedDatasets, setSelectedDatasets] = useState<string[]>([]);
   const [typeList, setTypeList] = useState<string[]>([]);
   const [loadingType, setLoadingType] = useState(false);
+
+  const searchParams = useSearchParams();
+
   const fetchTypeList = async () => {
     setLoadingType(true);
     try {
@@ -182,6 +187,18 @@ export default function SanctionsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if (!id) {
+      // URL에 id가 없으면 상세화면 닫기
+      setSelectedRecord(null);
+    } else {
+      // id가 있으면 해당 데이터 찾아서 표시 (이미 results 안에 있으면 바로 표시)
+      const found = results.find((r) => r.entity_id === id);
+      if (found) setSelectedRecord(found);
+    }
+  }, [searchParams, results]);
 
 
   useEffect(() => {
@@ -572,7 +589,10 @@ export default function SanctionsPage() {
                 {filteredResults.map((r) => (
                   <li
                     key={r.entity_id}
-                    onClick={() => setSelectedRecord(r)}
+                    onClick={() => {
+                      setSelectedRecord(r);
+                      router.push(`?id=${r.entity_id}`, { scroll: false }); // ✅ URL 반영
+                    }}
                     className="py-4 px-2 hover:bg-gray-50 cursor-pointer transition"
                   >
                     {/* 🔹 이름 + schema/dataset */}
