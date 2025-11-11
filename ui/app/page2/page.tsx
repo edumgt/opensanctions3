@@ -8,7 +8,14 @@ export default function Page2() {
   useEffect(() => {
     fetch("/api/stats?sources=true")
       .then((res) => res.json())
-      .then((json) => setData(json.sources || []))
+      .then((json) => {
+        const sources = json.sources || [];
+        // ✅ Dataset 이름 기준으로 알파벳순 정렬
+        const sorted = sources.sort((a, b) =>
+          a.dataset.localeCompare(b.dataset)
+        );
+        setData(sorted);
+      })
       .catch((err) => console.error("❌ Fetch error:", err))
       .finally(() => setLoading(false));
   }, []);
@@ -17,7 +24,7 @@ export default function Page2() {
 
   return (
     <main className="p-8 bg-white min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">🗂 Data Sources</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">🗂 Data Sources (A–Z)</h1>
       <table className="w-full border-collapse border border-gray-200 text-sm">
         <thead className="bg-gray-50 text-gray-700">
           <tr>
