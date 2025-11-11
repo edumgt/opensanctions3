@@ -687,35 +687,43 @@ export default function SanctionsPage() {
           )}
         </div>
 
-        {/* ✅ 오른쪽: Topics + News (항상 표시됨) */}
+        
         <aside className="w-full md:w-2/5 border-l border-gray-200 p-6 bg-gray-50">
-          <h2 className="text-lg font-bold mb-4 text-gray-800">Topics</h2>
-          <div className="space-y-2 overflow-y-auto max-h-[45vh] pr-2">
-            {topicCounts.length === 0 ? (
-              <p className="text-gray-400 text-sm">No topics available</p>
-            ) : (
-              topicCounts.map(([topic, count]) => (
-                <button
-                  key={topic}
-                  onClick={() => setSelectedTopic(selectedTopic === topic ? null : topic)}
-                  className={`w-full flex justify-between items-center text-left px-3 py-2 rounded-md transition ${
-                    selectedTopic === topic
-                      ? "bg-blue-600 text-white"
-                      : "bg-white hover:bg-blue-50 text-gray-800"
-                  }`}
-                >
-                  <span className="font-medium">{topic}</span>
-                  <span className="text-sm opacity-70">{count}</span>
-                </button>
-              ))
-            )}
-          </div>
+          {/* ✅ 상세보기일 때 Topics만 숨김 */}
+          {!selectedRecord && (
+            <>
+              <h2 className="text-lg font-bold mb-4 text-gray-800">Topics</h2>
+              <div className="space-y-2 overflow-y-auto max-h-[45vh] pr-2">
+                {topicCounts.length === 0 ? (
+                  <p className="text-gray-400 text-sm">No topics available</p>
+                ) : (
+                  topicCounts.map(([topic, count]) => (
+                    <button
+                      key={topic}
+                      onClick={() => setSelectedTopic(selectedTopic === topic ? null : topic)}
+                      className={`w-full flex justify-between items-center text-left px-3 py-2 rounded-md transition ${
+                        selectedTopic === topic
+                          ? "bg-blue-600 text-white"
+                          : "bg-white hover:bg-blue-50 text-gray-800"
+                      }`}
+                    >
+                      <span className="font-medium">{topic}</span>
+                      <span className="text-sm opacity-70">{count}</span>
+                    </button>
+                  ))
+                )}
+              </div>
 
-          <div className="my-4 border-t border-gray-300"></div>
+              <div className="my-4 border-t border-gray-300"></div>
+            </>
+          )}
 
+          {/* ✅ NewsPanel은 항상 표시 */}
           <h2 className="text-lg font-bold mb-3 text-gray-800">📰 Latest News</h2>
           <NewsPanel />
         </aside>
+
+        
       </div>
     </main>
   );
