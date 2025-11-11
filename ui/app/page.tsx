@@ -50,6 +50,8 @@ export default function SanctionsPage() {
   const [typeList, setTypeList] = useState<string[]>([]);
   const [loadingType, setLoadingType] = useState(false);
 
+  const [lastSearchKeyword, setLastSearchKeyword] = useState(""); // ✅ 추가
+
   const searchParams = useSearchParams();
 
   const fetchTypeList = async () => {
@@ -172,6 +174,9 @@ export default function SanctionsPage() {
       setSearched(true);
       setSelectedRecord(null);
       setPage(pageNum);
+
+      // ✅ 여기에 추가!
+      setLastSearchKeyword(query);
 
       // ✅ 검색 완료 후 Advanced 조건 초기화
       setSelectedCountry(null);
@@ -630,7 +635,7 @@ export default function SanctionsPage() {
               {searched && !selectedRecord && (
                 <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-md shadow-sm">
                   <div className="text-lg font-bold text-gray-800">
-                    <span className="text-blue-700 text-xl">“{query}”</span>
+                    <span className="text-blue-700 text-xl">“{lastSearchKeyword}”</span> {/* ✅ 변경 */}
                     <span className="ml-2 text-gray-800">키워드 검색 결과</span>{" "}
                     <span className="text-green-700 text-xl">
                       {pagination?.total?.toLocaleString() || 0}
@@ -639,6 +644,7 @@ export default function SanctionsPage() {
                   </div>
                 </div>
               )}
+
 
               
               <ul className="divide-y divide-gray-200">
