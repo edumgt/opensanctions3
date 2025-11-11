@@ -344,7 +344,7 @@ export default function SanctionsPage() {
 
       {/* 🔍 검색 영역 */}
       <section className="bg-[#2156d4] py-6 text-center relative z-30">
-        <h1 className="text-white text-2xl font-bold mb-4">Search SanctionLab.</h1>
+        <h1 className="text-white text-2xl font-bold mb-4">Search SanctionLab</h1>
         <div className="flex justify-center px-4 relative">
           {/* ✅ overflow-hidden 제거 */}
           <div className="flex w-full max-w-2xl bg-white rounded-md shadow-md overflow-visible relative">

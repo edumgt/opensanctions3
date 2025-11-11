@@ -5,7 +5,7 @@ import Navigation from "@/components/layout/Navigation";
 export const metadata = {
   title: "SanctionLab | Entity Intelligence Platform",
   description:
-    "Explore sanctions, compliance, and entity intelligence powered by SanctionLab.",
+    "Explore sanctions, compliance, and entity intelligence powered by SanctionLab",
 };
 
 export default function RootLayout({

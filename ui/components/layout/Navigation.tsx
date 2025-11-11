@@ -42,7 +42,7 @@ export default function Navigation() {
                 marginLeft: "10px",
               }}
             >
-              SanctionLab.
+              SanctionLab
             </span>
           </NavbarBrand>
         </Link>
