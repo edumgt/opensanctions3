@@ -535,12 +535,13 @@ export default function SanctionsPage() {
               <span className="text-blue-600">{stats.entity_count.toLocaleString()}</span>
             </span>
             <span
-              className="cursor-pointer hover:text-green-700 transition"
+              className="cursor-pointer text-green-700 hover:text-green-800 underline underline-offset-2 decoration-green-600 transition"
               onClick={() => router.push("/page2")}
             >
               - 데이터 소스:{" "}
-              <span className="text-green-600">{stats.source_count.toLocaleString()}</span>
+              <span className="font-semibold">{stats.source_count.toLocaleString()}</span>
             </span>
+
           </div>
         ) : (
           <div className="text-gray-400 text-sm">통계 정보를 불러오는 중...</div>
@@ -622,6 +623,24 @@ export default function SanctionsPage() {
               {filteredResults.length === 0 && !loading && (
                 <p className="text-center text-red-500 font-medium">No results found.</p>
               )}
+              
+              
+
+              {/* ✅ 검색 결과 요약 */}
+              {searched && !selectedRecord && (
+                <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-md shadow-sm">
+                  <div className="text-lg font-bold text-gray-800">
+                    <span className="text-blue-700 text-xl">“{query}”</span>
+                    <span className="ml-2 text-gray-800">키워드 검색 결과</span>{" "}
+                    <span className="text-green-700 text-xl">
+                      {pagination?.total?.toLocaleString() || 0}
+                    </span>
+                    건
+                  </div>
+                </div>
+              )}
+
+              
               <ul className="divide-y divide-gray-200">
                 {filteredResults.map((r) => (
                   <li
