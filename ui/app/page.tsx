@@ -235,8 +235,15 @@ export default function SanctionsPage() {
     if (!pagination) return null;
     const { page: current, totalPages } = pagination;
     const safeTotal = Math.max(totalPages, 1);
+    const pagesPerBlock = 5;
+
+    // 현재 블록 계산 (1~5, 6~10, ...)
+    const currentBlock = Math.ceil(current / pagesPerBlock);
+    const startPage = (currentBlock - 1) * pagesPerBlock + 1;
+    const endPage = Math.min(startPage + pagesPerBlock - 1, safeTotal);
+
     const pages = [];
-    for (let i = Math.max(1, current - 2); i <= Math.min(safeTotal, current + 2); i++) pages.push(i);
+    for (let i = startPage; i <= endPage; i++) pages.push(i);
 
     return (
       <div className="flex justify-center items-center gap-2 mt-6">
@@ -247,16 +254,20 @@ export default function SanctionsPage() {
         >
           ◀ Prev
         </button>
+
         {pages.map((num) => (
           <button
             key={num}
             onClick={() => setPage(num)}
             disabled={num === current}
-            className={`px-3 py-1 border rounded ${num === current ? "bg-blue-600 text-white" : "hover:bg-blue-50"}`}
+            className={`px-3 py-1 border rounded ${
+              num === current ? "bg-blue-600 text-white" : "hover:bg-blue-50"
+            }`}
           >
             {num}
           </button>
         ))}
+
         <button
           onClick={() => setPage((p) => Math.min(safeTotal, p + 1))}
           disabled={current >= safeTotal || loading}
@@ -267,6 +278,7 @@ export default function SanctionsPage() {
       </div>
     );
   };
+
 
   return (
     <main className="min-h-screen flex flex-col bg-white relative">
@@ -343,7 +355,7 @@ export default function SanctionsPage() {
                   ) : (
                     <>
                       
-                      <div className="max-h-48 overflow-y-auto border-t border-gray-100 pt-2">
+                      <div className="max-h-72 overflow-y-auto border-t border-gray-100 pt-2">
                         {typeList.map((schema) => (
                           <label key={schema} className="flex items-center text-sm mb-1">
                             <input
@@ -377,7 +389,7 @@ export default function SanctionsPage() {
                       <div className="border-b border-gray-100 pb-2 mb-2 font-semibold text-sm text-gray-600">
                         Country 선택 (1개)
                       </div>
-                      <div className="max-h-48 overflow-y-auto border-t border-gray-100 pt-2">
+                      <div className="max-h-72 overflow-y-auto border-t border-gray-100 pt-2">
                         {countryList.map((c) => (
                           <label
                             key={c.code}
@@ -428,7 +440,7 @@ export default function SanctionsPage() {
                           전체체크 ({selectedCountry})
                         </span>
                       </div>
-                      <div className="max-h-48 overflow-y-auto border-t border-gray-100 pt-2">
+                      <div className="max-h-72 overflow-y-auto border-t border-gray-100 pt-2">
                         {datasetList.map((ds) => (
                           <label key={ds} className="flex items-center text-sm mb-1">
                             <input
