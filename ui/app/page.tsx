@@ -252,26 +252,46 @@ export default function SanctionsPage() {
     if (!pagination) return null;
     const { page: current, totalPages } = pagination;
     const safeTotal = Math.max(totalPages, 1);
-    const pagesPerBlock = 5;
+    const maxVisible = 3; // 중앙에 보일 페이지 수
 
-    // 현재 블록 계산 (1~5, 6~10, ...)
-    const currentBlock = Math.ceil(current / pagesPerBlock);
-    const startPage = (currentBlock - 1) * pagesPerBlock + 1;
-    const endPage = Math.min(startPage + pagesPerBlock - 1, safeTotal);
+    const pages: number[] = [];
+    let start = Math.max(1, current - Math.floor(maxVisible / 2));
+    let end = Math.min(safeTotal, start + maxVisible - 1);
 
-    const pages = [];
-    for (let i = startPage; i <= endPage; i++) pages.push(i);
+    // 범위 조정 (끝쪽에서 잘리는 경우 보정)
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) pages.push(i);
 
     return (
       <div className="flex justify-center items-center gap-2 mt-6">
+        {/* ◀ 이전 */}
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={current <= 1 || loading}
           className="px-3 py-1 border rounded disabled:opacity-40"
         >
-          ◀ Prev
+          ◀ 이전
         </button>
 
+        {/* 첫 페이지 */}
+        {start > 1 && (
+          <>
+            <button
+              onClick={() => setPage(1)}
+              className={`px-3 py-1 border rounded ${
+                current === 1 ? "bg-blue-600 text-white" : "hover:bg-blue-50"
+              }`}
+            >
+              1
+            </button>
+            {start > 2 && <span className="px-2 text-gray-500">…</span>}
+          </>
+        )}
+
+        {/* 중앙 페이지들 */}
         {pages.map((num) => (
           <button
             key={num}
@@ -285,16 +305,33 @@ export default function SanctionsPage() {
           </button>
         ))}
 
+        {/* 마지막 페이지 */}
+        {end < safeTotal && (
+          <>
+            {end < safeTotal - 1 && <span className="px-2 text-gray-500">…</span>}
+            <button
+              onClick={() => setPage(safeTotal)}
+              className={`px-3 py-1 border rounded ${
+                current === safeTotal ? "bg-blue-600 text-white" : "hover:bg-blue-50"
+              }`}
+            >
+              {safeTotal}
+            </button>
+          </>
+        )}
+
+        {/* ▶ 다음 */}
         <button
           onClick={() => setPage((p) => Math.min(safeTotal, p + 1))}
           disabled={current >= safeTotal || loading}
           className="px-3 py-1 border rounded disabled:opacity-40"
         >
-          Next ▶
+          다음 ▶
         </button>
       </div>
     );
   };
+
 
 
   return (
