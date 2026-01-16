@@ -98,3 +98,25 @@ PostgreSQL 접속: localhost:5432
   make shell      # 컨테이너 내부 진입
   make crawl      # 기본 파이프라인 실행
   make clean      # 임시 파일 정리
+
+
+## DB 설치 후
+```Powershell
+Get-Content .\opensanctions_schema.sql -Raw | docker exec -i opensanctions3-db-1 psql -U postgres -d dev
+```
+---
+```bash
+docker exec -i opensanctions3-db-1 psql -U postgres -d dev < opensanctions_schema.sql
+```
+## sample data insert
+```
+Get-Content -Raw .\sample_data_insert.sql | docker exec -i opensanctions3-db-1 psql -U postgres -d dev
+```
+
+## 입력 중 오류 시 roll back
+```
+docker exec -it opensanctions3-db-1 psql -U postgres -d dev -c "ROLLBACK;"
+```
+
+## 최종 실습 및 화면 예시
+![alt text](image-1.png)
