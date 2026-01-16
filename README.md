@@ -66,6 +66,22 @@
 
 ---
 
+## 🐳 로컬 Docker 실행 (PostgreSQL 포함)
+
+로컬 Docker 환경에서는 `docker-compose.yml`이 PostgreSQL과 UI를 함께 띄우도록 구성되어 있습니다.  
+`.env`의 `POSTGRES_*` 값을 필요에 따라 변경한 뒤 아래 명령으로 실행하세요.
+
+```bash
+docker compose up -d db
+docker compose run --rm zavod bash -c "export DATABASE_URL=postgresql://postgres:password@db:5432/dev && zavod crawl datasets/nl/terrorism_list/nl_terrorism_list.yml && zavod export datasets/nl/terrorism_list/nl_terrorism_list.yml && zavod load-db datasets/nl/terrorism_list/nl_terrorism_list.yml"
+docker compose up -d web
+```
+
+UI 접속: http://localhost:3000  
+PostgreSQL 접속: localhost:5432
+
+---
+
 ### `start.sh` / `start.ps1`
 - **통합 실행 스크립트** (Linux/Windows)
 - 주요 기능:
