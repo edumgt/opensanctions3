@@ -6,8 +6,8 @@ const pool = new Pool({
   host: process.env.DB_HOST || "sa.edumgt.co.kr",
   port: 5432,
   user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "star##!!5836",
-  database: process.env.DB_NAME || "postgres",
+  password: process.env.DB_PASSWORD || "password",
+  database: process.env.DB_NAME || "dev",
 });
 
 export async function GET(req: NextRequest) {
