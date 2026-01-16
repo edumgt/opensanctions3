@@ -120,3 +120,6 @@ docker exec -it opensanctions3-db-1 psql -U postgres -d dev -c "ROLLBACK;"
 
 ## 최종 실습 및 화면 예시
 ![alt text](image-1.png)
+
+## Chat GPT
+https://chatgpt.com/share/6969debb-a8c8-8007-85a1-8c584ad7daa0
