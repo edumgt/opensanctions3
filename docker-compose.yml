@@ -25,6 +25,7 @@ services:
 
   zavod:
     image: ghcr.io/opensanctions/opensanctions:latest
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     env_file:
       - .env
     environment:

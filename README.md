@@ -82,6 +82,32 @@ PostgreSQL 접속: localhost:5432
 
 ---
 
+## 🐧 WSL Ubuntu 실행 가이드
+
+WSL2 기반 Ubuntu에서 실행하려면 **Docker 엔진이 WSL에 연결**되어 있어야 합니다.
+다음 흐름으로 준비하면 안정적으로 동작합니다.
+
+1. **WSL2 설치 및 Ubuntu 배포판 준비**
+2. **Docker 엔진 준비 (둘 중 하나)**
+   - Docker Desktop 설치 후 **WSL Integration** 활성화
+   - 또는 WSL 내부에 Docker Engine 설치 (`systemd` 활성화 권장)
+3. **WSL 홈 디렉터리에 저장소 클론**
+   - 예: `/home/<user>/opensanctions3` (Windows 파일시스템(`/mnt/c/...`)은 성능 저하 가능)
+4. **Docker 동작 확인**
+   ```bash
+   docker info
+   docker compose version
+   ```
+5. **실행**
+   ```bash
+   ./start.sh
+   ```
+
+> WSL에서는 Linux UID/GID가 중요하므로 `start.sh`가 자동으로 `LOCAL_UID/LOCAL_GID`를 주입해
+> 파일 권한 이슈를 줄입니다. 필요 시 `.env`에 동일 값을 직접 설정해도 됩니다.
+
+---
+
 ### `start.sh` / `start.ps1`
 - **통합 실행 스크립트** (Linux/Windows)
 - 주요 기능:
