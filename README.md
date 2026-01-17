@@ -1,4 +1,4 @@
-# 🧭 OpenSanctions Repository Overview
+# OpenSanctions 
 
 ## 사전에 WSL(WSL2) 설치/관리 + 여러 리눅스 배포판 설치 + Docker Desktop(WSL2) 공유 정리
 
@@ -245,9 +245,6 @@ wsl --shutdown
 후 다시 WSL 실행하면 적용됩니다.
 
 ---
-
-### 변경 이력
-- 2026-01-17: Docker Desktop + WSL2 공유 개념 + WSL 멀티 배포판 설치/관리 명령어를 하나의 문서로 통합
 
 
 ## 🎯 Purpose
