@@ -26,6 +26,29 @@
 
 ---
 
+## 1-1) WSL Ubuntu에서 실행
+
+WSL2 환경에서 실행 시 아래 사항을 먼저 확인하세요.
+
+1. **Docker Desktop WSL Integration** 또는 **WSL 내부 Docker Engine** 구동
+2. 저장소는 **WSL 홈 디렉터리**에 위치 (예: `/home/<user>/opensanctions3`)
+3. Docker 연결 확인
+   ```bash
+   docker info
+   docker compose version
+   ```
+
+그 다음 아래 명령으로 실행합니다.
+
+```bash
+./start.sh
+```
+
+> `start.sh`는 WSL 환경에서 `LOCAL_UID/LOCAL_GID`를 자동 설정하여
+> 권한 문제를 최소화합니다.
+
+---
+
 ## 2) Docker 기반 실행
 
 ### 이미지 빌드
